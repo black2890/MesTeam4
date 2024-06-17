@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Orders Management</title>
+    <!-- Datatables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FullCalendar CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css" rel="stylesheet">
+    <style>
+        /* Center the table */
+        div.dataTables_wrapper {
+            text-align: center;
+        }
+        table.dataTable {
+            margin: 0 auto;
+            width: 80%;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-4">
+    <button type="button" class="btn btn-primary mb-4" data-toggle="modal" data-target="#orderModal">
+        Create Order
+    </button>
+
+    <table id="example" class="display" style="width:100%">
+        <thead>
+        <tr>
+            <th>orderId</th>
+            <th>productName</th>
+            <th>vendorName</th>
+            <th>deliveryAddress</th>
+            <th>deliveryDate</th>
+            <th>status</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<!-- Order Modal -->
+<div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="orderModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="orderModalLabel">Create Order</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="orderForm">
+                    <div class="form-group">
+                        <label for="productName">Product Name</label>
+                        <select class="form-control" id="productName" name="productName" required>
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantity">Quantity</label>
+                        <input type="number" class="form-control" id="quantity" name="quantity" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="vendorName">Customer Name</label>
+                        <select class="form-control" id="vendorName" name="vendorName" required>
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="deliveryDate">Delivery Date</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="deliveryDate" name="deliveryDate" readonly required>
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-outline-secondary" id="selectDeliveryDate">Select Date</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="deliveryAddress">Delivery Address</label>
+                        <input type="text" class="form-control" id="deliveryAddress" name="deliveryAddress" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FullCalendar Modal -->
+<div class="modal fade" id="calendarModal" tabindex="-1" role="dialog" aria-labelledby="calendarModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="max-width:800px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="calendarModalLabel">Select Delivery Date</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="calendar"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Datatables JS -->
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<!-- FullCalendar JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
+<!-- Custom script to load data and handle form -->
+<script>
+    $(document).ready(function () {
+        var table = $('#example').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "/orderData",
+                "type": "POST"
+            },
+            "columns": [
+                {"data": "orderId"},
+                {"data": "productName"},
+                {"data": "vendorName"},
+                {"data": "deliveryAddress"},
+                {"data": "deliveryDate"},
+                {"data": "status"}
+            ]
+        });
+
+        function populateSelects() {
+            $.ajax({
+                url: '/get-products',
+                type: 'GET',
+                success: function(data) {
+                    data.forEach(product => {
+                        $('#productName').append(`<option value="${product.id}">${product.name}</option>`);
+                    });
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+
+            $.ajax({
+                url: '/get-customers',
+                type: 'GET',
+                success: function(data) {
+                    data.forEach(customer => {
+                        $('#vendorName').append(`<option value="${customer.id}">${customer.name}</option>`);
+                    });
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        }
+
+        populateSelects();
+
+        $('#selectDeliveryDate').on('click', function() {
+            $('#calendarModal').modal('show');
+        });
+
+        $('#calendar').fullCalendar({
+            selectable: true,
+            select: function(startDate) {
+                $('#deliveryDate').val(startDate.format('YYYY-MM-DD'));
+                $('#calendarModal').modal('hide');
+            }
+        });
+
+        $('#orderForm').on('submit', function(e) {
+            e.preventDefault();
+            var formData = $(this).serialize();
+            $.ajax({
+                url: '/create-order',  // 서버에 데이터를 보낼 엔드포인트
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    $('#orderModal').modal('hide');
+                    table.ajax.reload();
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
