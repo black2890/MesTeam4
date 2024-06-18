@@ -18,7 +18,10 @@ public class Equipment {
     @GeneratedValue
     private Long equipmentId;
     private String equipmentName;
-    private String equipmentType;
+    //private String equipmentType;
+    private Long processId;
+
+    //나중에 enum 으로 고쳐야 함
     private String product;
 
     private Long productionCapacity;

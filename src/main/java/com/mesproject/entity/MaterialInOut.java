@@ -16,8 +16,13 @@ public class MaterialInOut {
     @GeneratedValue
     private Long inoutId;
 
-    //private Long materialOrderId;
-    //private Long workOrderId;
+    @OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="material_order_id")
+    private MaterialOrders materialOrders;
+
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="orders_plan_id")
+    private OrdersPlan ordersPlan;
 
     private LocalDate expirationDate;
 

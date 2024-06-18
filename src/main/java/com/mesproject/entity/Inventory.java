@@ -12,8 +12,14 @@ public class Inventory {
     @Id
     @GeneratedValue
     private Long inventoryId;
-    // private Long productId;
-    // private Long workPlanId;
+
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="product_id")
+    private Product product;
+
+    @OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="work_plan_id")
+    private WorkPlan workPlan;
 
     private Long quantity;
 

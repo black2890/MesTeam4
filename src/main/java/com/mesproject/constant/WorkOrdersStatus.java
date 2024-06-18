@@ -1,5 +1,6 @@
 package com.mesproject.constant;
 
 public enum WorkOrdersStatus {
-    STORAGECOMPLETED, RETRIEVALCOMPLETED
+
+    PENDING, INPROGRESS,COMPLETED
 }

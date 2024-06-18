@@ -13,6 +13,6 @@ public class BOM {
     @Id
     @GeneratedValue
     private Long bomId;
-    //private Long productId;
-    //private Long materialId;
+    private Long productId;
+    private Long materialId;
 }
