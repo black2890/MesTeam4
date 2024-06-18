@@ -11,14 +11,14 @@ public class DataTableDto {
     private int draw;
     private int recordsTotal;
     private int recordsFiltered;
-    private List<Orders> data;
+    private List<?> data;
 
-    public List<Orders> getData() {
-
-        if (CollectionUtils.isEmpty(data)) {
-            data = new ArrayList();
-        }
-
-        return data;
-    }
+//    public List<Orders> getData() {
+//
+//        if (CollectionUtils.isEmpty(data)) {
+//            data = new ArrayList();
+//        }
+//
+//        return data;
+//    }
 }

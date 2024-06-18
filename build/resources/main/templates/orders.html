@@ -7,8 +7,18 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 </head>
+
 <body>
 
+    <label for="selectBox">검색 조건:</label>
+    <select id="selectBox">
+        <option value="option1">옵션 1</option>
+        <option value="option2">옵션 2</option>
+        <option value="option3">옵션 3</option>
+        <option value="option4">옵션 4</option>
+    </select>
+
+    <input type="text" placeholder="검색어를 입력하세요...">
 
     <table id="ordersTable" class="table table-bordered">
         <thead>
@@ -24,7 +34,6 @@
         </thead>
     </table>
 
-
 </body>
 
 <script>
@@ -33,7 +42,7 @@
         "serverSide":true,
         "processing":true,
         "ajax":{
-            "url":"/ordersData",
+            "url":"/api/ordersData",
             "type":"POST",
             "dataSrc":"data",
         },
@@ -47,6 +56,8 @@
             {"data":"ordersStatus"},
         ]
     });
+
+    $("#ordersTable_filter").attr("hidden", "hidden");
 
 </script>
 </html>

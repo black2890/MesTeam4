@@ -17,4 +17,10 @@ public class ViewController {
 
         return "orders";
     }
+
+    @GetMapping(value="/equipment")
+    public String equipmentsPage() {
+
+        return "equipment";
+    }
 }

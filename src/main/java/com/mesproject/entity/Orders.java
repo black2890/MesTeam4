@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -17,8 +18,9 @@ public class Orders {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
 
-    @JoinColumn
-    private Long productId;
+    @OneToMany
+    @JoinColumn(name = "productId")
+    private List<Product> productId;
     private Long vendorId;
     private Long workPlanId;
     private Long materialOrderId;

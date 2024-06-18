@@ -1,8 +1,6 @@
 package com.mesproject.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,7 +16,10 @@ public class Equipment {
     @GeneratedValue
     private Long equipmentId;
     private String equipmentName;
-    private String equipmentType;
+
+    @JoinColumn(name = "user_id")
+    @ManyToOne
+    private Process processId;
     private String product;
 
     private Long productionCapacity;
