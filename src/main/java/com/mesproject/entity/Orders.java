@@ -17,11 +17,13 @@ public class Orders {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
 
-    @JoinColumn
-    private Long productId;
-    private Long vendorId;
-    private Long workPlanId;
-    private Long materialOrderId;
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
+
+    @ManyToOne
+    @JoinColumn(name = "vendor_id")
+    private Vendor vendor;
 
     private Long quantity;
     private LocalDateTime deliveryDate;
@@ -29,5 +31,15 @@ public class Orders {
 
     @Enumerated(EnumType.STRING)
     private OrdersStatus ordersStatus;
+
+
+
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "work_plan_id")
+//    private WorkPlan workPlan;
+//
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "material_order_id")
+//    private MaterialOrders materialOrder;
 
 }

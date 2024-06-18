@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.Time;
+import java.util.List;
 
 @Entity
 @Getter
@@ -23,4 +24,5 @@ public class Product {
     private Long minProduction;
     private Long maxProduction;
     private Time leadTime;
+
 }

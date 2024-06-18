@@ -16,9 +16,13 @@ public class MaterialOrders {
     @Id
     @GeneratedValue
     private Long materialOrderId;
+
     private Long productId;
+
     private LocalDateTime materialOrderDate;
+
     private LocalDateTime deliveryDate;
+
     private Long quantity;
 
     @Enumerated(EnumType.STRING)

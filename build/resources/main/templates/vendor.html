@@ -27,10 +27,10 @@
     <table id="example" class="display" style="width:100%">
         <thead>
         <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Info</th>
+            <th>업체번호</th>
+            <th>업체명</th>
+            <th>업체유형</th>
+            <th>연락처</th>
         </tr>
         </thead>
         <tbody>
@@ -86,7 +86,7 @@
             "processing": true,
             "serverSide": true,
             "ajax": {
-                "url": "/data",
+                "url": "/vendorData",
                 "type": "POST"
             },
             "columns": [
@@ -113,6 +113,7 @@
                 }
             });
         });
+
     });
 </script>
 </body>

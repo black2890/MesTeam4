@@ -12,7 +12,9 @@ public class Inventory {
     @Id
     @GeneratedValue
     private Long inventoryId;
-    // private Long productId;
+
+    @JoinColumn
+    private Long productId;
     // private Long workPlanId;
 
     private Long quantity;

@@ -18,7 +18,7 @@ public class Equipment {
     @GeneratedValue
     private Long equipmentId;
     private String equipmentName;
-    private String equipmentType;
+    // private String equipmentType;
     private String product;
 
     private Long productionCapacity;

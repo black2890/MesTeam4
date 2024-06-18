@@ -4,6 +4,7 @@ import com.mesproject.entity.Vendor;
 import com.mesproject.constant.vendorType;
 import com.mesproject.repository.VendorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,16 +36,21 @@ public class VendorController {
         return response;
     }
 
-    private vendorType convertToVendorType(String type) {
-        switch (type.toLowerCase()) {
-            case "수주업체":
-                return vendorType.ORDER;
-            case "발주업체":
-                return vendorType.MATERIALORDER;
-            case "배송업체":
-                return vendorType.DELIVERY;
-            default:
-                throw new IllegalArgumentException("Invalid vendor type: " + type);
-        }
+    @GetMapping("/get-vendors")
+    public List<Vendor> getVendor() {
+        return vendorRepository.findAll();
     }
+
+//    private vendorType convertToVendorType(String type) {
+//        switch (type.toLowerCase()) {
+//            case "수주업체":
+//                return vendorType.ORDER;
+//            case "발주업체":
+//                return vendorType.MATERIALORDER;
+//            case "배송업체":
+//                return vendorType.DELIVERY;
+//            default:
+//                throw new IllegalArgumentException("Invalid vendor type: " + type);
+//        }
+//    }
 }
