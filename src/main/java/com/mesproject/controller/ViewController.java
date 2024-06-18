@@ -8,6 +8,13 @@ public class ViewController {
 
     @GetMapping(value = "/")
     public String vendor(){
+
         return "vendor";
+    }
+
+    @GetMapping(value="/orders")
+    public String ordersPage() {
+
+        return "orders";
     }
 }
