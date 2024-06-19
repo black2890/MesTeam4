@@ -92,7 +92,21 @@
             "columns": [
                 {"data": "vendorId"},
                 {"data": "vendorName"},
-                {"data": "vendorType"},
+                {
+                    "data": "vendorType",
+                    "render": function (data, type, row, meta) {
+                        switch (data) {
+                            case 'ORDER':
+                                return '수주업체';
+                            case 'MATERIALORDER':
+                                return '발주업체';
+                            case 'DELIVERY':
+                                return '배송업체';
+                            default:
+                                return data;
+                        }
+                    }
+                },
                 {"data": "contactInfo"}
             ]
         });

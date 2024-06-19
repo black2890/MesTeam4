@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -26,20 +27,12 @@ public class Orders {
     private Vendor vendor;
 
     private Long quantity;
-    private LocalDateTime deliveryDate;
+
+    private LocalDate deliveryDate;
+
     private String deliveryAddress;
 
     @Enumerated(EnumType.STRING)
     private OrdersStatus ordersStatus;
-
-
-
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "work_plan_id")
-//    private WorkPlan workPlan;
-//
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "material_order_id")
-//    private MaterialOrders materialOrder;
 
 }

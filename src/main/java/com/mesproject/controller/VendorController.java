@@ -4,6 +4,10 @@ import com.mesproject.entity.Vendor;
 import com.mesproject.constant.vendorType;
 import com.mesproject.repository.VendorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,12 +33,43 @@ public class VendorController {
     }
 
     @PostMapping("/vendorData")
-    public Map<String, Object> getVendors() {
-        List<Vendor> vendors = vendorRepository.findAll();
+    public Map<String, Object> getVendors(
+            @RequestParam("draw") int draw,
+            @RequestParam("start") int start,
+            @RequestParam("length") int length,
+            @RequestParam("search[value]") String searchValue,
+            @RequestParam("order[0][column]") int orderColumn,
+            @RequestParam("order[0][dir]") String orderDir) {
+
+        int page = start / length;
+        Sort.Direction sortDirection = orderDir.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        String[] columnNames = {"vendorId", "vendorName", "contactName", "phone", "address"};
+        Sort sort = Sort.by(sortDirection, columnNames[orderColumn]);
+        Pageable pageable = PageRequest.of(page, length, sort);
+
+        Page<Vendor> vendorPage;
+        if (searchValue == null || searchValue.isEmpty()) {
+            vendorPage = vendorRepository.findAll(pageable);
+        } else {
+            vendorPage = vendorRepository.findAllByVendorNameContaining(searchValue, pageable);
+        }
+
         Map<String, Object> response = new HashMap<>();
-        response.put("data", vendors); // Datatables expects a "data" field
+        response.put("draw", draw);
+        response.put("recordsTotal", vendorRepository.count());
+        response.put("recordsFiltered", vendorPage.getTotalElements());
+        response.put("data", vendorPage.getContent());
+
         return response;
     }
+
+//    @PostMapping("/vendorData")
+//    public Map<String, Object> getVendors() {
+//        List<Vendor> vendors = vendorRepository.findAll();
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("data", vendors); // Datatables expects a "data" field
+//        return response;
+//    }
 
     @GetMapping("/get-vendors")
     public List<Vendor> getVendor() {

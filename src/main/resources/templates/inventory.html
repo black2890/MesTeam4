@@ -24,7 +24,8 @@
     <table id="example" class="display" style="width:100%">
         <thead>
         <tr>
-            <th>제품번호</th>
+            <th>재고번호</th>
+            <th>제품명</th>
             <th>수량</th>
             <th>상태</th>
             <th>생산완료일</th>
@@ -55,8 +56,21 @@
             },
             "columns": [
                 {"data": "inventoryId"},
+                {"data": "productName"},
                 {"data": "quantity"},
-                {"data": "inventoryStatus"},
+                {
+                    "data": "inventoryStatus",
+                    "render": function (data, type, row, meta) {
+                        switch (data) {
+                            case 'STORAGECOMPLETED':
+                                return '입고완료';
+                            case 'RETRIEVALCOMPLETED':
+                                return '출고완료';
+                            default:
+                                return data;
+                        }
+                    }
+                }
                 // {"data": "completedDate"}
             ]
         });
