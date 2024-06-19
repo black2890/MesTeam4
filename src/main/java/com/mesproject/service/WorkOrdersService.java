@@ -32,79 +32,142 @@ public class WorkOrdersService {
     private final MaterialInOutService materialInOutService;
 
     public List<WorkOrders> createWorkOrders(WorkPlan workPlan){
-       //즙
         List<WorkOrders> workOrdersList = new ArrayList<>();
         LocalDateTime temp = LocalDateTime.now();
 
-        WorkOrders workOrders1 = new WorkOrders();
+        //즙
+        if(workPlan.getProduct().getProductId()==1||workPlan.getProduct().getProductId()==2){
 
-        //세척
-        workOrders1.setProcessType(ProcessType.CLEANING);
-        workOrders1.setDuration(Duration.ofHours(2));
-        workOrders1.setScheduledDate(temp);
-        workOrders1.setWorkOrdersStatus(WorkOrdersStatus.PENDING);
-        workOrdersList.add(workOrders1);
+            //세척
+            WorkOrders workOrders1 = new WorkOrders();
+            workOrders1.setProcessType(ProcessType.CLEANING);
+            workOrders1.setDuration(Duration.ofHours(2));
+            workOrders1.setScheduledDate(temp);
+            workOrders1.setWorkOrdersStatus(WorkOrdersStatus.PENDING);
+            workOrdersList.add(workOrders1);
 
-        //추출
-        temp = temp.plusHours(2);
+            //추출
+            temp = temp.plusHours(2);
 
-        WorkOrders workOrders2 = new WorkOrders();
+            WorkOrders workOrders2 = new WorkOrders();
 
-        workOrders2.setProcessType(ProcessType.EXTRACTION);
-        workOrders2.setDuration(Duration.ofHours(24));
-        workOrders2.setScheduledDate(temp);
-        workOrders2.setWorkOrdersStatus(WorkOrdersStatus.PENDING);
-        workOrdersList.add(workOrders2);
+            workOrders2.setProcessType(ProcessType.EXTRACTION);
+            workOrders2.setDuration(Duration.ofHours(24));
+            workOrders2.setScheduledDate(temp);
+            workOrders2.setWorkOrdersStatus(WorkOrdersStatus.PENDING);
+            workOrdersList.add(workOrders2);
 
-        //여과
-        temp = temp.plusHours(24);
+            //여과
+            temp = temp.plusHours(24);
 
-        WorkOrders workOrders3 = new WorkOrders();
-        workOrders3.setProcessType(ProcessType.FILTRATION);
-        workOrders3.setDuration(Duration.ofHours(4));
-        workOrders3.setScheduledDate(temp);
-        workOrders3.setWorkOrdersStatus(WorkOrdersStatus.PENDING);
-        workOrdersList.add(workOrders3);
+            WorkOrders workOrders3 = new WorkOrders();
+            workOrders3.setProcessType(ProcessType.FILTRATION);
+            workOrders3.setDuration(Duration.ofHours(4));
+            workOrders3.setScheduledDate(temp);
+            workOrders3.setWorkOrdersStatus(WorkOrdersStatus.PENDING);
+            workOrdersList.add(workOrders3);
 
-        //살균
-        temp = temp.plusHours(4);
+            //살균
+            temp = temp.plusHours(4);
 
-        WorkOrders workOrders4 = new WorkOrders();
-        workOrders4.setProcessType(ProcessType.STERILIZATION);
-        workOrders4.setDuration(Duration.ofHours(2));
-        workOrders4.setScheduledDate(temp);
-        workOrders4.setWorkOrdersStatus(WorkOrdersStatus.PENDING);
-        workOrdersList.add(workOrders4);
+            WorkOrders workOrders4 = new WorkOrders();
+            workOrders4.setProcessType(ProcessType.STERILIZATION);
+            workOrders4.setDuration(Duration.ofHours(2));
+            workOrders4.setScheduledDate(temp);
+            workOrders4.setWorkOrdersStatus(WorkOrdersStatus.PENDING);
+            workOrdersList.add(workOrders4);
 
-        //충진
-        temp = temp.plusHours(2);
+            //충진
+            temp = temp.plusHours(2);
 
-        WorkOrders workOrders5 = new WorkOrders();
-        workOrders5.setProcessType(ProcessType.FILLING);
-        workOrders5.setDuration(Duration.ofHours(8));
-        workOrders5.setScheduledDate(temp);
-        workOrders5.setWorkOrdersStatus(WorkOrdersStatus.PENDING);
-        workOrdersList.add(workOrders5);
+            WorkOrders workOrders5 = new WorkOrders();
+            workOrders5.setProcessType(ProcessType.FILLING);
+            workOrders5.setDuration(Duration.ofHours(8));
+            workOrders5.setScheduledDate(temp);
+            workOrders5.setWorkOrdersStatus(WorkOrdersStatus.PENDING);
+            workOrdersList.add(workOrders5);
 
-        //검사
-        temp = temp.plusHours(8);
+            //검사
+            temp = temp.plusHours(8);
 
-        WorkOrders workOrders6 = new WorkOrders();
-        workOrders6.setProcessType(ProcessType.INSPECTION);
-        workOrders6.setDuration(Duration.ofHours(2));
-        workOrders6.setScheduledDate(temp);
-        workOrders6.setWorkOrdersStatus(WorkOrdersStatus.PENDING);
-        workOrdersList.add(workOrders6);
+            WorkOrders workOrders6 = new WorkOrders();
+            workOrders6.setProcessType(ProcessType.INSPECTION);
+            workOrders6.setDuration(Duration.ofHours(2));
+            workOrders6.setScheduledDate(temp);
+            workOrders6.setWorkOrdersStatus(WorkOrdersStatus.PENDING);
+            workOrdersList.add(workOrders6);
 
-        //포장
-        temp = temp.plusHours(2);
+            //포장
+            temp = temp.plusHours(2);
 
-        WorkOrders workOrders7 = new WorkOrders();
-        workOrders7.setProcessType(ProcessType.PACKAGING);
-        workOrders7.setDuration(Duration.ofHours(1));
-        workOrders7.setScheduledDate(temp);
-        workOrders7.setWorkOrdersStatus(WorkOrdersStatus.PENDING);
-        workOrdersList.add(workOrders7);
+            WorkOrders workOrders7 = new WorkOrders();
+            workOrders7.setProcessType(ProcessType.PACKAGING);
+            workOrders7.setDuration(Duration.ofHours(1));
+            workOrders7.setScheduledDate(temp);
+            workOrders7.setWorkOrdersStatus(WorkOrdersStatus.PENDING);
+            workOrdersList.add(workOrders7);
+        }
+        //스틱
+        else if(workPlan.getProduct().getProductId()==3||workPlan.getProduct().getProductId()==4){
+            //혼합
+            WorkOrders workOrders1 = new WorkOrders();
+            workOrders1.setProcessType(ProcessType.MIX);
+            workOrders1.setDuration(Duration.ofHours(8));
+            workOrders1.setScheduledDate(temp);
+            workOrders1.setWorkOrdersStatus(WorkOrdersStatus.PENDING);
+            workOrdersList.add(workOrders1);
+
+            //살균
+            temp = temp.plusHours(8);
+
+            WorkOrders workOrders2 = new WorkOrders();
+            workOrders2.setProcessType(ProcessType.FILTRATION);
+            workOrders2.setDuration(Duration.ofHours(2));
+            workOrders2.setScheduledDate(temp);
+            workOrders2.setWorkOrdersStatus(WorkOrdersStatus.PENDING);
+            workOrdersList.add(workOrders2);
+
+            //충진
+            temp = temp.plusHours(2);
+
+            WorkOrders workOrders3 = new WorkOrders();
+            workOrders3.setProcessType(ProcessType.FILLING);
+            workOrders3.setDuration(Duration.ofHours(2));
+            workOrders3.setScheduledDate(temp);
+            workOrders3.setWorkOrdersStatus(WorkOrdersStatus.PENDING);
+            workOrdersList.add(workOrders3);
+
+            //냉각
+            temp = temp.plusHours(2);
+
+            WorkOrders workOrders4 = new WorkOrders();
+            workOrders4.setProcessType(ProcessType.COOLING);
+            workOrders4.setDuration(Duration.ofHours(8));
+            workOrders4.setScheduledDate(temp);
+            workOrders4.setWorkOrdersStatus(WorkOrdersStatus.PENDING);
+            workOrdersList.add(workOrders4);
+
+            //검사
+            temp = temp.plusHours(8);
+
+            WorkOrders workOrders5 = new WorkOrders();
+            workOrders5.setProcessType(ProcessType.INSPECTION);
+            workOrders5.setDuration(Duration.ofHours(1));
+            workOrders5.setScheduledDate(temp);
+            workOrders5.setWorkOrdersStatus(WorkOrdersStatus.PENDING);
+            workOrdersList.add(workOrders5);
+
+            //포장
+            temp = temp.plusHours(1);
+
+            WorkOrders workOrders6 = new WorkOrders();
+            workOrders6.setProcessType(ProcessType.PACKAGING);
+            workOrders6.setDuration(Duration.ofHours(1));
+            workOrders6.setScheduledDate(temp);
+            workOrders6.setWorkOrdersStatus(WorkOrdersStatus.PENDING);
+            workOrdersList.add(workOrders6);
+
+        }
 
         for(WorkOrders workOrders : workOrdersList){
             workOrders.setWorkPlan(workPlan);
