@@ -23,7 +23,7 @@ public class MaterialInOut {
     private MaterialOrders materialOrders;
 
     @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="work_orders_id")
+    @JoinColumn(name="work_order_id")
     private WorkOrders workOrders;
 
     private LocalDate expirationDate;

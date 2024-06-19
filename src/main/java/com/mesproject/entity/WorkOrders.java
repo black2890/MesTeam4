@@ -47,4 +47,7 @@ public class WorkOrders {
     }
 
 
+    public boolean isCompleted() {
+        return workOrdersStatus == WorkOrdersStatus.COMPLETED;
+    }
 }

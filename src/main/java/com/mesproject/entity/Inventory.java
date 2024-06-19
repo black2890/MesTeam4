@@ -1,6 +1,8 @@
 package com.mesproject.entity;
 
 import com.mesproject.constant.InventoryStatus;
+import com.mesproject.constant.MaterialOrdersStatus;
+import com.mesproject.dto.MaterialOrderDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,5 +27,16 @@ public class Inventory {
 
     @Enumerated(EnumType.STRING)
     private InventoryStatus inventoryStatus;
+
+    public static Inventory createInventory(WorkPlan workPlan){
+
+        Inventory inventory = new Inventory();
+        inventory.setProduct(workPlan.getProduct());
+        inventory.setWorkPlan(workPlan);
+        inventory.setQuantity(workPlan.getQuantity());
+        inventory.setInventoryStatus(InventoryStatus.STORAGECOMPLETED);
+
+        return inventory;
+    }
 
 }

@@ -2,10 +2,15 @@ package com.mesproject.service;
 
 import com.mesproject.constant.ProcessType;
 import com.mesproject.constant.WorkOrdersStatus;
+import com.mesproject.dto.MaterialInOutDto;
 import com.mesproject.dto.MaterialOrderDto;
 import com.mesproject.dto.OrderDto;
+import com.mesproject.dto.WorkOrdersDto;
 import com.mesproject.entity.*;
+import com.mesproject.repository.InventoryRepository;
 import com.mesproject.repository.WorkOrdersRepository;
+import com.mesproject.repository.WorkPlanRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,11 +19,17 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class WorkOrdersService {
+
+    private final WorkOrdersRepository workOrdersRepository;
+    private final WorkPlanRepository   workPlanRepository;
+    private final InventoryRepository inventoryRepository;
+    private final MaterialInOutService materialInOutService;
 
     public List<WorkOrders> createWorkOrders(WorkPlan workPlan){
        //즙
@@ -111,9 +122,69 @@ public class WorkOrdersService {
      3. 혼합이면, 석류/매실, 콜라겐 출고
      */
 
+    public void start(WorkOrdersDto workOrdersDto){
+        WorkOrders workOrders = workOrdersRepository.findById(workOrdersDto.getWorkOrderId())
+                .orElseThrow(EntityNotFoundException::new);
+
+        WorkPlan workPlan = workOrders.getWorkPlan();
+        List<WorkOrders> workOrdersList = workPlan.getWorkOrders();
+
+        // 현재 작업 공정의 인덱스 찾기
+        int currentIndex = workOrdersList.indexOf(workOrders);
+        if (currentIndex == -1) {
+            throw new IllegalStateException("작업 공정이 작업 계획에 없습니다: " + workOrders.getWorkOrderId());
+        }
+
+        // 현재 공정 이전의 모든 공정들이 완료되었는지 확인
+        for (int i = 0; i < currentIndex; i++) {
+            WorkOrders previousOrder = workOrdersList.get(i);
+            if (!previousOrder.isCompleted()) {
+                throw new IllegalStateException("선공정이 완료되지 않았습니다: " + previousOrder.getWorkOrderId());
+            }
+        }
+
+        // 작업 시작 처리
+        workOrders.setStart(workOrdersDto.getStart());
+        workOrders.setWorker(workOrdersDto.getWorker());
+        workOrders.setWorkOrdersStatus(WorkOrdersStatus.INPROGRESS);
+
+        // 공정에 필요한 원자재 출고 처리
+        //포장지, box 도 출고해야 함( 생산량에 따라)
+        switch (workOrders.getProcessType()) {
+            case CLEANING:
+            case FILLING:
+            case MIX:
+                materialInOutService.Out(workOrders.getWorkOrderId(),workOrdersDto.getStart(),workOrdersDto.getWorker());
+                 break;
+            default:
+                break;
+
+        }
+
+    }
+
     /*
+
+
     작업종료 메서드
     작업 시작시점 기준으로 작업 소요시간이 지나기 이전 종료처리가 불가능하므로 유효성 검사를 거친다.
      유효성 검사 완료 후 해당 공정이 완료 처리된다.
      */
+
+    public void end(WorkOrdersDto workOrdersDto){
+        WorkOrders workOrders = workOrdersRepository.findById(workOrdersDto.getWorkOrderId())
+                .orElseThrow(EntityNotFoundException::new);
+        workOrders.setEnd(workOrdersDto.getEnd());
+        workOrders.setWorkOrdersStatus(WorkOrdersStatus.COMPLETED);
+        WorkPlan workPlan = workOrders.getWorkPlan();
+        List<WorkOrders> workOrdersList = workPlan.getWorkOrders();
+
+            //마지막 공정이면 재고 데이터 생성
+            WorkOrders FinalWorkOrder = workOrdersList.get(workOrdersList.size() - 1);
+            if (Objects.equals(workOrders.getWorkOrderId(), FinalWorkOrder.getWorkOrderId())) {
+                Inventory.createInventory(workPlan);
+            }
+        }
+
+
 }
