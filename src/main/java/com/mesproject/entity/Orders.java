@@ -18,10 +18,13 @@ public class Orders {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
 
-    @OneToMany
-    @JoinColumn(name = "productId")
-    private List<Product> productId;
-    private Long vendorId;
+    @ManyToOne
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
+
+    @ManyToOne
+    @JoinColumn(name = "vendor_id", nullable = false)
+    private Vendor vendor;
     private Long workPlanId;
     private Long materialOrderId;
 
