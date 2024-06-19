@@ -1,12 +1,14 @@
 package com.mesproject.controller;
 
 import com.mesproject.constant.OrdersStatus;
+import com.mesproject.dto.OrderDto;
 import com.mesproject.entity.Orders;
 import com.mesproject.entity.Product;
 import com.mesproject.entity.Vendor;
 import com.mesproject.repository.OrdersRepository;
 import com.mesproject.repository.ProductRepository;
 import com.mesproject.repository.VendorRepository;
+import com.mesproject.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,6 +34,9 @@ public class OrdersController {
     @Autowired
     private VendorRepository vendorRepository;
 
+    @Autowired
+    private OrderService orderService;
+
 
     @PostMapping("/orderData")
     public Map<String, Object> getOrders() {
@@ -55,7 +60,7 @@ public class OrdersController {
     }
 
     @PostMapping("/create-order")
-    public Orders createOrder(@RequestParam Map<String, String> body){
+    public void createOrder(@RequestParam Map<String, String> body){
 
         Orders order = new Orders();
 
@@ -72,6 +77,16 @@ public class OrdersController {
         order.setDeliveryDate(LocalDate.parse(body.get("deliveryDate"), DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay());
         order.setDeliveryAddress(body.get("deliveryAddress"));
         order.setOrdersStatus(OrdersStatus.PENDINGSTORAGE);
-        return ordersRepository.save(order);
+
+        OrderDto orderDto = new OrderDto();
+        orderDto.setProductId(product.getProductId());
+        orderDto.setVendorId(vendor.getVendorId());
+        orderDto.setQuantity((long) Integer.parseInt(body.get("quantity")));
+        orderDto.setDeliveryDate(LocalDate.parse(body.get("deliveryDate"), DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay());
+        orderDto.setDeliveryAddress(body.get("deliveryAddress"));
+
+        orderService.order(orderDto);
+
+        return;
     }
 }

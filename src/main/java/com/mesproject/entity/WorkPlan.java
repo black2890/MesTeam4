@@ -14,7 +14,7 @@ import java.util.List;
 @Setter
 public class WorkPlan {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long workPlanId;
 
     @ManyToOne(fetch= FetchType.LAZY)

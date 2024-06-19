@@ -1,6 +1,10 @@
 package com.mesproject.service;
 
+import com.mesproject.dto.MaterialInOutDto;
+import com.mesproject.entity.MaterialInOut;
+import com.mesproject.repository.MaterialInOutRepository;
 import com.mesproject.repository.OrdersRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -9,16 +13,29 @@ import org.springframework.stereotype.Service;
 @Transactional
 @RequiredArgsConstructor
 public class MaterialInOutService {
+    private final MaterialInOutRepository materialInOutRepository;
    /*
-   입고 메서드
-   갖고온 발주번호로 입출고 엔티티 생성
-   수주-발주 테이블에서 발주코드로 수주코드조회
-   수주-작업계획 테이블에서 수주코드로 작업계획 코드 조회
+    입고 메서드
+    입출고코드 들고와서 상태 바꿔주기
+    발주일 기준 원자재 lead time 지났는지 유효성 검사(원자재 종류에 따라)
+  */
+    public void In(MaterialInOutDto materialInOutDto){
+        MaterialInOut materialInOut = materialInOutRepository.findById(materialInOutDto.getInoutId())
+                .orElseThrow(EntityNotFoundException::new);
+        materialInOut.setStorageDate(materialInOutDto.getStorageDate());
+        materialInOut.setStorageWorker(materialInOutDto.getStorageWorker());
 
-    작업지시에서 (작업계획코드==? && 작업명==? )
-    발주코드에 있는 제품코드가 5이면, 작업명 : 세척
-    ...
+    }
 
-    발주코드, 작업지시코드 등록해 입고완료
-    */
+    /*
+    출고 메서드
+    입출고코드 들고와서 상태 바꿔주기
+     */
+    public void Out(MaterialInOutDto materialInOutDto){
+        MaterialInOut materialInOut = materialInOutRepository.findById(materialInOutDto.getInoutId())
+                .orElseThrow(EntityNotFoundException::new);
+        materialInOut.setRetrievalDate(materialInOutDto.getRetrievalDate());
+        materialInOut.setRetrievalWorker(materialInOutDto.getRetrievalWorker());
+
+    }
 }

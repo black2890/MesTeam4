@@ -17,7 +17,7 @@ import java.util.List;
 public class MaterialOrders {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long materialOrderId;
 
     @ManyToOne(fetch=FetchType.LAZY)

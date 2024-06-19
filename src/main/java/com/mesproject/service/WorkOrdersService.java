@@ -26,7 +26,7 @@ public class WorkOrdersService {
         LocalDateTime temp = LocalDateTime.now();
 
         WorkOrders workOrders1 = new WorkOrders();
-        workOrders1.setWorkPlan(workPlan);
+
         //세척
         workOrders1.setProcessType(ProcessType.CLEANING);
         workOrders1.setDuration(Duration.ofHours(2));
@@ -38,6 +38,7 @@ public class WorkOrdersService {
         temp = temp.plusHours(2);
 
         WorkOrders workOrders2 = new WorkOrders();
+
         workOrders2.setProcessType(ProcessType.EXTRACTION);
         workOrders2.setDuration(Duration.ofHours(24));
         workOrders2.setScheduledDate(temp);
@@ -93,6 +94,10 @@ public class WorkOrdersService {
         workOrders7.setScheduledDate(temp);
         workOrders7.setWorkOrdersStatus(WorkOrdersStatus.PENDING);
         workOrdersList.add(workOrders7);
+
+        for(WorkOrders workOrders : workOrdersList){
+            workOrders.setWorkPlan(workPlan);
+        }
 
         return workOrdersList;
     }

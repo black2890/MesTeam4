@@ -12,7 +12,7 @@ import java.sql.Time;
 @Setter
 public class Product {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId;
     private Long routingId;
     private String productName;

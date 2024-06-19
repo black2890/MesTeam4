@@ -19,13 +19,14 @@ import java.time.LocalDateTime;
 @Setter
 public class WorkOrders {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long workOrderId;
 
     @ManyToOne(fetch= FetchType.LAZY)
     @JoinColumn(name="work_plan_id")
     private WorkPlan workPlan;
 
+    @Enumerated(EnumType.STRING)
     private ProcessType processType;
     private LocalDateTime start;
     private LocalDateTime end;

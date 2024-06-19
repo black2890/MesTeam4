@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 public class Inventory {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long inventoryId;
 
     @ManyToOne(fetch=FetchType.LAZY)

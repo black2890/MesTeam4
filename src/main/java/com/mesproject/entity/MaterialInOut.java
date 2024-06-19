@@ -1,6 +1,8 @@
 package com.mesproject.entity;
 
 import com.mesproject.constant.MaterialInOutStatus;
+import com.mesproject.constant.MaterialOrdersStatus;
+import com.mesproject.dto.MaterialOrderDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +15,7 @@ import java.time.LocalDateTime;
 @Setter
 public class MaterialInOut {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long inoutId;
 
     @OneToOne(fetch=FetchType.LAZY)
@@ -21,8 +23,8 @@ public class MaterialInOut {
     private MaterialOrders materialOrders;
 
     @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="orders_plan_id")
-    private OrdersPlan ordersPlan;
+    @JoinColumn(name="work_orders_id")
+    private WorkOrders workOrders;
 
     private LocalDate expirationDate;
 
@@ -33,4 +35,14 @@ public class MaterialInOut {
     private LocalDateTime retrievalDate;
     private String storageWorker;
     private String retrievalWorker;
+
+    public static MaterialInOut createMaterialInOut(MaterialOrders materialOrders){
+
+        MaterialInOut materialInOut = new MaterialInOut();
+        materialInOut.setMaterialOrders(materialOrders);
+        materialInOut.setMaterialInOutStatus(MaterialInOutStatus.PENDINGSTORAGE);
+
+
+        return materialInOut;
+    }
 }

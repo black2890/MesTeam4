@@ -2,6 +2,7 @@ package com.mesproject.entity;
 
 import com.mesproject.constant.OrdersStatus;
 import com.mesproject.constant.vendorType;
+import com.mesproject.dto.OrderDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -63,20 +64,27 @@ public class Orders {
     public static Orders createOrder(List<OrdersMaterials> ordersMaterialsList,
                                      List<OrdersPlan> ordersPlanList,
                                      Product product,
-                                     Long quantity){
+                                     Vendor vendor,
+                                     OrderDto orderDto){
 
         Orders order = new Orders();
 
         for(OrdersMaterials ordersMaterials : ordersMaterialsList){
             order.addOrdersMaterials(ordersMaterials);
+            ordersMaterials.setOrders(order);
         }
 
         for(OrdersPlan ordersPlan : ordersPlanList){
             order.addOrdersPlan(ordersPlan);
+            ordersPlan.setOrders(order);
         }
-        order.setOrdersStatus(OrdersStatus.PENDINGSTORAGE);
+
         order.setProduct(product);
-        order.setQuantity(quantity);
+        order.setVendor(vendor);
+        order.setQuantity(orderDto.getQuantity());
+        order.setDeliveryDate(orderDto.getDeliveryDate());
+        order.setDeliveryAddress(orderDto.getDeliveryAddress());
+        order.setOrdersStatus(OrdersStatus.PENDINGSTORAGE);
 
         return order;
     }

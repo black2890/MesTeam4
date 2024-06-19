@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Setter
 public class Process {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long processId;
 
     @Enumerated(EnumType.STRING)
