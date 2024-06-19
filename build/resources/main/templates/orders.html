@@ -2,11 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title></title>
+    <title>Orders Management</title>
     <!-- Datatables CSS -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.css">
     <!-- Bootstrap CSS -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FullCalendar CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css" rel="stylesheet">
     <style>
         /* Center the table */
         div.dataTables_wrapper {
@@ -27,12 +29,13 @@
     <table id="example" class="display" style="width:100%">
         <thead>
         <tr>
-            <th>orderId</th>
-            <th>productName</th>
-            <th>vendorName</th>
-            <th>deliveryAddress</th>
-            <th>deliveryDate</th>
-            <th>status</th>
+            <th>주문번호</th>
+            <th>제품명</th>
+            <th>고객명</th>
+            <th>수량</th>
+            <th>납품주소</th>
+            <th>납품일</th>
+            <th>상태</th>
         </tr>
         </thead>
         <tbody>
@@ -40,12 +43,12 @@
     </table>
 </div>
 
-<!-- Vendor Modal -->
+<!-- Order Modal -->
 <div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="orderModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="orderModalLabel">Create Vendor</h5>
+                <h5 class="modal-title" id="orderModalLabel">Create Order</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -53,23 +56,53 @@
             <div class="modal-body">
                 <form id="orderForm">
                     <div class="form-group">
-                        <label for="vendorType">Vendor Type</label>
-                        <select class="form-control" id="vendorType" name="type">
-                            <option value="order"></option>
-                            <option value="materialOrder"></option>
-                            <option value="delivery"></option>
+                        <label for="productName">Product</label>
+                        <select class="form-control" id="productName" name="productName" required>
+                            <!-- Options will be populated by JavaScript -->
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="vendorName">Vendor Name</label>
-                        <input type="text" class="form-control" id="vendorName" name="name" required>
+                        <label for="quantity">Quantity(Box)</label>
+                        <input type="number" class="form-control" id="quantity" name="quantity" required>
                     </div>
                     <div class="form-group">
-                        <label for="vendorContact">Contact</label>
-                        <input type="text" class="form-control" id="vendorContact" name="contact" required>
+                        <label for="vendorName">Vendor</label>
+                        <select class="form-control" id="vendorName" name="vendorName" required>
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="deliveryDate">Delivery Date</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="deliveryDate" name="deliveryDate" readonly required>
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-outline-secondary" id="selectDeliveryDate">Select Date</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="deliveryAddress">Delivery Address</label>
+                        <input type="text" class="form-control" id="deliveryAddress" name="deliveryAddress" required>
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FullCalendar Modal -->
+<div class="modal fade" id="calendarModal" tabindex="-1" role="dialog" aria-labelledby="calendarModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="max-width:800px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="calendarModalLabel">Select Delivery Date</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="calendar"></div>
             </div>
         </div>
     </div>
@@ -81,37 +114,89 @@
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.js"></script>
 <!-- Bootstrap JS -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-<!-- Custom script to load data -->
+<!-- FullCalendar JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
+<!-- Custom script to load data and handle form -->
 <script>
     $(document).ready(function () {
-        $('#example').DataTable({
+        var table = $('#example').DataTable({
             "processing": true,
             "serverSide": true,
             "ajax": {
-                "url": "/data",
+                "url": "/orderData",
                 "type": "POST"
             },
             "columns": [
-                {"data": "vendorId"},
+                {"data": "orderId"},
+                {"data": "productName"},
                 {"data": "vendorName"},
-                {"data": "vendorType"},
-                {"data": "contactInfo"}
+                {"data": "quantity"},
+                {"data": "deliveryAddress"},
+                {"data": "deliveryDate"},
+                {"data": "ordersStatus"}
             ]
         });
 
-        $('#vendorForm').on('submit', function(e) {
+        function populateSelects() {
+            $.ajax({
+                url: '/get-products',
+                type: 'GET',
+                success: function(data) {
+                    $('#productName').empty();
+                    $('#productName').append('<option value="">Select Product</option>');
+                    data.forEach(product => {
+                        $('#productName').append(`<option value="${product.productName}">${product.productName}</option>`);
+                    });
+                },
+                error: function(error) {
+                    console.error("Error fetching products: ", error);
+                }
+            });
+
+            $.ajax({
+                url: '/get-vendors',
+                type: 'GET',
+                success: function(data) {
+                    $('#vendorName').empty();
+                    $('#vendorName').append('<option value="">Select Vendor</option>');
+                    data.forEach(customer => {
+                        $('#vendorName').append(`<option value="${customer.vendorName}">${customer.vendorName}</option>`);
+                    });
+                },
+                error: function(error) {
+                    console.error("Error fetching customers: ", error);
+                }
+            });
+        }
+
+        populateSelects();
+
+        $('#selectDeliveryDate').on('click', function() {
+            $('#calendarModal').modal('show');
+        });
+
+        $('#calendar').fullCalendar({
+            selectable: true,
+            select: function(startDate) {
+                $('#deliveryDate').val(startDate.format('YYYY-MM-DD'));
+                $('#calendarModal').modal('hide');
+            }
+        });
+
+        $('#orderForm').on('submit', function(e) {
             e.preventDefault();
             var formData = $(this).serialize();
             $.ajax({
-                url: '/create-vendor',  // 서버에 데이터를 보낼 엔드포인트
+                url: '/create-order',
                 type: 'POST',
                 data: formData,
                 success: function(response) {
-                    $('#vendorModal').modal('hide');
+                    $('#orderModal').modal('hide');
                     table.ajax.reload();
                 },
                 error: function(error) {
-                    console.log(error);
+                    console.error("Error creating order: ", error);
                 }
             });
         });
