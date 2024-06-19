@@ -23,4 +23,22 @@ public class ViewController {
 
         return "equipment";
     }
+
+    @GetMapping(value="/materialOrders")
+    public String materialOrdersPage() {
+
+        return "materialOrders";
+    }
+
+    @GetMapping(value="/materialInOut")
+    public String materialInOutPage() {
+
+        return "materialInOut";
+    }
+
+    @GetMapping(value="/workOrders")
+    public String workOrdersPage() {
+
+        return "materialInOut";
+    }
 }
