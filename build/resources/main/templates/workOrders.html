@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="/css/sidebar.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <title>Title</title>
+    <title>작업 지시</title>
 
     <style>
         <!--  사이드바 CSS 시작    -->
@@ -81,22 +81,20 @@
 </div>
 
 <div class="content">
-    <h1>설비현황</h1>
-</div>
+    <h1>작업 지시</h1>
 
-<div class="content">
-    <table id="equipmentTable" class="display table table-bordered">
+    <table id="workOrdersTable" class="display table table-bordered" style="width:100%">
         <thead>
         <tr>
-            <th>설비ID</th>
-            <th>설비명</th>
-            <th>설비 유형</th>
-            <th>생산 제품</th>
-            <th>생산 가능량</th>
-            <th>설비 상태</th>
-            <th>생산 준비 시간</th>
-            <th>생산 시간</th>
-            <th>설비 도입 시기</th>
+            <th>작업 번호</th>
+            <th>제품</th>
+            <th>공정</th>
+            <th>담장자</th>
+            <th>작업 예정일</th>
+            <th>소요시간</th>
+            <th>시작일시</th>
+            <th>완료일시</th>
+            <th>상태</th>
         </tr>
         </thead>
     </table>
@@ -127,7 +125,7 @@
         ]
     });
 
-    $("#equipmentTable_filter").remove();
+    $("#workOrdersTable_filter").remove();
 
     var buttons = document.getElementsByClassName('sidebar-btn');
     for (var i = 0; i < buttons.length; i++) {

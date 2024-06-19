@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="/css/sidebar.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <title>Title</title>
+    <title>자재 입출고 현황</title>
 
     <style>
         <!--  사이드바 CSS 시작    -->
@@ -81,22 +81,20 @@
 </div>
 
 <div class="content">
-    <h1>설비현황</h1>
-</div>
+    <h1>자재 입출고 현황</h1>
 
-<div class="content">
-    <table id="materialInOutTable" class="display table table-bordered">
+    <table id="materialInOutTable" class="display table table-bordered" style="width:100%">
         <thead>
         <tr>
-            <th>설비ID</th>
-            <th>설비명</th>
-            <th>설비 유형</th>
-            <th>생산 제품</th>
-            <th>생산 가능량</th>
-            <th>설비 상태</th>
-            <th>생산 준비 시간</th>
-            <th>생산 시간</th>
-            <th>설비 도입 시기</th>
+            <th>입고번호</th>
+            <th>제품명</th>
+            <th>수량</th>
+            <th>유통기한</th>
+            <th>상태</th>
+            <th>입고일</th>
+            <th>입고자</th>
+            <th>출고일</th>
+            <th>출고자</th>
         </tr>
         </thead>
     </table>
@@ -115,15 +113,15 @@
             "dataSrc":"data",
         },
         "columns":[
-            {"data":"equipmentId"},
-            {"data":"equipmentName"},
-            {"data":"equipmentType"},
-            {"data":"equipmentProduct"},
-            {"data":"productionCapacity"},
-            {"data":"equipmentStatus"},
-            {"data":"setupTime"},
-            {"data":"cycleHour"},
-            {"data":"acquisitionDate"},
+            {"data":"inOutId"},
+            {"data":"materialName"},
+            {"data":"quantity"},
+            {"data":"expirationDate"},
+            {"data":"status"},
+            {"data":"storageDate"},
+            {"data":"storageWorker"},
+            {"data":"retrievalDate"},
+            {"data":"retrievalWorker"},
         ]
     });
 

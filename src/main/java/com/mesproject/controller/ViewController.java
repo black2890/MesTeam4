@@ -39,6 +39,6 @@ public class ViewController {
     @GetMapping(value="/workOrders")
     public String workOrdersPage() {
 
-        return "materialInOut";
+        return "workOrders";
     }
 }

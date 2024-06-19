@@ -2,6 +2,7 @@ package com.mesproject.controller;
 
 import com.mesproject.dto.DataTableDto;
 import com.mesproject.service.MaterialOrdersService;
+import com.mesproject.service.WorkOrdersService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,12 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-public class MaterialOrdersController {
+public class WorkOrdersController {
 
-    private final MaterialOrdersService materialOrdersService;
+    private final WorkOrdersService workOrdersService;
 
-    @PostMapping("/api/materialOrdersData") // Post api로 자재 주문 현황 데이터 반환 컨트롤러
-    public DataTableDto getMaterialOrders(@RequestBody MultiValueMap<String, String> formData) {
-        return materialOrdersService.getMaterialOrdersData(formData);
+    @PostMapping("/api/workOrdersData") // Post api로 자재 주문 현황 데이터 반환 컨트롤러
+    public DataTableDto getWorkOrders(@RequestBody MultiValueMap<String, String> formData) {
+        return workOrdersService.getWorkOrdersData(formData);
     }
 }
+
