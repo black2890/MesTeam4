@@ -31,6 +31,8 @@ public class WorkOrders {
     private LocalDateTime start;
     private LocalDateTime end;
     private Duration duration;
+    private long tempDuration;
+
     private LocalDateTime scheduledDate;
 
     @Enumerated(EnumType.STRING)
@@ -49,5 +51,9 @@ public class WorkOrders {
 
     public boolean isCompleted() {
         return workOrdersStatus == WorkOrdersStatus.COMPLETED;
+    }
+    public void setTempDuration(){
+        tempDuration = duration.toHours();
+
     }
 }

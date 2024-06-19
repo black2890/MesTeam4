@@ -33,7 +33,7 @@ public class WorkOrdersService {
 
     public List<WorkOrders> createWorkOrders(WorkPlan workPlan){
         List<WorkOrders> workOrdersList = new ArrayList<>();
-        LocalDateTime temp = LocalDateTime.now();
+        LocalDateTime temp = workPlan.getStart();
 
         //즙
         if(workPlan.getProduct().getProductId()==1||workPlan.getProduct().getProductId()==2){
@@ -237,8 +237,26 @@ public class WorkOrdersService {
     public void end(WorkOrdersDto workOrdersDto){
         WorkOrders workOrders = workOrdersRepository.findById(workOrdersDto.getWorkOrderId())
                 .orElseThrow(EntityNotFoundException::new);
+
+        LocalDateTime start = workOrders.getStart();
+        LocalDateTime end = workOrdersDto.getEnd();
+        workOrders.setTempDuration();
+        long duration = workOrders.getDuration().toHours(); // 소요시간 (시간 단위)
+
+        // 유효성 검사: 작업 시작 기준 소요시간이 지났는지 확인
+        if (start != null && workOrdersDto.getEnd() != null) {
+            Duration time = Duration.between(start, workOrdersDto.getEnd());
+            if (time.toHours() < duration) {
+                throw new IllegalStateException("작업 시작 기준 소요시간이 지나지 않았습니다.");
+            }
+        } else {
+            throw new IllegalStateException("작업 시작 시간 또는 종료 시간이 설정되지 않았습니다.");
+        }
+
+
         workOrders.setEnd(workOrdersDto.getEnd());
         workOrders.setWorkOrdersStatus(WorkOrdersStatus.COMPLETED);
+
         WorkPlan workPlan = workOrders.getWorkPlan();
         List<WorkOrders> workOrdersList = workPlan.getWorkOrders();
 

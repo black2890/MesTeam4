@@ -11,9 +11,11 @@ import lombok.RequiredArgsConstructor;
 import org.hibernate.query.Order;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalTime;
+import java.util.*;
 
 @Service
 @Transactional
@@ -48,15 +50,34 @@ public class OrderService {
                               4이면, 매실, 콜라겐 발주
          */
 
+        // 생산횟수 계산
         int numberOfProduction=0;
         int maxQuantity=0;
+
+
         if(product.getProductId()==1 || product.getProductId()==2){
             maxQuantity=333;
 
         }else if(product.getProductId()==3|| product.getProductId()==4){
             maxQuantity=160;
+
         }
         numberOfProduction = (int)(orderDto.getQuantity()/maxQuantity)+1;
+
+        //생산 시작일시 계산
+        int productionPeriod = 0;
+        LocalDateTime deliveryDate = orderDto.getDeliveryDate();
+        LocalDateTime productionDate = null;
+
+        if(product.getProductId()==1 || product.getProductId()==2){
+            productionPeriod=2;
+            productionDate = deliveryDate.minusDays((long) productionPeriod *numberOfProduction/2 + 2);
+        }else if(product.getProductId()==3|| product.getProductId()==4){
+            productionPeriod=1;
+            productionDate = deliveryDate.minusDays(productionPeriod*numberOfProduction + 2);
+        }
+
+
 
         Long materialId1=null;
         Long materialId2=null;
@@ -77,6 +98,7 @@ public class OrderService {
         // 납품예정일 저장해야함(지금 기준 이틀 뒤?, 원래는 생산 일정에 맞춰 발주하는 게 맞음)--> 첫 생산계획 3일 전?
         MaterialOrderDto materialOrderDto1 = new MaterialOrderDto();
         materialOrderDto1.setProductId(materialId1);
+   //     materialOrderDto1.setDeliveryDate(productionDate);
         if(orderDto.getProductId()==1 || orderDto.getProductId()==2){
             materialOrderDto1.setQuantity(1000L);
         }else if(orderDto.getProductId()==3||orderDto.getProductId()==4){
@@ -84,6 +106,7 @@ public class OrderService {
         }
         MaterialOrderDto materialOrderDto2 = new MaterialOrderDto();
         materialOrderDto2.setProductId(materialId2);
+      //  materialOrderDto2.setDeliveryDate(productionDate);
         if(orderDto.getProductId()==1 || orderDto.getProductId()==2){
             materialOrderDto2.setQuantity(50L);
         }else if(orderDto.getProductId()==3||orderDto.getProductId()==4){
@@ -140,11 +163,14 @@ public class OrderService {
             }
             count++;
 
-            workPlan.setStart(LocalDateTime.now());
+            workPlan.setStart(productionDate);
             if(orderDto.getProductId()==1 || orderDto.getProductId()==2){
-                workPlan.setEnd(LocalDateTime.now().plusDays(1));
+                workPlan.setEnd(productionDate.plusHours(44));
+                if(count!=1&& count%2==1){
+                productionDate = productionDate.plusDays(2);}
             }else if(orderDto.getProductId()==3||orderDto.getProductId()==4){
-                workPlan.setEnd(LocalDateTime.now().plusHours(22));
+                workPlan.setEnd(productionDate.plusHours(22));
+                productionDate = productionDate.plusDays(1);
             }
 
             //수주-작업계획 엔티티 생성 :  수주코드 저장은 createorder 에서
@@ -186,5 +212,35 @@ public class OrderService {
 
         return order.getOrderId();
     }
+
+    public class MaterialDeliveryDateCalculator {
+        private static final Set<LocalDate> HOLIDAYS = new HashSet<>(Arrays.asList(
+                LocalDate.of(2024, 1, 1),
+                LocalDate.of(2024, 2, 9),
+                LocalDate.of(2024, 3, 1)
+
+        ));
+        public static LocalDate calculateDeliveryDate(LocalDateTime orderDateTime) {
+            LocalDate orderDate = orderDateTime.toLocalDate();
+            LocalTime orderTime = orderDateTime.toLocalTime();
+
+            //즙이면, 2일/3일
+            //스틱이면 3일/4일
+            int leadTime = orderTime.isBefore(LocalTime.NOON) ? 2 : 3;
+
+            LocalDate estimatedDeliveryDate = orderDate.plusDays(leadTime);
+
+            while (isWeekendOrHoliday(estimatedDeliveryDate)) {
+                estimatedDeliveryDate = estimatedDeliveryDate.plusDays(1);
+            }
+            return estimatedDeliveryDate;
+        }
+        private static boolean isWeekendOrHoliday(LocalDate date) {
+            DayOfWeek dayOfWeek = date.getDayOfWeek();
+            return dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY || HOLIDAYS.contains(date);
+        }
+    }
+
+
 
 }

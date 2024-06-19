@@ -41,6 +41,15 @@ public class MaterialOrders {
         materialOrders.setProduct(product);
         materialOrders.setQuantity(materialOrderDto.getQuantity());
         materialOrders.setMaterialOrdersStatus(MaterialOrdersStatus.PENDINGSTORAGE);
+//        materialOrders.setDeliveryDate(materialOrderDto.getDeliveryDate());
+//        if(product.getProductId()==5||product.getProductId()==6||product.getProductId()==7){
+//            materialOrders.setMaterialOrderDate(materialOrderDto.getDeliveryDate().minusDays(2));
+//        } else if (product.getProductId() == 8 || product.getProductId() ==9 ||product.getProductId()== 10||product.getProductId() ==12) {
+//            materialOrders.setMaterialOrderDate(materialOrderDto.getDeliveryDate().minusDays(3));
+//        }else if(product.getProductId()==11){
+//
+//        }
+
 
         return materialOrders;
     }
