@@ -1,6 +1,7 @@
 package com.mesproject.controller;
 
 import com.mesproject.constant.OrdersStatus;
+import com.mesproject.dto.OrderDto;
 import com.mesproject.dto.OrderStatusUpdateRequest;
 import com.mesproject.entity.Orders;
 import com.mesproject.entity.Product;
@@ -8,6 +9,7 @@ import com.mesproject.entity.Vendor;
 import com.mesproject.repository.OrdersRepository;
 import com.mesproject.repository.ProductRepository;
 import com.mesproject.repository.VendorRepository;
+import com.mesproject.service.OrderService;
 import com.mesproject.service.OrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -43,6 +45,8 @@ public class OrdersController {
 
     @Autowired
     private OrdersService ordersService;
+    @Autowired
+    private OrderService orderService;
 
     @PostMapping("/orderData")
     public Map<String, Object> getOrders(
@@ -164,8 +168,7 @@ public class OrdersController {
         orderDto.setDeliveryAddress(body.get("deliveryAddress"));
 
         orderService.order(orderDto);
-
-        return;
+        
     }
 
     @PostMapping("/updateOrderStatus")

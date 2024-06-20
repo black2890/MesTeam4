@@ -16,4 +16,7 @@ public class ViewController {
 
     @GetMapping(value= "/inventorys")
     public String inventory() {return "inventory";}
+
+//    @GetMapping(value= "/materials/orders")
+//    public String materialOrders() {return "materialOrders";}
 }

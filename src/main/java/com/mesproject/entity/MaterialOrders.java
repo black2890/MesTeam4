@@ -30,12 +30,12 @@ public class MaterialOrders {
     @JoinColumn(name="product_id")
     private Product product;
 
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="vendor_id")
-    private Vendor vendor;
+//    @ManyToOne(fetch=FetchType.LAZY)
+//    @JoinColumn(name="vendor_id")
+//    private Vendor vendor;
 
     private LocalDateTime materialOrderDate;
-   // private LocalDateTime deliveryDate;
+    // private LocalDateTime deliveryDate;
 
     private LocalDate deliveryDate;
     private Long quantity;
@@ -80,7 +80,7 @@ public class MaterialOrders {
             //스틱이면 3일/4일
             int leadTime=0;
             if(productId==5||productId==6||productId==7){
-            leadTime = orderTime.isBefore(LocalTime.NOON) ? 2 : 3;
+                leadTime = orderTime.isBefore(LocalTime.NOON) ? 2 : 3;
             }else if(productId==8||productId==9||productId==10){
                 leadTime = orderTime.isBefore(LocalTime.of(15, 0)) ? 3 : 4;
             }else if(productId==11){

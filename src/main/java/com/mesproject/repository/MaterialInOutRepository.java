@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface MaterialInOutRepository extends JpaRepository<MaterialInOut, Long> {
    List<MaterialInOut> findByWorkOrders_WorkOrderId(Long id);
+   Optional<MaterialInOut> findByMaterialOrders_MaterialOrderId(Long id);
 }

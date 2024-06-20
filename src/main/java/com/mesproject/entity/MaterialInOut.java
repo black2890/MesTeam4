@@ -26,7 +26,7 @@ public class MaterialInOut {
     @JoinColumn(name="work_order_id")
     private WorkOrders workOrders;
 
-    private LocalDate expirationDate;
+    private LocalDateTime expirationDate;
 
     @Enumerated(EnumType.STRING)
     private MaterialInOutStatus materialInOutStatus;

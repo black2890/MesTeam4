@@ -67,7 +67,12 @@ public class OrderService {
             maxQuantity=160;
 
         }
-        numberOfProduction = (int)(orderDto.getQuantity()/maxQuantity)+1;
+        if(orderDto.getQuantity()%maxQuantity ==0){
+            numberOfProduction = (int)(orderDto.getQuantity()/maxQuantity);
+        }else {
+            numberOfProduction = (int)(orderDto.getQuantity()/maxQuantity)+1;
+        }
+
 
         //생산 시작일시 계산
         //납품일에 맞춰서 생산일시 계산하는 로직필요
@@ -129,7 +134,7 @@ public class OrderService {
         List<OrdersMaterials> ordersMaterialsList = new ArrayList<>();
         List<OrdersPlan> ordersPlanList = new ArrayList<>();
 
-        int count =1;
+        int count =0;
         for(int i=0;i<numberOfProduction;i++){
 
             //발주, 입출고 엔티티생성
@@ -162,6 +167,7 @@ public class OrderService {
          */
             WorkPlan workPlan;
             if(count==numberOfProduction){
+                //처음에 count 가 0, numberofProduction 이 1
                 workPlan = WorkPlan.createWorkPlan(product,orderDto.getQuantity()%maxQuantity);
             }else if(numberOfProduction ==1){
                 workPlan = WorkPlan.createWorkPlan(product,orderDto.getQuantity());
