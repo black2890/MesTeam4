@@ -1,21 +1,33 @@
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
 
-/.gradle/8.8
-/.gradle/8.8
-/.gradle/8.8
-.idea/workspace.xml
-/build/tmp/compileJava
-/.gradle/8.8/executionHistory
-/.gradle/8.8
-/.gradle/8.8
-/.gradle/8.8/fileHashes
-/.gradle/8.8
-/.gradle/8.8/fileHashes
-.idea/workspace.xml
-build/tmp/compileJava/previous-compilation-data.bin
-/.gradle/8.8/executionHistory
-/.gradle/8.8/executionHistory
-/.gradle/8.8
-.idea/workspace.xml
-/.idea
-/.gradle
-.gradle/file-system.probe
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
