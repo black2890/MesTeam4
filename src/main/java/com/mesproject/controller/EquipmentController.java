@@ -14,7 +14,7 @@ public class EquipmentController {
 
     private final EquipmentService equipmentService;
 
-    @PostMapping("/api/equipmentData") // Post api로 수주 테이블 데이터 반환 컨트롤러
+    @PostMapping("/api/equipmentData") // Post api로 설비 현황 테이블 데이터 반환 컨트롤러
     public DataTableDto getEquipment(@RequestBody MultiValueMap<String, String> formData) {
         return equipmentService.getEquipmentsData(formData);
     }

@@ -15,7 +15,7 @@ public class MaterialInOutController {
 
     private final MaterialInOutService materialInOutService;
 
-    @PostMapping("/api/materialInOutData") // Post api로 자재 주문 현황 데이터 반환 컨트롤러
+    @PostMapping("/api/materialInOutData") // Post api로 자재 입출고 현황 데이터 반환 컨트롤러
     public DataTableDto getMaterialInOut(@RequestBody MultiValueMap<String, String> formData) {
         return materialInOutService.getMaterialInOutData(formData);
     }
