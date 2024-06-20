@@ -5,11 +5,31 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="77f90476-4ae8-46ab-b5ba-daeaba94fb8b" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/modules/mesProject.main.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/mesProject.main.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/static/js/sidebar.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/templates/material.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/templates/process.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/templates/product.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/templates/routing.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.8/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.8/executionHistory/executionHistory.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.8/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.8/executionHistory/executionHistory.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.8/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.8/fileHashes/fileHashes.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.8/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.8/fileHashes/fileHashes.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.8/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.8/fileHashes/resourceHashesCache.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mesproject/controller/EquipmentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mesproject/controller/EquipmentController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mesproject/controller/MaterialInOutController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mesproject/controller/MaterialInOutController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mesproject/controller/WorkOrdersController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mesproject/controller/WorkOrdersController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/mesproject/controller/ViewController.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/mesproject/controller/ViewController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/resources/main/templates/equipment.html" beforeDir="false" afterPath="$PROJECT_DIR$/build/resources/main/templates/equipment.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/resources/main/templates/materialInOut.html" beforeDir="false" afterPath="$PROJECT_DIR$/build/resources/main/templates/materialInOut.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/resources/main/templates/materialOrders.html" beforeDir="false" afterPath="$PROJECT_DIR$/build/resources/main/templates/materialOrders.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/resources/main/templates/orders.html" beforeDir="false" afterPath="$PROJECT_DIR$/build/resources/main/templates/orders.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/resources/main/templates/workOrders.html" beforeDir="false" afterPath="$PROJECT_DIR$/build/resources/main/templates/workOrders.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/previous-compilation-data.bin" beforeDir="false" afterPath="$PROJECT_DIR$/build/tmp/compileJava/previous-compilation-data.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mesproject/controller/ViewController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mesproject/controller/ViewController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/equipment.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/equipment.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/materialInOut.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/materialInOut.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/materialOrders.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/materialOrders.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/orders.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/orders.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/workOrders.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/workOrders.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,9 +62,10 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Enum" />
-        <option value="HTML File" />
         <option value="Interface" />
         <option value="Class" />
+        <option value="JavaScript File" />
+        <option value="HTML File" />
       </list>
     </option>
   </component>

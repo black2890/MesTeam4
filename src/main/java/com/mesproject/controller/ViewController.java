@@ -41,4 +41,29 @@ public class ViewController {
 
         return "workOrders";
     }
+
+    //기준정보 View
+    @GetMapping(value="/material")
+    public String materialPage() {
+
+        return "material";
+    }
+
+    @GetMapping(value="/process")
+    public String processPage() {
+
+        return "process";
+    }
+
+    @GetMapping(value="/product")
+    public String productPage() {
+
+        return "product";
+    }
+
+    @GetMapping(value="/routing")
+    public String routingPage() {
+
+        return "routing";
+    }
 }

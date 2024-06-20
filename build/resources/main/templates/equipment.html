@@ -2,10 +2,9 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="/css/sidebar.css">
-    <title>설비현황</title>
+    <title>설비 정보</title>
 
     <style>
         <!--  사이드바 CSS 시작    -->
@@ -19,12 +18,8 @@
             padding: 20px;
         }
 
-        .sub-menu {
-            display: none; /* 기본적으로 하위 메뉴는 숨김 */
-        }
-
-        .sub-menu.show {
-            display: block; /* show 클래스가 추가되면 보이도록 설정 */
+        .table td {
+            text-align: center;
         }
 
     </style>
@@ -88,71 +83,173 @@
     </div>
 
     <div class="content">
-        <h1>설비현황</h1>
+        <h1>설비 정보</h1>
 
         <table id="equipmentTable" class="display table table-bordered" style="width:100%">
             <thead>
-            <tr>
-                <th>설비ID</th>
-                <th>설비명</th>
-                <th>설비 유형</th>
-                <th>생산 제품</th>
-                <th>생산 가능량</th>
-                <th>설비 상태</th>
-                <th>생산 준비 시간</th>
-                <th>생산 시간</th>
-                <th>설비 도입 시기</th>
-            </tr>
+                <tr>
+                    <th>설비ID</th>
+                    <th>설비명</th>
+                    <th>설비 공정 유형</th>
+                    <th>생산 제품</th>
+                    <th>생산 가능량(ea/h)</th>
+                    <th>생산 준비 시간(min)</th>
+                    <th>Cycle 시간</th>
+                    <th>설비 도입 시기</th>
+                    <th>설비 상태</th>
+                </tr>
             </thead>
-
+            <tbody>
+            <tr>
+                <td>FC-01-01</td>
+                <td>즙 포장기(1)</td>
+                <td>충진</td>
+                <td>즙</td>
+                <td>1250</td>
+                <td>20</td>
+                <td>2</td>
+                <td>2018-03-18</td>
+                <td>가용 가능</td>
+            </tr>
+            <tr>
+                <td>FC-01-02</td>
+                <td>즙 포장기(2)</td>
+                <td>충진</td>
+                <td>즙</td>
+                <td>1250</td>
+                <td>20</td>
+                <td>2</td>
+                <td>2022-02-11</td>
+                <td>가용 가능</td>
+            </tr>
+            <tr>
+                <td>FC-01-03</td>
+                <td>젤리스틱 포장기(1)</td>
+                <td>충진</td>
+                <td>젤리스틱</td>
+                <td>2000</td>
+                <td>20</td>
+                <td>1</td>
+                <td>2020-02-01</td>
+                <td>가용 가능</td>
+            </tr>
+            <tr>
+                <td>FC-01-04</td>
+                <td>젤리스틱 포장기(2)</td>
+                <td>충진</td>
+                <td>젤리스틱</td>
+                <td>2000</td>
+                <td>20</td>
+                <td>1</td>
+                <td>2024-02-01</td>
+                <td>가용 가능</td>
+            </tr>
+            <tr>
+                <td>FC-02-01</td>
+                <td>추출기(착즙기)(1)</td>
+                <td>추출</td>
+                <td>즙</td>
+                <td>1t</td>
+                <td>60</td>
+                <td>24</td>
+                <td>2018-03-18</td>
+                <td>가용 가능</td>
+            </tr>
+            <tr>
+                <td>FC-02-02</td>
+                <td>추출기(착즙기)(2)</td>
+                <td>추출</td>
+                <td>즙</td>
+                <td>1t</td>
+                <td>60</td>
+                <td>24</td>
+                <td>2020-03-18</td>
+                <td>가용 가능</td>
+            </tr>
+            <tr>
+                <td>FC-03-01</td>
+                <td>살균기(1)</td>
+                <td>살균</td>
+                <td>즙, 젤리</td>
+                <td>0.1</td>
+                <td>60</td>
+                <td>2</td>
+                <td>2020-03-18</td>
+                <td>가용 가능</td>
+            </tr>
+            <tr>
+                <td>FC-03-02</td>
+                <td>살균기(2)</td>
+                <td>살균</td>
+                <td>즙, 젤리</td>
+                <td>0.1t</td>
+                <td>60min</td>
+                <td>2h</td>
+                <td>2020-03-18</td>
+                <td>가용 가능</td>
+            </tr>
+            <tr>
+                <td>FC-04-01</td>
+                <td>혼합기</td>
+                <td>혼합</td>
+                <td>젤리</td>
+                <td>60kg</td>
+                <td>60min</td>
+                <td>8h</td>
+                <td>2020-03-18</td>
+                <td>가용 가능</td>
+            </tr>
+            <tr>
+                <td>FC-05-01</td>
+                <td>여과기</td>
+                <td>여과</td>
+                <td>즙</td>
+                <td>0.1t</td>
+                <td>60min</td>
+                <td>2h</td>
+                <td>2020-03-18</td>
+                <td>가용 가능</td>
+            </tr>
+            <tr>
+                <td>FC-06-01</td>
+                <td>Box 포장기</td>
+                <td>포장</td>
+                <td>즙, 젤리</td>
+                <td>160ea/h</td>
+                <td>30</td>
+                <td>2h</td>
+                <td>2020-03-18</td>
+                <td>가용 가능</td>
+            </tr>
+            <tr>
+                <td>FC-07-01</td>
+                <td>금속검출기</td>
+                <td>검사</td>
+                <td>즙, 젤리</td>
+                <td>5000ea/h</td>
+                <td>10</td>
+                <td>2h</td>
+                <td>2020-03-18</td>
+                <td>가용 가능</td>
+            </tr>
+            </tbody>
         </table>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-</body>
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/js/sidebar.js"></script>
 <script>
 
-    $("#equipmentTable").DataTable({
-        "serverSide":true,
-        "processing":true,
-        "ajax":{
-            "url":"/api/equipmentData",
-            "type":"POST",
-            "dataSrc":"data",
-        },
-        "columns":[
-            {"data":"equipmentId"},
-            {"data":"equipmentName"},
-            {"data":"equipmentType"},
-            {"data":"equipmentProduct"},
-            {"data":"productionCapacity"},
-            {"data":"equipmentStatus"},
-            {"data":"setupTime"},
-            {"data":"cycleHour"},
-            {"data":"acquisitionDate"},
-        ]
+    $(document).ready(function() {
+        $('#equipmentTable').DataTable();
     });
 
+    // DataTables의 기본 검색 필드 제거
     $("#equipmentTable_filter").remove();
 
-    var buttons = document.getElementsByClassName('sidebar-btn');
-    for (var i = 0; i < buttons.length; i++) {
-        buttons[i].addEventListener('click', toggleSubMenu);
-    }
-
-    function toggleSubMenu() {
-        // 클릭된 요소(this)의 다음 형제 요소(.sub-menu)를 가져옴
-        var subMenu = this.nextElementSibling;
-
-        // .sub-menu의 현재 상태를 확인하여 토글
-        if (subMenu.classList.contains('show')) {
-            subMenu.classList.remove('show'); // show 클래스가 있으면 제거하여 닫음
-        } else {
-            subMenu.classList.add('show'); // show 클래스가 없으면 추가하여 엶
-        }
-    }
-
 </script>
+
+</body>
 </html>

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="/css/sidebar.css">
-    <title>자재 입출고 현황</title>
+    <title>공정 정보</title>
 
     <style>
         <!--  사이드바 CSS 시작    -->
@@ -16,6 +16,10 @@
         .content {
             margin-left: 250px; /* 사이드바의 폭만큼 왼쪽 마진 */
             padding: 20px;
+        }
+
+        .table td {
+            text-align: center;
         }
 
     </style>
@@ -79,22 +83,104 @@
 </div>
 
 <div class="content">
-    <h1>자재 입출고 현황</h1>
+    <h1>공정 정보</h1>
 
-    <table id="materialInOutTable" class="display table table-bordered" style="width:100%">
+    <table id="processTable" class="display table table-bordered" style="width:100%">
         <thead>
         <tr>
-            <th>입고번호</th>
-            <th>제품명</th>
-            <th>수량</th>
-            <th>유통기한</th>
-            <th>상태</th>
-            <th>입고일</th>
-            <th>입고자</th>
-            <th>출고일</th>
-            <th>출고자</th>
+            <th>공정 ID</th>
+            <th>공정 제품 유형</th>
+            <th>공정 단계</th>
+            <th>공정 설비 내역</th>
+            <th>공정 소요 시간</th>
         </tr>
         </thead>
+        <tbody>
+        <tr>
+            <td>PC-01-01</td>
+            <td>즙, 젤리</td>
+            <td>살균</td>
+            <td>살균기(1), 살균기(2)</td>
+            <td>2h</td>
+        </tr>
+        <tr>
+            <td>PC-02-01</td>
+            <td>즙</td>
+            <td>세척</td>
+            <td>-</td>
+            <td>2h</td>
+        </tr>
+        <tr>
+            <td>PC-02-02</td>
+            <td>즙</td>
+            <td>추출</td>
+            <td>추출기(착즙기)(1), 추출기(착즙기)(2)</td>
+            <td>24h</td>
+        </tr>
+        <tr>
+            <td>PC-02-03</td>
+            <td>즙</td>
+            <td>여과</td>
+            <td>여과기</td>
+            <td>4h</td>
+        </tr>
+        <tr>
+            <td>PC-02-04</td>
+            <td>즙</td>
+            <td>충진</td>
+            <td>즙 포장기(1), 즙 포장기(2)</td>
+            <td>8h</td>
+        </tr>
+        <tr>
+            <td>PC-02-05</td>
+            <td>즙</td>
+            <td>검사</td>
+            <td>금속검출기</td>
+            <td>2h</td>
+        </tr>
+        <tr>
+            <td>PC-02-06</td>
+            <td>즙</td>
+            <td>포장</td>
+            <td>Box 포장기</td>
+            <td>2h</td>
+        </tr>
+        <tr>
+            <td>PC-03-01</td>
+            <td>젤리</td>
+            <td>혼합</td>
+            <td>혼합기</td>
+            <td>8h</td>
+        </tr>
+        <tr>
+            <td>PC-03-02</td>
+            <td>젤리</td>
+            <td>충진</td>
+            <td>젤리스틱 포장기(1), 젤리스틱 포장기(2)</td>
+            <td>2h</td>
+        </tr>
+        <tr>
+            <td>PC-03-03</td>
+            <td>젤리</td>
+            <td>냉각</td>
+            <td>-</td>
+            <td>8h</td>
+        </tr>
+        <tr>
+            <td>PC-03-04</td>
+            <td>젤리</td>
+            <td>검사</td>
+            <td>금속검출기</td>
+            <td>1h</td>
+        </tr>
+        <tr>
+            <td>PC-03-05</td>
+            <td>젤리</td>
+            <td>포장</td>
+            <td>Box 포장기</td>
+            <td>1h</td>
+        </tr>
+        </tbody>
     </table>
 </div>
 
@@ -104,45 +190,12 @@
 <script type="text/javascript" src="/js/sidebar.js"></script>
 <script>
 
-    $("#materialInOutTable").DataTable({
-        "serverSide":true,
-        "processing":true,
-        "ajax":{
-            "url":"/api/materialInOutData",
-            "type":"POST",
-            "dataSrc":"data",
-        },
-        "columns":[
-            {"data":"inOutId"},
-            {"data":"materialName"},
-            {"data":"quantity"},
-            {"data":"expirationDate"},
-            {"data":"status"},
-            {"data":"storageDate"},
-            {"data":"storageWorker"},
-            {"data":"retrievalDate"},
-            {"data":"retrievalWorker"},
-        ]
+    $(document).ready(function() {
+        $('#processTable').DataTable();
     });
 
-    $("#equipmentTable_filter").remove();
-
-    var buttons = document.getElementsByClassName('sidebar-btn');
-    for (var i = 0; i < buttons.length; i++) {
-        buttons[i].addEventListener('click', toggleSubMenu);
-    }
-
-    function toggleSubMenu() {
-        // 클릭된 요소(this)의 다음 형제 요소(.sub-menu)를 가져옴
-        var subMenu = this.nextElementSibling;
-
-        // .sub-menu의 현재 상태를 확인하여 토글
-        if (subMenu.classList.contains('show')) {
-            subMenu.classList.remove('show'); // show 클래스가 있으면 제거하여 닫음
-        } else {
-            subMenu.classList.add('show'); // show 클래스가 없으면 추가하여 엶
-        }
-    }
+    // DataTables의 기본 검색 필드 제거
+    $("#processTable_filter").remove();
 
 </script>
 

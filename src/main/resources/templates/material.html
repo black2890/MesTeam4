@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="/css/sidebar.css">
-    <title>자재 입출고 현황</title>
+    <title>원자재 주문 정보</title>
 
     <style>
         <!--  사이드바 CSS 시작    -->
@@ -16,6 +16,10 @@
         .content {
             margin-left: 250px; /* 사이드바의 폭만큼 왼쪽 마진 */
             padding: 20px;
+        }
+
+        .table td {
+            text-align: center;
         }
 
     </style>
@@ -79,22 +83,84 @@
 </div>
 
 <div class="content">
-    <h1>자재 입출고 현황</h1>
+    <h1>원자재 주문 정보</h1>
 
-    <table id="materialInOutTable" class="display table table-bordered" style="width:100%">
+    <table id="materialTable" class="display table table-bordered" style="width:100%">
         <thead>
         <tr>
-            <th>입고번호</th>
-            <th>제품명</th>
-            <th>수량</th>
-            <th>유통기한</th>
-            <th>상태</th>
-            <th>입고일</th>
-            <th>입고자</th>
-            <th>출고일</th>
-            <th>출고자</th>
+            <th>원자재 ID</th>
+            <th>원자재 명</th>
+            <th>발주 업체</th>
+            <th>최소 주문 수량</th>
+            <th>최대 주문 수량</th>
+            <th>입고 리드 타임(h)</th>
         </tr>
         </thead>
+        <tbody>
+        <tr>
+            <td>MT-01-01</td>
+            <td>양배추</td>
+            <td>에이농장</td>
+            <td>100kg</td>
+            <td>2000kg</td>
+            <td>48h</td>
+        </tr>
+        <tr>
+            <td>MT-01-02</td>
+            <td>흑마늘</td>
+            <td>에이농장</td>
+            <td>100kg</td>
+            <td>2000kg</td>
+            <td>48h</td>
+        </tr>
+        <tr>
+            <td>MT-01-03</td>
+            <td>벌꿀</td>
+            <td>에이농장</td>
+            <td>1L</td>
+            <td>200L</td>
+            <td>48h</td>
+        </tr>
+        <tr>
+            <td>MT-02-01</td>
+            <td>석류(농축액)</td>
+            <td>OO농협</td>
+            <td>20L</td>
+            <td>200L</td>
+            <td>72h</td>
+        </tr>
+        <tr>
+            <td>MT-02-02</td>
+            <td>매실(농축액)</td>
+            <td>OO농협</td>
+            <td>20L</td>
+            <td>200L</td>
+            <td>72h</td>
+        </tr><tr>
+            <td>MT-02-03</td>
+            <td>콜라겐</td>
+            <td>OO농협</td>
+            <td>20L</td>
+            <td>200L</td>
+            <td>72h</td>
+        </tr>
+        <tr>
+            <td>MT-03-01</td>
+            <td>포장지</td>
+            <td>OO포장</td>
+            <td>10000ea</td>
+            <td>100000ea</td>
+            <td>168h</td>
+        </tr>
+        <tr>
+            <td>MT-03-02</td>
+            <td>Box</td>
+            <td>OO포장</td>
+            <td>1000ea</td>
+            <td>10000ea</td>
+            <td>72h</td>
+        </tr>
+        </tbody>
     </table>
 </div>
 
@@ -104,45 +170,12 @@
 <script type="text/javascript" src="/js/sidebar.js"></script>
 <script>
 
-    $("#materialInOutTable").DataTable({
-        "serverSide":true,
-        "processing":true,
-        "ajax":{
-            "url":"/api/materialInOutData",
-            "type":"POST",
-            "dataSrc":"data",
-        },
-        "columns":[
-            {"data":"inOutId"},
-            {"data":"materialName"},
-            {"data":"quantity"},
-            {"data":"expirationDate"},
-            {"data":"status"},
-            {"data":"storageDate"},
-            {"data":"storageWorker"},
-            {"data":"retrievalDate"},
-            {"data":"retrievalWorker"},
-        ]
+    $(document).ready(function() {
+        $('#materialTable').DataTable();
     });
 
-    $("#equipmentTable_filter").remove();
-
-    var buttons = document.getElementsByClassName('sidebar-btn');
-    for (var i = 0; i < buttons.length; i++) {
-        buttons[i].addEventListener('click', toggleSubMenu);
-    }
-
-    function toggleSubMenu() {
-        // 클릭된 요소(this)의 다음 형제 요소(.sub-menu)를 가져옴
-        var subMenu = this.nextElementSibling;
-
-        // .sub-menu의 현재 상태를 확인하여 토글
-        if (subMenu.classList.contains('show')) {
-            subMenu.classList.remove('show'); // show 클래스가 있으면 제거하여 닫음
-        } else {
-            subMenu.classList.add('show'); // show 클래스가 없으면 추가하여 엶
-        }
-    }
+    // DataTables의 기본 검색 필드 제거
+    $("#materialTable_filter").remove();
 
 </script>
 
