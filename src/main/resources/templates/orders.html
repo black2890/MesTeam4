@@ -92,7 +92,7 @@
 
                     <div class="form-group">
                         <label for="quantity">Quantity(Box)</label>
-                        <input type="number" class="form-control" id="quantity" name="quantity" required>
+                        <input type="number" class="form-control" id="quantity" name="quantity" min="20" max="1000" required>
                     </div>
                     <div class="form-group">
                         <label for="vendorName">Vendor</label>
@@ -216,12 +216,6 @@
         });
 
         function updateOrderStatus(status) {
-            // var selectedData = table.rows({ selected: true }).data();
-            // var orderIds = [];
-            //
-            // for (var i = 0; i < selectedData.length; i++) {
-            //     orderIds.push(selectedData[i].orderId);
-            // }
 
             var selectedData = [];
             $('#example tbody input[type="checkbox"]:checked').each(function () {
@@ -247,16 +241,60 @@
                     }
                 });
             } else {
-                alert("Please select at least one order.");
+                alert(" 최소한 하나 이상의 데이터 행을 체크해주세요. ");
             }
         }
 
+        $('#checkall').on('click', function(){
+            var rows = table.rows({ 'search': 'applied' }).nodes();
+            $('input[type="checkbox"]', rows).prop('checked', this.checked);
+        });
+
+        // Handle click on individual checkbox to maintain state of "select-all" checkbox
+        $('#example tbody').on('change', 'input[type="checkbox"]', function(){
+            if(!this.checked){
+                var el = $('#checkall').get(0);
+                if(el && el.checked && ('indeterminate' in el)){
+                    el.indeterminate = true;
+                }
+            }
+        });
+
         $('#shipButton').on('click', function () {
-            updateOrderStatus('RETRIEVALCOMPLETED');
+            var canShip = true;
+            $('#example tbody input[type="checkbox"]:checked').each(function () {
+                var data = table.row($(this).closest('tr')).data();
+                if (data.ordersStatus !== 'PRODUCTIONCOMPLETED') {
+                    canShip = false;
+                    return false;
+                }
+            });
+
+            if (canShip) {
+                updateOrderStatus('RETRIEVALCOMPLETED');
+                alert("출하가 완료되었습니다.");
+            } else {
+                alert("출하 버튼은 상태가 (생산완료)인 경우에만 사용할 수 있습니다.");
+            }
         });
 
         $('#deliverButton').on('click', function () {
-            updateOrderStatus('DELIVERED');
+            var canDeliver = true;
+            $('#example tbody input[type="checkbox"]:checked').each(function () {
+                var data = table.row($(this).closest('tr')).data();
+                console.log('Order data:', data);
+                if (data.ordersStatus !== 'RETRIEVALCOMPLETED') {
+                    canDeliver = false;
+                    return false;
+                }
+            });
+
+            if (canDeliver) {
+                updateOrderStatus('DELIVERED');
+                alert("배송이 완료되었습니다.");
+            } else {
+                alert("배송완료 버튼은 상태가 (출하완료)인 경우에만 사용할 수 있습니다.");
+            }
         });
 
 
@@ -325,10 +363,10 @@
                 return false;
             }
         });
+
+
     });
 </script>
-
-
 
 </body>
 </html>

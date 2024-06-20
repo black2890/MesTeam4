@@ -20,8 +20,8 @@
 </head>
 <body>
 <div class="container mt-4">
-    <button type="button" class="btn btn-primary mb-4" data-toggle="modal" data-target="#vendorModal">
-        Create Vendor
+    <button type="button" class="btn btn-primary mb-4 float-right" data-toggle="modal" data-target="#vendorModal">
+        업체 등록
     </button>
 
     <table id="example" class="display" style="width:100%">
@@ -51,7 +51,7 @@
             <div class="modal-body">
                 <form id="vendorForm">
                     <div class="form-group">
-                        <label for="vendorType">Vendor Type</label>
+                        <label for="vendorType">업체 유형</label>
                         <select class="form-control" id="vendorType" name="type">
                             <option value="order">수주업체</option>
                             <option value="materialOrder">발주업체</option>
@@ -59,11 +59,11 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="vendorName">Vendor Name</label>
+                        <label for="vendorName">업체명</label>
                         <input type="text" class="form-control" id="vendorName" name="name" required>
                     </div>
                     <div class="form-group">
-                        <label for="vendorContact">Contact</label>
+                        <label for="vendorContact">연락처</label>
                         <input type="text" class="form-control" id="vendorContact" name="contact" required>
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
@@ -79,12 +79,22 @@
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.js"></script>
 <!-- Bootstrap JS -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-<!-- Custom script to load data -->
+<!-- Datatables Buttons JS -->
+<script src="https://cdn.datatables.net/buttons/2.0.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.print.min.js"></script>
 <script>
     $(document).ready(function () {
         $('#example').DataTable({
             "processing": true,
             "serverSide": true,
+            "paging": true,
+            "pageLength": 10,
+            "searching": true,
+            "lengthChange": true,
+            "ordering": true,
+            "info": true,
             "ajax": {
                 "url": "/vendorData",
                 "type": "POST"
@@ -108,6 +118,15 @@
                     }
                 },
                 {"data": "contactInfo"}
+            ],
+            "dom": '<"d-flex justify-content-between"lfB>tipr<"d-flex justify-content-between">',
+            buttons: [
+                {
+                    "extend": 'excelHtml5',
+                    "text": '엑셀 다운로드',
+                    "className": 'btn btn-outline-primary excelBtn',
+                    "title": '업체 데이터'
+                }
             ]
         });
 
@@ -127,7 +146,6 @@
                 }
             });
         });
-
     });
 </script>
 </body>

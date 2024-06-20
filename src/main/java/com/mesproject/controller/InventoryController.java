@@ -75,9 +75,8 @@ public class InventoryController {
             @RequestParam Map<String, String> requestParams) {
 
         int page = start / length;
-
-        // Collect sorting information
         List<Sort.Order> orders = new ArrayList<>();
+
         int i = 0;
         while (requestParams.containsKey("order[" + i + "][column]")) {
             int columnIdx = Integer.parseInt(requestParams.get("order[" + i + "][column]"));
@@ -118,7 +117,7 @@ public class InventoryController {
     }
 
     private String getColumnName(int columnIdx) {
-        String[] columnNames = {"inventoryId", "productName", "quantity", "inventoryStatus", "completedDate"};
+        String[] columnNames = {"inventoryId", "product.productName", "quantity", "inventoryStatus", "completedDate"};
         return columnNames[columnIdx];
     }
 }

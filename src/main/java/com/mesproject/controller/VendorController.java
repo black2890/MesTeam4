@@ -43,7 +43,7 @@ public class VendorController {
 
         int page = start / length;
         Sort.Direction sortDirection = orderDir.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
-        String[] columnNames = {"vendorId", "vendorName", "contactName", "phone", "address"};
+        String[] columnNames = {"vendorId", "vendorName", "vendorType", "contactInfo"};
         Sort sort = Sort.by(sortDirection, columnNames[orderColumn]);
         Pageable pageable = PageRequest.of(page, length, sort);
 
