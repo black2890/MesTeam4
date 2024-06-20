@@ -13,8 +13,10 @@ public class Inventory {
     @GeneratedValue
     private Long inventoryId;
 
-    @JoinColumn
-    private Long productId;
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
+
     // private Long workPlanId;
 
     private Long quantity;
