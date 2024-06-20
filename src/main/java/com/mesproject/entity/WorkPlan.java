@@ -1,5 +1,6 @@
 package com.mesproject.entity;
 
+import com.mesproject.constant.WorkOrdersStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,6 +32,9 @@ public class WorkPlan {
             fetch=FetchType.LAZY)
     private List<WorkOrders> workOrders = new ArrayList<>();
 
+    @Enumerated(EnumType.STRING)
+    private WorkOrdersStatus workPlanStatus;
+
 
 
     public static WorkPlan createWorkPlan(Product product, Long quantity){
@@ -38,6 +42,7 @@ public class WorkPlan {
         WorkPlan workPlan = new WorkPlan();
         workPlan.setProduct(product);
         workPlan.setQuantity(quantity);
+        workPlan.setWorkPlanStatus(WorkOrdersStatus.PENDING);
 
         return workPlan;
     }

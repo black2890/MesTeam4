@@ -1,8 +1,11 @@
 package com.mesproject.service;
 
+import com.mesproject.constant.MaterialOrdersStatus;
 import com.mesproject.dto.MaterialInOutDto;
 import com.mesproject.entity.MaterialInOut;
+import com.mesproject.entity.MaterialOrders;
 import com.mesproject.repository.MaterialInOutRepository;
+import com.mesproject.repository.MaterialOrdersRepository;
 import com.mesproject.repository.OrdersRepository;
 import com.mesproject.repository.WorkOrdersRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -10,6 +13,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,6 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MaterialInOutService {
     private final MaterialInOutRepository materialInOutRepository;
+    private final MaterialOrdersRepository materialOrdersRepository;
 
    /*
     입고 메서드
@@ -27,8 +32,20 @@ public class MaterialInOutService {
     public void In(MaterialInOutDto materialInOutDto){
         MaterialInOut materialInOut = materialInOutRepository.findById(materialInOutDto.getInoutId())
                 .orElseThrow(EntityNotFoundException::new);
+        MaterialOrders materialOrders = materialOrdersRepository.findById(materialInOut.getMaterialOrders().getMaterialOrderId())
+                .orElseThrow(EntityNotFoundException::new);
+
+        // deliveryDate 가져오기
+        LocalDate deliveryDate = materialOrders.getDeliveryDate();
+
+        // storageDate가 deliveryDate 이후인지 확인
+        if (materialInOutDto.getStorageDate().isBefore(deliveryDate.atStartOfDay())) {
+            throw new IllegalArgumentException("발주일 기준, 원자재 lead time 이 지나지 않았습니다.");
+        }
+
         materialInOut.setStorageDate(materialInOutDto.getStorageDate());
         materialInOut.setStorageWorker(materialInOutDto.getStorageWorker());
+        materialOrders.setMaterialOrdersStatus(MaterialOrdersStatus.STORAGECOMPLETED);
 
     }
 

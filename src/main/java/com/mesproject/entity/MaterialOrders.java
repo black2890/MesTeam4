@@ -8,8 +8,14 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -29,7 +35,9 @@ public class MaterialOrders {
     private Vendor vendor;
 
     private LocalDateTime materialOrderDate;
-    private LocalDateTime deliveryDate;
+   // private LocalDateTime deliveryDate;
+
+    private LocalDate deliveryDate;
     private Long quantity;
 
     @Enumerated(EnumType.STRING)
@@ -41,6 +49,9 @@ public class MaterialOrders {
         materialOrders.setProduct(product);
         materialOrders.setQuantity(materialOrderDto.getQuantity());
         materialOrders.setMaterialOrdersStatus(MaterialOrdersStatus.PENDINGSTORAGE);
+        LocalDateTime materialOrderDate = materialOrderDto.getMaterialOrderDate();
+        materialOrders.setMaterialOrderDate(materialOrderDate);
+        materialOrders.setDeliveryDate(MaterialDeliveryDateCalculator.calculateDeliveryDate(materialOrderDate,product.getProductId()));
 //        materialOrders.setDeliveryDate(materialOrderDto.getDeliveryDate());
 //        if(product.getProductId()==5||product.getProductId()==6||product.getProductId()==7){
 //            materialOrders.setMaterialOrderDate(materialOrderDto.getDeliveryDate().minusDays(2));
@@ -52,6 +63,43 @@ public class MaterialOrders {
 
 
         return materialOrders;
+    }
+
+    public class MaterialDeliveryDateCalculator {
+        private static final Set<LocalDate> HOLIDAYS = new HashSet<>(Arrays.asList(
+                LocalDate.of(2024, 1, 1),
+                LocalDate.of(2024, 2, 9),
+                LocalDate.of(2024, 3, 1)
+
+        ));
+        public static LocalDate calculateDeliveryDate(LocalDateTime orderDateTime, Long productId) {
+            LocalDate orderDate = orderDateTime.toLocalDate();
+            LocalTime orderTime = orderDateTime.toLocalTime();
+
+            //즙이면, 2일/3일
+            //스틱이면 3일/4일
+            int leadTime=0;
+            if(productId==5||productId==6||productId==7){
+            leadTime = orderTime.isBefore(LocalTime.NOON) ? 2 : 3;
+            }else if(productId==8||productId==9||productId==10){
+                leadTime = orderTime.isBefore(LocalTime.of(15, 0)) ? 3 : 4;
+            }else if(productId==11){
+                leadTime = 7;
+            }else if(productId==12){
+                leadTime = 3;
+            }
+
+            LocalDate estimatedDeliveryDate = orderDate.plusDays(leadTime);
+
+            while (isWeekendOrHoliday(estimatedDeliveryDate)) {
+                estimatedDeliveryDate = estimatedDeliveryDate.plusDays(1);
+            }
+            return estimatedDeliveryDate;
+        }
+        private static boolean isWeekendOrHoliday(LocalDate date) {
+            DayOfWeek dayOfWeek = date.getDayOfWeek();
+            return dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY || HOLIDAYS.contains(date);
+        }
     }
 
 }

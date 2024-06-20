@@ -30,6 +30,7 @@ public class WorkOrdersService {
     private final WorkPlanRepository   workPlanRepository;
     private final InventoryRepository inventoryRepository;
     private final MaterialInOutService materialInOutService;
+    private final WorkPlanServicce workPlanService;
 
     public List<WorkOrders> createWorkOrders(WorkPlan workPlan){
         List<WorkOrders> workOrdersList = new ArrayList<>();
@@ -198,6 +199,10 @@ public class WorkOrdersService {
             throw new IllegalStateException("작업 공정이 작업 계획에 없습니다: " + workOrders.getWorkOrderId());
         }
 
+        if (currentIndex == 0) {
+         workPlan.setWorkPlanStatus(WorkOrdersStatus.INPROGRESS);
+        }
+
         // 현재 공정 이전의 모든 공정들이 완료되었는지 확인
         for (int i = 0; i < currentIndex; i++) {
             WorkOrders previousOrder = workOrdersList.get(i);
@@ -264,6 +269,8 @@ public class WorkOrdersService {
             WorkOrders FinalWorkOrder = workOrdersList.get(workOrdersList.size() - 1);
             if (Objects.equals(workOrders.getWorkOrderId(), FinalWorkOrder.getWorkOrderId())) {
                 Inventory.createInventory(workPlan);
+                workPlan.setWorkPlanStatus(WorkOrdersStatus.COMPLETED);
+                workPlanService.ProductionCompleted(workPlan);
             }
         }
 

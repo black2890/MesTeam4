@@ -31,6 +31,11 @@ public class OrderService {
     private final WorkPlanRepository workPlanRepository;
     private final VendorRepository vendorRepository;
 
+    /*납품일 받았을 때, 생산계획 비어있다고 생각하고 넣는 메서드
+    만약, 생산계획 차있으면 그 자리는 피해서 넣어야함.
+    스틱은 있으면 건너뛰고 하루에 할당하면 되는데
+    즙은 하루만 비어있으면 그 때는 생산 못하고 이틀 비어있는 곳에 넣어야 함.
+     */
     public Long order(OrderDto orderDto){
 
 
@@ -65,6 +70,7 @@ public class OrderService {
         numberOfProduction = (int)(orderDto.getQuantity()/maxQuantity)+1;
 
         //생산 시작일시 계산
+        //납품일에 맞춰서 생산일시 계산하는 로직필요
         int productionPeriod = 0;
         LocalDateTime deliveryDate = orderDto.getDeliveryDate();
         LocalDateTime productionDate = null;
@@ -76,6 +82,7 @@ public class OrderService {
             productionPeriod=1;
             productionDate = deliveryDate.minusDays(productionPeriod*numberOfProduction + 2);
         }
+
 
 
 
@@ -98,6 +105,7 @@ public class OrderService {
         // 납품예정일 저장해야함(지금 기준 이틀 뒤?, 원래는 생산 일정에 맞춰 발주하는 게 맞음)--> 첫 생산계획 3일 전?
         MaterialOrderDto materialOrderDto1 = new MaterialOrderDto();
         materialOrderDto1.setProductId(materialId1);
+        materialOrderDto1.setMaterialOrderDate(productionDate.minusDays(7));
    //     materialOrderDto1.setDeliveryDate(productionDate);
         if(orderDto.getProductId()==1 || orderDto.getProductId()==2){
             materialOrderDto1.setQuantity(1000L);
@@ -106,6 +114,7 @@ public class OrderService {
         }
         MaterialOrderDto materialOrderDto2 = new MaterialOrderDto();
         materialOrderDto2.setProductId(materialId2);
+        materialOrderDto2.setMaterialOrderDate(productionDate.minusDays(7));
       //  materialOrderDto2.setDeliveryDate(productionDate);
         if(orderDto.getProductId()==1 || orderDto.getProductId()==2){
             materialOrderDto2.setQuantity(50L);
@@ -151,7 +160,7 @@ public class OrderService {
         productid가 1,2이면 2일
         productid가 3,4이면 1일
          */
-            WorkPlan workPlan = new WorkPlan();
+            WorkPlan workPlan;
             if(count==numberOfProduction){
                 workPlan = WorkPlan.createWorkPlan(product,orderDto.getQuantity()%maxQuantity);
             }else if(numberOfProduction ==1){
@@ -162,7 +171,7 @@ public class OrderService {
 
             }
             count++;
-
+            //productiondate를 무작정 +2 or +1 해주는 건 안됨. 사이에 작업계획 있는지 확인해야
             workPlan.setStart(productionDate);
             if(orderDto.getProductId()==1 || orderDto.getProductId()==2){
                 workPlan.setEnd(productionDate.plusHours(44));
@@ -213,33 +222,7 @@ public class OrderService {
         return order.getOrderId();
     }
 
-    public class MaterialDeliveryDateCalculator {
-        private static final Set<LocalDate> HOLIDAYS = new HashSet<>(Arrays.asList(
-                LocalDate.of(2024, 1, 1),
-                LocalDate.of(2024, 2, 9),
-                LocalDate.of(2024, 3, 1)
 
-        ));
-        public static LocalDate calculateDeliveryDate(LocalDateTime orderDateTime) {
-            LocalDate orderDate = orderDateTime.toLocalDate();
-            LocalTime orderTime = orderDateTime.toLocalTime();
-
-            //즙이면, 2일/3일
-            //스틱이면 3일/4일
-            int leadTime = orderTime.isBefore(LocalTime.NOON) ? 2 : 3;
-
-            LocalDate estimatedDeliveryDate = orderDate.plusDays(leadTime);
-
-            while (isWeekendOrHoliday(estimatedDeliveryDate)) {
-                estimatedDeliveryDate = estimatedDeliveryDate.plusDays(1);
-            }
-            return estimatedDeliveryDate;
-        }
-        private static boolean isWeekendOrHoliday(LocalDate date) {
-            DayOfWeek dayOfWeek = date.getDayOfWeek();
-            return dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY || HOLIDAYS.contains(date);
-        }
-    }
 
 
 
