@@ -19,11 +19,11 @@ public class Orders {
     private Long orderId;
 
     @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
+    @JoinColumn(name = "product_id")
     private Product product;
 
     @ManyToOne
-    @JoinColumn(name = "vendor_id", nullable = false)
+    @JoinColumn(name = "vendor_id")
     private Vendor vendor;
     private Long workPlanId;
     private Long materialOrderId;

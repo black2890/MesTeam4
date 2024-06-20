@@ -5,7 +5,6 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="/css/sidebar.css">
-
     <title>수주</title>
 
     <style>
@@ -100,8 +99,8 @@
         <div class="input-group mb-3 searchBar">
             <button class="btn btn-outline-info dropdown-toggle searchBtn" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">검색 조건</button>
             <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#" onclick="changeButtonText('제품명')">제품명</a></li>
-                <li><a class="dropdown-item" href="#" onclick="changeButtonText('고객명(업체)')">고객명(업체)</a></li>
+                <li><a class="dropdown-item" onclick="changeButtonText('제품명')">제품명</a></li>
+                <li><a class="dropdown-item" onclick="changeButtonText('고객명(업체)')">고객명(업체)</a></li>
             </ul>
             <input type="text" class="form-control inputText" aria-label="Text input with dropdown button">
             <button class="btn btn-outline-info" type="button" id="button-addon2">search</button>
@@ -125,65 +124,75 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-</body>
-
-<script>
-    $(document).ready(function() {
-        var table = $("#ordersTable").DataTable({
-            "serverSide": true,
-            "processing": true,
-            "ajax": {
-                "url": "/api/ordersData",
-                "type": "POST",
-                "dataSrc": function(res) {
-                    var data = res.data;
-                    return data;
+    <script>
+        
+        $(document).ready(function() {
+            var table = $("#ordersTable").DataTable({
+                "serverSide": true,
+                "processing": true,
+                "ajax": {
+                    "url": "/api/ordersData",
+                    "type": "POST",
+                    "dataSrc": function(res) {
+                        var data = res.data;
+                        return data;
+                    },
+                    "data": function(d) {
+                        d.searchType = $("#dropdownMenuButton").text().trim(); // 드롭다운에서 선택된 검색 조건
+                        d.searchValue = $(".inputText").val(); // 검색어 입력값
+                    }
                 },
-                "data": function(d) {
-                    d.searchType = $("#dropdownMenuButton").text().trim(); // 드롭다운에서 선택된 검색 조건
-                    d.searchValue = $(".inputText").val(); // 검색어 입력값
-                }
-            },
-            "columns": [
-                {"data": "orderId"},
-                {"data": "productName"},
-                {"data": "quantity"},
-                {"data": "vendorName"},
-                {"data": "deliveryAddress"},
-                {"data": "deliveryDate"},
-                {"data": "ordersStatus"}
-            ]
-        });
+                "columns": [
+                    {"data": "orderId"},
+                    {"data": "productName"},
+                    {"data": "quantity"},
+                    {"data": "vendorName"},
+                    {"data": "deliveryAddress"},
+                    {"data": "deliveryDate"},
+                    {"data": "ordersStatus"}
+                ]
+            });
 
-        // DataTables의 기본 검색 필드 제거
-        $("#ordersTable_filter").remove();
+            // DataTables의 기본 검색 필드 제거
+            $("#ordersTable_filter").remove();
 
-        // 사이드바 JS -START- //
-        let buttons = document.getElementsByClassName('sidebar-btn');
+            // 사이드바 JS -START- //
+            let buttons = document.getElementsByClassName('sidebar-btn');
 
-        for (let i = 0; i < buttons.length; i++) {
-            buttons[i].addEventListener('click', toggleSubMenu);
-        }
-
-        function toggleSubMenu() {
-            let subMenu = this.nextElementSibling;
-            if (subMenu.classList.contains('show')) {
-                subMenu.classList.remove('show');
-            } else {
-                subMenu.classList.add('show');
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].addEventListener('click', toggleSubMenu);
             }
-        }
-        // 사이드바 JS -END- //
 
-        // 검색 버튼 클릭 시 동작할 함수
-        $("#searchButton").click(function() {
-            table.ajax.reload(); // DataTables를 다시 로드하여 새로운 검색 조건을 적용
+            function toggleSubMenu() {
+                let subMenu = this.nextElementSibling;
+                if (subMenu.classList.contains('show')) {
+                    subMenu.classList.remove('show');
+                } else {
+                    subMenu.classList.add('show');
+                }
+            }
+            // 사이드바 JS -END- //
+
+            // 검색 버튼 클릭 시 동작할 함수
+            $("#button-addon2").click(function() {
+                table.ajax.reload(); // DataTables를 다시 로드하여 새로운 검색 조건을 적용
+            });
+
         });
 
         // 드롭다운 메뉴에서 검색 조건 변경 시 버튼 텍스트 업데이트 함수
         function changeButtonText(text) {
             $("#dropdownMenuButton").text(text);
+
+            // 검색 조건에 따라 입력 필드 및 검색 버튼 표시 여부 변경
+            if (text === '제품명' || text === '고객명(업체)') {
+                $("#searchInputGroup").show();
+            } else {
+                $("#searchInputGroup").hide();
+            }
         }
-    });
-</script>
+    </script>
+
+</body>
+
 </html>

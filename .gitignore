@@ -16,3 +16,6 @@ build/tmp/compileJava/previous-compilation-data.bin
 /.gradle/8.8/executionHistory
 /.gradle/8.8
 .idea/workspace.xml
+/.idea
+/.gradle
+.gradle/file-system.probe

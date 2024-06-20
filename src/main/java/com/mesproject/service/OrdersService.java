@@ -27,25 +27,30 @@ public class OrdersService {
         int start = Integer.parseInt(formData.get("start").get(0));
         int length = Integer.parseInt(formData.get("length").get(0));
 
+        System.out.println(start +"입니다.");
+        System.out.println(length +"입니다.");
 
         // 페이지 설정
         Pageable pageable = PageRequest.of(start / length, length);
 
         // 검색 조건 가져오기
-        String productName = formData.getFirst("columns[1][search][value]");
-        String vendorName = formData.getFirst("columns[3][search][value]");
+        String searchType = formData.getFirst("searchType");
+        String searchValue = formData.getFirst("searchValue");
+
+        System.out.println(searchType +"입니다.");
+        System.out.println(searchValue +"입니다.");
 
         // 페이지네이션을 이용한 데이터 조회
         Page<OrdersDto> ordersPage;
 
-        if (StringUtils.isEmpty(productName) && StringUtils.isEmpty(vendorName)) {
+        if (searchType.equals("검색 조건") || StringUtils.isEmpty(searchValue)) {
             // 검색 조건이 없는 경우 전체 데이터 조회
             ordersPage = ordersRepository.findOrders(pageable);
         } else {
             // 검색 조건이 있는 경우 해당 조건으로 데이터 조회
             ordersPage = ordersRepository.findOrdersByProductOrVendor(
-                    StringUtils.isEmpty(productName) ? null : productName,
-                    StringUtils.isEmpty(vendorName) ? null : vendorName,
+                    searchType,
+                    searchValue,
                     pageable
             );
         }
