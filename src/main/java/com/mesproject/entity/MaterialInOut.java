@@ -17,9 +17,11 @@ public class MaterialInOut {
     private Long inoutId;
 
     //private Long materialOrderId;
-    //private Long workOrderId;
+    @OneToOne
+    @JoinColumn(name = "work_orders_id")
+    private WorkOrders workOrders;
 
-    private LocalDate expirationDate;
+    private LocalDateTime expirationDate;
 
     @Enumerated(EnumType.STRING)
     private MaterialInOutStatus materialInOutStatus;

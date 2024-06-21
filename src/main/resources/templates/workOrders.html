@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="/css/sidebar.css">
     <title>작업 지시</title>
@@ -114,18 +115,23 @@
             "ajax": {
                 "url": "/api/workOrdersData",
                 "type": "POST",
-                "dataSrc": "data",
+                "dataSrc": function(res) {
+                    var data = res.data;
+                    return data;
+                },
+                "data": function(d) {
+                    d.searchType = $("#dropdownMenuButton").text().trim(); // 드롭다운에서 선택된 검색 조건
+                    d.searchValue = $(".inputText").val(); // 검색어 입력값
+                }
             },
             "columns": [
-                {"data": "equipmentId"},
-                {"data": "equipmentName"},
-                {"data": "equipmentType"},
-                {"data": "equipmentProduct"},
-                {"data": "productionCapacity"},
-                {"data": "equipmentStatus"},
-                {"data": "setupTime"},
-                {"data": "cycleHour"},
-                {"data": "acquisitionDate"},
+                {"data": "orderId"},
+                {"data": "productName"},
+                {"data": "quantity"},
+                {"data": "vendorName"},
+                {"data": "deliveryAddress"},
+                {"data": "deliveryDate"},
+                {"data": "ordersStatus"}
             ]
         });
 

@@ -18,7 +18,9 @@ public class WorkOrders {
     @GeneratedValue
     private Long workOrderId;
 
-    //private Long workPlanId;
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private WorkPlan workPlan;
 
     private String workName;
     private LocalDateTime start;

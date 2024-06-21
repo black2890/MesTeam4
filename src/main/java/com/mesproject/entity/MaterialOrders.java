@@ -16,7 +16,10 @@ public class MaterialOrders {
     @Id
     @GeneratedValue
     private Long materialOrderId;
-    private Long productId;
+
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
     private LocalDateTime materialOrderDate;
     private LocalDateTime deliveryDate;
     private Long quantity;

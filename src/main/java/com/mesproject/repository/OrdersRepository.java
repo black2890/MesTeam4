@@ -17,7 +17,7 @@ public interface OrdersRepository extends JpaRepository<Orders, Long> {
     Page<OrdersDto> findOrders(Pageable pageable);
 
     @Query("SELECT NEW com.mesproject.dto.OrdersDto(o.orderId, p.productName, o.quantity, v.vendorName, o.deliveryAddress, o.deliveryDate, o.ordersStatus) " +
-            "FROM Orders o JOIN o.product p JOIN o.vendor v " +
+            "FROM Orders o LEFT JOIN o.product p LEFT JOIN o.vendor v " +
             "WHERE (:searchType = '제품명' AND p.productName LIKE %:searchValue%) OR " +
             "      (:searchType = '고객명(업체)' AND v.vendorName LIKE %:searchValue%)")
     Page<OrdersDto> findOrdersByProductOrVendor(
