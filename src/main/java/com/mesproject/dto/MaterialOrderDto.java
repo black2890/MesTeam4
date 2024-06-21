@@ -12,9 +12,12 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class MaterialOrderDto {
+    private Long materialOrderId;
     private Long productId;
     private LocalDateTime materialOrderDate;
     private LocalDateTime deliveryDate;
+    private LocalDateTime storageDate;
     private Long quantity;
+    private String storageWorker;
 
 }

@@ -1,5 +1,6 @@
 package com.mesproject.controller;
 
+import com.mesproject.dto.MaterialOrderDto;
 import com.mesproject.entity.MaterialInOut;
 import com.mesproject.entity.MaterialOrders;
 import com.mesproject.entity.Orders;
@@ -40,8 +41,8 @@ public class MaterialOrderController {
     }
 
     @PostMapping("/material/in")
-    public ResponseEntity<?> materialsIn(@RequestBody Long materialOrderId){
-        materialInOutService.In(materialOrderId);
+    public ResponseEntity<?> materialsIn(@RequestBody MaterialOrderDto materialOrderDto){
+        materialInOutService.In(materialOrderDto);
 
         return ResponseEntity.ok()
                 .build();

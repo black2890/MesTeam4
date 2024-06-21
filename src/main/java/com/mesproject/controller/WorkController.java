@@ -1,5 +1,6 @@
 package com.mesproject.controller;
 
+import com.mesproject.dto.WorkOrdersDto;
 import com.mesproject.entity.MaterialOrders;
 import com.mesproject.entity.WorkOrders;
 import com.mesproject.repository.WorkOrdersRepository;
@@ -30,10 +31,19 @@ public class WorkController {
 
 
     @PostMapping("/work/start")
-    public ResponseEntity<?> workStart(@RequestBody Long workId){
-        workOrdersService.start(workId);
+    public ResponseEntity<?> workStart(@RequestBody WorkOrdersDto workOrdersDto){
+        workOrdersService.start(workOrdersDto);
 
         return ResponseEntity.ok()
                 .build();
     }
+
+    @PostMapping("/work/end")
+    public ResponseEntity<?> workEnd(@RequestBody WorkOrdersDto workOrdersDto){
+        workOrdersService.end(workOrdersDto);
+
+        return ResponseEntity.ok()
+                .build();
+    }
+
 }
