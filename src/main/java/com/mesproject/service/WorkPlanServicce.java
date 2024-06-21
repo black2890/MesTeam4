@@ -28,6 +28,13 @@ public class WorkPlanServicce{
     public void ProductionCompleted(WorkPlan workPlan){
 
         //수주-작업계획 테이블에서 작업계획 코드로 데이터 찾음 (ex.작업계획 10000번 완료)
+
+        /*
+            1. workPlanId를 가지고 JPA를 통해 workPlan 리스트를 가져와서 ordersPlanList에 담음.
+            2. orderIdList와 workPlanIdList 빈 ArrayList생성
+            3. wo
+        */
+
         List<OrdersPlan> ordersPlanList = ordersPlanRepository.findByWorkPlan_WorkPlanId(workPlan.getWorkPlanId());
         List<Long> orderIdList = new ArrayList<>();
         List<Long> workPlanIdList = new ArrayList<>();
