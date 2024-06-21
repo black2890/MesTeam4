@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Orders Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container {
+            width: 45%;
+            margin: 10px;
+            display: inline-block;
+            vertical-align: top;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<div style="width: 80%; margin: auto;">
+    <div class="chart-container">
+        <canvas id="chart1"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="chart2"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="chart3"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="chart4"></canvas>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // AJAX request to fetch data from backend
+        fetch('/api/product-orders-summary')
+            .then(response => response.json())
+            .then(data => {
+                // Process data
+                const products = {};
+
+                // Group data by product name
+                data.forEach(item => {
+                    const productName = item[0]; // Replace with actual product name if needed
+                    const vendorName = item[1]; // Replace with actual vendor name if needed
+                    const quantity = item[2];
+
+                    if (!products[productName]) {
+                        products[productName] = {
+                            labels: [],
+                            quantities: []
+                        };
+                    }
+
+                    products[productName].labels.push(vendorName);
+                    products[productName].quantities.push(quantity);
+                });
+
+                const colors = {
+                    '양배추 즙': 'rgba(210,180,22,0.2)', // 초록색
+                    '흑마늘 즙': 'rgba(0, 0, 0, 0.2)', // 검은색
+                    '석류 젤리스틱': 'rgba(255, 99, 132, 0.2)', // 빨간색
+                    '매실 젤리스틱': 'rgba(0,255,4,0.2)' // 초록색
+                };
+
+                // Create charts for each product
+                Object.keys(products).forEach((productName, index) => {
+                    const ctx = document.getElementById(`chart${index + 1}`).getContext('2d');
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: products[productName].labels,
+                            datasets: [{
+                                label: ` ${productName}`,
+                                data: products[productName].quantities,
+                                backgroundColor: colors[productName],
+                                borderColor: colors[productName],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true, // 차트가 반응형으로 동작하도록 설정
+                            maintainAspectRatio: false, // 캔버스의 종횡비(aspect ratio)를 유지하지 않도록 설정
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                });
+
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    });
+</script>
+</body>
+</html>

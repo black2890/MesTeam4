@@ -71,6 +71,8 @@
                     "data": "inventoryStatus",
                     "render": function (data, type, row, meta) {
                         switch (data) {
+                            case 'PENDINGSTORAGE':
+                                return '입고대기';
                             case 'STORAGECOMPLETED':
                                 return '입고완료';
                             case 'RETRIEVALCOMPLETED':

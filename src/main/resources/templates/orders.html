@@ -39,6 +39,8 @@
 <script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.print.min.js"></script>
 
+<script src='https://unpkg.com/fullcalendar@5.11.0/main.min.js'></script>
+<script src='https://unpkg.com/axios/dist/axios.min.js'></script>
 <div class="container mt-4">
     <button type="button" class="btn btn-primary mb-4 float-right" data-toggle="modal" data-target="#orderModal">
         수주 등록
@@ -323,7 +325,7 @@
 
         $('#calendar').fullCalendar({
             selectable: true,
-            select: function (startDate) {
+            select: function(startDate) {
                 $('#deliveryDate').val(startDate.format('YYYY-MM-DD'));
                 $('#calendarModal').modal('hide');
             }
@@ -363,7 +365,6 @@
                 return false;
             }
         });
-
 
     });
 </script>

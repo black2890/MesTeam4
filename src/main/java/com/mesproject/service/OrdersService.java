@@ -11,9 +11,13 @@ import java.util.List;
 public class OrdersService {
 
     @Autowired
-    private OrdersRepository orderRepository;
+    private OrdersRepository ordersRepository;
 
     public void updateOrderStatus(List<Long> orderIds, OrdersStatus status) {
-        orderRepository.updateStatusByIds(orderIds, status);
+        ordersRepository.updateStatusByIds(orderIds, status);
+    }
+
+    public List<Object[]> getProductOrdersSummary() {
+        return ordersRepository.findProductOrdersSummary();
     }
 }

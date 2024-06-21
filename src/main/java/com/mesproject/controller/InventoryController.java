@@ -1,8 +1,8 @@
 package com.mesproject.controller;
 
 import com.mesproject.entity.Inventory;
-import com.mesproject.entity.Product;
 import com.mesproject.repository.InventoryRepository;
+import com.mesproject.service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +24,9 @@ public class InventoryController {
 
     @Autowired
     private InventoryRepository inventoryRepository;
+
+    @Autowired
+    private InventoryService inventoryService;
 
 //    @PostMapping("/inventoryData")
 //    public Map<String, Object> getInventory(
@@ -119,5 +122,10 @@ public class InventoryController {
     private String getColumnName(int columnIdx) {
         String[] columnNames = {"inventoryId", "product.productName", "quantity", "inventoryStatus", "completedDate"};
         return columnNames[columnIdx];
+    }
+
+    @GetMapping("/api/inventory/totalStock")
+    public Map<String, Integer> getTotalStock() {
+        return inventoryService.getTotalStockByProductNameAndStatus();
     }
 }
