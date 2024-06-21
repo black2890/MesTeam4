@@ -46,7 +46,9 @@ public class MaterialInOutService {
         // 페이지네이션을 이용한 데이터 조회
         Page<MaterialInOutDto> materialInOutPage;
 
-        if (searchType.equals("검색 조건") || StringUtils.isEmpty(searchValue)) {
+        if (searchType.equals("검색 조건") || StringUtils.isEmpty(searchValue)
+                //임시 예외 사항 조건문 처리
+            || searchType.equals("유통기한") || searchType.equals("상태") || searchType.equals("입고일") || searchType.equals("출고일")) {
             // 검색 조건이 없는 경우 전체 데이터 조회
             materialInOutPage = materialInOutRepository.findMaterialInOut(pageable);
         } else {

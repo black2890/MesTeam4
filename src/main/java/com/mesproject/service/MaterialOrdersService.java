@@ -46,7 +46,9 @@ public class MaterialOrdersService {
         // 페이지네이션을 이용한 데이터 조회
         Page<MaterialOrdersDto> materialOrdersPage;
 
-        if (searchType.equals("검색 조건") || StringUtils.isEmpty(searchValue)) {
+        if (searchType.equals("검색 조건") || StringUtils.isEmpty(searchValue)
+                //임시 예외 사항 조건문 처리
+            || searchType.equals("발주상태")) {
             // 검색 조건이 없는 경우 전체 데이터 조회
             materialOrdersPage = materialOrdersRepository.findMaterialOrders(pageable);
         } else {
