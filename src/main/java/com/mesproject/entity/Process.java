@@ -1,6 +1,6 @@
 package com.mesproject.entity;
 
-import com.mesproject.constant.processType;
+import com.mesproject.constant.ProcessType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +16,7 @@ public class Process {
     private Long processId;
 
     @Enumerated(EnumType.STRING)
-    private processType processType;
+    private ProcessType processType;
 
     private LocalDateTime processDuration;
 

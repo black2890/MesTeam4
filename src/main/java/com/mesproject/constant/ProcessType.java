@@ -1,5 +1,5 @@
 package com.mesproject.constant;
 
-public enum processType {
+public enum ProcessType {
     CLEANING, EXTRACTION, FILTRATION, STERILIZATION, FILLING, INSPECTION, PACKAGING
 }

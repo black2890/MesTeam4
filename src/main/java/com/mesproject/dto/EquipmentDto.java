@@ -1,28 +1,26 @@
-package com.mesproject.entity;
+package com.mesproject.dto;
 
 import com.mesproject.constant.EquipmentStatus;
-import jakarta.persistence.*;
+import com.mesproject.constant.ProcessType;
+import com.mesproject.entity.Equipment;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Data
+@AllArgsConstructor
 @Getter
 @Setter
-@Entity
-public class Equipment {
+public class EquipmentDto {
 
-    @Id
-    @GeneratedValue
     private Long equipmentId;
     private String equipmentName;
-    @JoinColumn(name = "process_id")
-    @ManyToOne
-    private Process process;
-    private String product;
-    private Long productionCapacity;
-    private String productionCapacityUnit;
+    private ProcessType processType;
+    private String Product;
+    private String productionCapacity;
     private Long setupTime;
     private Long cycleHour;
     private LocalDateTime acquisitionDate;
