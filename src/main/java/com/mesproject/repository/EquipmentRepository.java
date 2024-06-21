@@ -14,12 +14,12 @@ import java.util.List;
 
 public interface EquipmentRepository extends JpaRepository<Equipment, Long> {
 
-    @Query("SELECT NEW com.mesproject.dto.EquipmentDto(e.equipmentId, e.equipmentName, pc.processType, e.product, CONCAT(e.productionCapacity, e.productionCapacityUnit), e.setupTime, e.cycleHour, e.acquisitionDate, e.equipmentStatus) " +
+    @Query("SELECT NEW com.mesproject.dto.EquipmentDto(e.equipmentId, e.equipmentName, pc.processType, e.product, CONCAT(e.productionCapacity, e.productionCapacityUnit), CONCAT(e.setupTime, 'min'), CONCAT(e.cycleHour,'h'), e.acquisitionDate, e.equipmentStatus) " +
             "FROM Equipment e " +
             "LEFT JOIN e.process pc")
     Page<EquipmentDto> findEquipment(Pageable pageable);
 
-    @Query("SELECT NEW com.mesproject.dto.EquipmentDto(e.equipmentId, e.equipmentName, pc.processType, e.product, CONCAT(e.productionCapacity, e.productionCapacityUnit), e.setupTime, e.cycleHour, e.acquisitionDate, e.equipmentStatus) " +
+    @Query("SELECT NEW com.mesproject.dto.EquipmentDto(e.equipmentId, e.equipmentName, pc.processType, e.product, CONCAT(e.productionCapacity, e.productionCapacityUnit), CONCAT(e.setupTime, 'min'), CONCAT(e.cycleHour,'h'), e.acquisitionDate, e.equipmentStatus) " +
             "FROM Equipment e " +
             "LEFT JOIN e.process pc " +
             "WHERE (:searchType = '설비명' AND e.equipmentName LIKE %:searchValue%) OR " +

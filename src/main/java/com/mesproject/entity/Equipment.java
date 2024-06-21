@@ -26,6 +26,7 @@ public class Equipment {
     private Long setupTime;
     private Long cycleHour;
     private LocalDateTime acquisitionDate;
+    @Enumerated(EnumType.STRING)
     private EquipmentStatus equipmentStatus;
 
 }

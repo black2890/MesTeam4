@@ -21,8 +21,8 @@ public class EquipmentDto {
     private ProcessType processType;
     private String Product;
     private String productionCapacity;
-    private Long setupTime;
-    private Long cycleHour;
+    private String setupTime;
+    private String cycleHour;
     private LocalDateTime acquisitionDate;
     private EquipmentStatus equipmentStatus;
 
