@@ -18,6 +18,12 @@ public interface OrdersRepository extends JpaRepository<Orders, Long> {
     @Transactional
     @Query("UPDATE Orders o SET o.ordersStatus = :status WHERE o.orderId IN (:orderIds)")
     void updateStatusByIds(@Param("orderIds") List<Long> orderIds, @Param("status") Enum status);
+
+    @Query("SELECT o.product.productName, o.vendor.vendorName, SUM(o.quantity) " +
+            "FROM Orders o " +
+//            "WHERE o.ordersStatus = 'PENDINGSTORAGE' " +
+            "GROUP BY o.product.productName, o.vendor.vendorName")
+    List<Object[]> findProductOrdersSummary();
 }
 
 

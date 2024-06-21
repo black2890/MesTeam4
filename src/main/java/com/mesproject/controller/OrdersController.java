@@ -15,10 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -150,5 +147,10 @@ public class OrdersController {
 
         ordersService.updateOrderStatus(request.getOrderIds(), request.getStatus());
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/api/product-orders-summary")
+    public List<Object[]> getProductOrdersSummary() {
+        return ordersService.getProductOrdersSummary();
     }
 }
