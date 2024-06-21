@@ -17,10 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -45,6 +42,7 @@ public class OrdersController {
 
     @Autowired
     private OrdersService ordersService;
+
     @Autowired
     private OrderService orderService;
 
@@ -119,29 +117,31 @@ public class OrdersController {
         return columnNames[columnIdx];
     }
 
-    // @PostMapping("/create-order")
-    // public Orders createOrder(@RequestParam Map<String, String> body){
+//    @PostMapping("/create-order")
+//    public Orders createOrder(@RequestParam Map<String, String> body){
+//
+//        Orders order = new Orders();
+//        System.out.println(body.get("productName"));
+//        Product product = productRepository.findByProductName(body.get("productName"));
+//        System.out.println(product);
+//        Vendor vendor = vendorRepository.findByVendorName(body.get("vendorName"));
+//
+//        if (product == null || vendor == null) {
+//            throw new RuntimeException("Invalid product or vendor name");
+//        }
+//
+//        order.setProduct(product);
+//        order.setVendor(vendor);
+//        order.setQuantity((long) Integer.parseInt(body.get("quantity")));
+//        order.setDeliveryDate(LocalDate.parse(body.get("deliveryDate"),
+//                DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+//        order.setDeliveryAddress(body.get("deliveryAddress"));
+//        order.setOrdersStatus(OrdersStatus.PENDINGSTORAGE);
+//        return ordersRepository.save(order);
+//    }
 
-    //     Orders order = new Orders();
-    //     System.out.println(body.get("productName"));
-    //     Product product = productRepository.findByProductName(body.get("productName"));
-    //     System.out.println(product);
-    //     Vendor vendor = vendorRepository.findByVendorName(body.get("vendorName"));
 
-    //     if (product == null || vendor == null) {
-    //         throw new RuntimeException("Invalid product or vendor name");
-    //     }
-
-    //     order.setProduct(product);
-    //     order.setVendor(vendor);
-    //     order.setQuantity((long) Integer.parseInt(body.get("quantity")));
-    //     order.setDeliveryDate(LocalDate.parse(body.get("deliveryDate"),
-    //             DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-    //     order.setDeliveryAddress(body.get("deliveryAddress"));
-    //     order.setOrdersStatus(OrdersStatus.PENDINGSTORAGE);
-    //     return ordersRepository.save(order);
-    // }
-     @PostMapping("/create-order")
+    @PostMapping("/create-order")
     public void createOrder(@RequestParam Map<String, String> body){
 
         Orders order = new Orders();
@@ -156,7 +156,8 @@ public class OrdersController {
         order.setProduct(product);
         order.setVendor(vendor);
         order.setQuantity((long) Integer.parseInt(body.get("quantity")));
-        order.setDeliveryDate(LocalDate.parse(body.get("deliveryDate"), DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay());
+        order.setDeliveryDate(LocalDate.parse(body.get("deliveryDate"),
+                DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay());
         order.setDeliveryAddress(body.get("deliveryAddress"));
         order.setOrdersStatus(OrdersStatus.PENDINGSTORAGE);
 
@@ -168,9 +169,8 @@ public class OrdersController {
         orderDto.setDeliveryAddress(body.get("deliveryAddress"));
 
         orderService.order(orderDto);
-        
-    }
 
+    }
     @PostMapping("/updateOrderStatus")
     public ResponseEntity<?> updateOrderStatus(@RequestBody OrderStatusUpdateRequest request) {
         // request에서 orderIds와 status를 가져와서 처리
@@ -183,5 +183,10 @@ public class OrdersController {
 
         ordersService.updateOrderStatus(request.getOrderIds(), request.getStatus());
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/api/product-orders-summary")
+    public List<Object[]> getProductOrdersSummary() {
+        return ordersService.getProductOrdersSummary();
     }
 }

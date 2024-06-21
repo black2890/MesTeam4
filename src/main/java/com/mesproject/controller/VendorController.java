@@ -73,7 +73,7 @@ public class VendorController {
 
     @GetMapping("/get-vendors")
     public List<Vendor> getVendor() {
-        return vendorRepository.findAll();
+        return vendorRepository.findByVendorType(vendorType.ORDER);
     }
 
 //    private vendorType convertToVendorType(String type) {

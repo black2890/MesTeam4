@@ -17,6 +17,12 @@ public class ViewController {
     @GetMapping(value= "/inventorys")
     public String inventory() {return "inventory";}
 
-//    @GetMapping(value= "/materials/orders")
-//    public String materialOrders() {return "materialOrders";}
+    @GetMapping(value= "/inventoryChart")
+    public String inventoryChart(){return "inventoryChart";}
+
+    @GetMapping(value= "/p")
+    public String summary(){return "productOrdersSummary";}
+
+    @GetMapping(value= "/c")
+    public String calendar(){return "workPlans";}
 }
