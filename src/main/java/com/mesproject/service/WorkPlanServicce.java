@@ -31,6 +31,7 @@ public class WorkPlanServicce{
         List<OrdersPlan> ordersPlanList = ordersPlanRepository.findByWorkPlan_WorkPlanId(workPlan.getWorkPlanId());
         List<Long> orderIdList = new ArrayList<>();
         List<Long> workPlanIdList = new ArrayList<>();
+        boolean isCompleted = true;
 
         //해당하는 수주코드 리스트로 뽑힘.(ex. 1000번 , 1001번)
         for(OrdersPlan ordersPlan : ordersPlanList){
@@ -49,13 +50,17 @@ public class WorkPlanServicce{
                    WorkPlan workplan =  workPlanRepository.findById(workplanId)
                            .orElseThrow(EntityNotFoundException::new);
                    if(workplan.getWorkPlanStatus()!= WorkOrdersStatus.COMPLETED){
-                       break;
+                       isCompleted = false;
                    }
-                    Orders orders = ordersRepository.findById(orderId)
-                            .orElseThrow(EntityNotFoundException::new);
-                    orders.setOrdersStatus(OrdersStatus.PRODUCTIONCOMPLETED);
+
 
                 }
+            }
+            if(isCompleted){
+
+                Orders orders = ordersRepository.findById(orderId)
+                        .orElseThrow(EntityNotFoundException::new);
+                orders.setOrdersStatus(OrdersStatus.PRODUCTIONCOMPLETED);
             }
         }
         }
