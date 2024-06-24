@@ -232,51 +232,6 @@ public class WorkOrdersService {
     }
 
 
-//    public void start(Long workId){
-//        WorkOrders workOrders = workOrdersRepository.findById(workId)
-//                .orElseThrow(EntityNotFoundException::new);
-//
-//        WorkPlan workPlan = workOrders.getWorkPlan();
-//        List<WorkOrders> workOrdersList = workPlan.getWorkOrders();
-//
-//        // 현재 작업 공정의 인덱스 찾기
-//        int currentIndex = workOrdersList.indexOf(workOrders);
-//        if (currentIndex == -1) {
-//            throw new IllegalStateException("작업 공정이 작업 계획에 없습니다: " + workOrders.getWorkOrderId());
-//        }
-//
-//        if (currentIndex == 0) {
-//            workPlan.setWorkPlanStatus(WorkOrdersStatus.INPROGRESS);
-//        }
-//
-//        // 현재 공정 이전의 모든 공정들이 완료되었는지 확인
-//        for (int i = 0; i < currentIndex; i++) {
-//            WorkOrders previousOrder = workOrdersList.get(i);
-//            if (!previousOrder.isCompleted()) {
-//                throw new IllegalStateException("선공정이 완료되지 않았습니다: " + previousOrder.getWorkOrderId());
-//            }
-//        }
-//
-//        // 작업 시작 처리
-////        workOrders.setStart(workOrdersDto.getStart());
-////        workOrders.setWorker(workOrdersDto.getWorker());
-//        workOrders.setWorkOrdersStatus(WorkOrdersStatus.INPROGRESS);
-//
-//        // 공정에 필요한 원자재 출고 처리
-//        //포장지, box 도 출고해야 함( 생산량에 따라)
-//        switch (workOrders.getProcessType()) {
-//            case CLEANING:
-//            case FILLING:
-//            case MIX:
-//                materialInOutService.Out(workOrders.getWorkOrderId(),null,null);
-////                materialInOutService.Out(workOrders.getWorkOrderId(),workOrdersDto.getStart(),workOrdersDto.getWorker());
-//                break;
-//            default:
-//                break;
-//
-//        }
-//
-//    }
     /*
 
 

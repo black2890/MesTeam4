@@ -45,7 +45,7 @@ public class WorkPlanServicce{
             for(OrdersPlan ordersPlan2 : ordersPlanList2){
                 //작업계획 코드 리스트로 뽑힘.( 10000번, 10001번)
                 workPlanIdList.add(ordersPlan2.getWorkPlan().getWorkPlanId());
-                //반복문 돌면서 그 작업계획이 완료되었는지 확인. break로 빠져나가지 않았으면 생산완료 처리
+                //반복문 돌면서 그 작업계획이 완료되었는지 확인
                 for(Long workplanId : workPlanIdList){
                    WorkPlan workplan =  workPlanRepository.findById(workplanId)
                            .orElseThrow(EntityNotFoundException::new);

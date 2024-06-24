@@ -36,6 +36,17 @@ public class Inventory {
 
         return inventory;
     }
+    public static Inventory updateInventory(WorkPlan workPlan, Long quantity){
+
+        Inventory inventory = new Inventory();
+        inventory.setProduct(workPlan.getProduct());
+        inventory.setWorkPlan(workPlan);
+        inventory.setQuantity(quantity);
+        inventory.setInventoryStatus(InventoryStatus.RETRIEVALCOMPLETED);
+
+        return inventory;
+    }
+
 
 }
 

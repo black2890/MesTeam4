@@ -1,6 +1,7 @@
 package com.mesproject.repository;
 
 import com.mesproject.entity.Inventory;
+import com.mesproject.entity.OrdersPlan;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,4 +19,8 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
     @Query("SELECT i.product.productName, SUM(i.quantity) FROM Inventory i WHERE i.inventoryStatus = 'STORAGECOMPLETED' GROUP BY i.product.productName")
     List<Object[]> findTotalStockByProductNameAndStatus();
+
+    Inventory findByWorkPlan_WorkPlanId(Long workPlanId);
+
+
 }
