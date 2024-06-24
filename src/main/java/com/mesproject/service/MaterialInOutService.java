@@ -17,6 +17,24 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import com.mesproject.dto.DataTableDto;
+import com.mesproject.dto.MaterialInOutDto;
+import com.mesproject.dto.MaterialOrdersDto;
+import com.mesproject.entity.MaterialInOut;
+import com.mesproject.entity.MaterialOrders;
+import com.mesproject.repository.MaterialInOutRepository;
+import com.mesproject.repository.MaterialOrdersRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.thymeleaf.util.StringUtils;
+
+import java.util.List;
+
 
 @Service
 @Transactional
@@ -26,6 +44,7 @@ public class MaterialInOutService {
     private final MaterialOrdersRepository materialOrdersRepository;
     private  final OrdersRepository ordersRepository;
     private final OrdersMaterialsRepository ordersMaterialsRepository;
+    
 
 
    /*
@@ -91,26 +110,7 @@ public class MaterialInOutService {
 
      */
 
-//    public void storageCompleted(Orders orders){
-//        Long orderId = orders.getOrderId();
-//        List<OrdersMaterials> ordersMaterialsList = ordersMaterialsRepository.findByOrders_OrderId(orderId);
-//        List<Long> materialIdList = new ArrayList<>();
-//        boolean isCompleted = true;
-//        for(OrdersMaterials ordersMaterials : ordersMaterialsList){
-//            materialIdList.add(ordersMaterials.getMaterialOrders().getMaterialOrderId());
-//        }
-//        for(Long id : materialIdList){
-//            MaterialOrders materialOrders = materialOrdersRepository.findById(id)
-//                    .orElseThrow(EntityNotFoundException::new);
-//            if(materialOrders.getMaterialOrdersStatus() != MaterialOrdersStatus.STORAGECOMPLETED){
-//                isCompleted = false;
-//            }
-//        }
-//        if(isCompleted){
-//            orders.setOrdersStatus(OrdersStatus.STORAGECOMPLETED);
-//        }
-//
-//    }
+
 
     //list null 처리 아직 안 함
     public void storageCompleted(MaterialOrders materialOrders){
@@ -153,4 +153,54 @@ public class MaterialInOutService {
             }
         }
     }
+
+     // 페이지 및
+    public DataTableDto getMaterialInOutData(MultiValueMap<String, String> formData) {
+        int draw = Integer.parseInt(formData.get("draw").get(0));
+        int start = Integer.parseInt(formData.get("start").get(0));
+        int length = Integer.parseInt(formData.get("length").get(0));
+
+        System.out.println(start +"입니다.");
+        System.out.println(length +"입니다.");
+
+        // 페이지 설정
+        Pageable pageable = PageRequest.of(start / length, length);
+
+        // 검색 조건 가져오기
+        String searchType = formData.getFirst("searchType");
+        String searchValue = formData.getFirst("searchValue");
+
+        System.out.println(searchType +"입니다.");
+        System.out.println(searchValue +"입니다.");
+
+        // 페이지네이션을 이용한 데이터 조회
+        Page<MaterialInOutDto> materialInOutPage;
+
+        if (searchType.equals("검색 조건") || StringUtils.isEmpty(searchValue)
+                //임시 예외 사항 조건문 처리
+            || searchType.equals("유통기한") || searchType.equals("상태") || searchType.equals("입고일") || searchType.equals("출고일")) {
+            // 검색 조건이 없는 경우 전체 데이터 조회
+            materialInOutPage = materialInOutRepository.findMaterialInOut(pageable);
+        } else {
+            // 검색 조건이 있는 경우 해당 조건으로 데이터 조회
+            materialInOutPage = materialInOutRepository.findMaterialInOutBySearchOption(
+                    searchType,
+                    searchValue,
+                    pageable
+            );
+        }
+
+        System.out.println(materialInOutPage.getContent());
+
+        // DataTableDto에 결과 저장
+        DataTableDto dto = new DataTableDto();
+        dto.setDraw(draw);
+        dto.setRecordsFiltered((int) materialInOutPage.getTotalElements());
+        dto.setRecordsTotal((int) materialInOutRepository.count());
+        dto.setData(materialInOutPage.getContent());
+
+        return dto;
+    }
 }
+
+

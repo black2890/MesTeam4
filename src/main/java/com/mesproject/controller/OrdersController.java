@@ -183,10 +183,16 @@ public class OrdersController {
 
         ordersService.updateOrderStatus(request.getOrderIds(), request.getStatus());
         return ResponseEntity.ok().build();
+
     }
 
     @GetMapping("/api/product-orders-summary")
     public List<Object[]> getProductOrdersSummary() {
         return ordersService.getProductOrdersSummary();
+    }
+     @PostMapping("/api/ordersData") // Post api로 수주 테이블 데이터 반환 컨트롤러
+    public DataTableDto getOrders(@RequestBody MultiValueMap<String, String> formData) {
+        return ordersService.getOrdersData(formData);
+
     }
 }

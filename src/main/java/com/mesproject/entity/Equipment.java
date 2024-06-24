@@ -1,9 +1,7 @@
 package com.mesproject.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.mesproject.constant.EquipmentStatus;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,15 +17,16 @@ public class Equipment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long equipmentId;
     private String equipmentName;
-    //private String equipmentType;
-    private Long processId;
-
-    //나중에 enum 으로 고쳐야 함
+    @JoinColumn(name = "process_id")
+    @ManyToOne
+    private Process process;
     private String product;
-
     private Long productionCapacity;
-    private String equipmentStatus;
-    private LocalDateTime setupTime;
+    private String productionCapacityUnit;
+    private Long setupTime;
     private Long cycleHour;
-    private LocalDate acquisitionDate;
+    private LocalDateTime acquisitionDate;
+    @Enumerated(EnumType.STRING)
+    private EquipmentStatus equipmentStatus;
+
 }

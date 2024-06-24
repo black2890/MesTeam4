@@ -8,6 +8,8 @@ import lombok.Setter;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
+@Data
+@AllArgsConstructor
 @Getter
 @Setter
 public class WorkOrdersDto {
@@ -19,5 +21,9 @@ public class WorkOrdersDto {
     private LocalDateTime scheduledDate;
     private WorkOrdersStatus workOrdersStatus;
     private String worker;
+
+    private String productName;
+    private String workName;
+   //private Time duration;
 
 }

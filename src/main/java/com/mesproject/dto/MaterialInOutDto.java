@@ -7,6 +7,8 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Data
+@AllArgsConstructor
 @Getter
 @Setter
 public class MaterialInOutDto {
@@ -20,4 +22,9 @@ public class MaterialInOutDto {
     private LocalDateTime retrievalDate;
     private String storageWorker;
     private String retrievalWorker;
+
+    private String productName;                          // 제품명
+    private Long quantity;                               // 수량
+    private LocalDateTime retrieverDate;                 // 출고일
+    private String retrieverWorker; 
 }
