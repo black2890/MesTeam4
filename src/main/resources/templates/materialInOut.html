@@ -147,8 +147,8 @@
                                 <tr th:each="material : ${materialInOut}">
                                     <td><input class="replyCheckbox" type="checkbox"/></td>
                                     <td th:text="${material.getInoutId()}"></td>
-                                    <td th:text="${material.getMaterialOrders().getProduct().getProductName()}"></td>
-                                    <td th:text="${material.getMaterialOrders().getQuantity()}"></td>
+                                    <td th:text="${material.getProduct().getProductName()}"></td>
+                                    <td th:text="${material.getQuantity()}"></td>
                                     <td th:text="${material.getExpirationDate()}"></td>
                                     <td th:text="${material.getMaterialInOutStatus()}"></td>
                                     <td th:text="${material.getStorageDate()}"></td>

@@ -187,6 +187,18 @@ public class OrderService {
 
             2) count =2, numberofProduction =2
             workplan2 : 333
+
+
+            ex) quantity = 1000
+            1) count = 1 ,numberofProduction =3
+            workplan1 : 333
+            2) count = 2 ,numberofProduction =3
+            workplan2 : 333
+            3) count = 3, numberofProduction =3
+            workplan3: 334
+
+            현재방식의 문제점 : workplan 3 을 333으로 저장해버림. 실제 생산량과 괴리 있음.
+
              */
             WorkPlan workPlan;
             if(count==numberOfProduction){

@@ -224,6 +224,8 @@ public class WorkOrdersService {
             case MIX:
                 materialInOutService.Out(workOrders.getWorkOrderId(),workOrdersDto.getStart(),workOrdersDto.getWorker());
                  break;
+            case PACKAGING:
+                materialInOutService.outpackaging(workPlan,workOrdersDto.getStart(),workOrdersDto.getWorker());
             default:
                 break;
 

@@ -1,9 +1,6 @@
 package com.mesproject.service;
 
-import com.mesproject.constant.MaterialInOutStatus;
-import com.mesproject.constant.MaterialOrdersStatus;
-import com.mesproject.constant.OrdersStatus;
-import com.mesproject.constant.WorkOrdersStatus;
+import com.mesproject.constant.*;
 import com.mesproject.dto.MaterialInOutDto;
 import com.mesproject.dto.MaterialOrderDto;
 import com.mesproject.entity.*;
@@ -26,6 +23,7 @@ public class MaterialInOutService {
     private final MaterialOrdersRepository materialOrdersRepository;
     private  final OrdersRepository ordersRepository;
     private final OrdersMaterialsRepository ordersMaterialsRepository;
+    private final WorkPlanRepository workPlanRepository;
 
 
    /*
@@ -52,6 +50,7 @@ public class MaterialInOutService {
         }
         //입고 데이터에 입고일, 입고자, 입고상태 저장
         materialInOut.setStorageDate(materialOrderDto.getStorageDate());
+        materialInOut.setExpirationDate(materialOrderDto.getStorageDate().plusMonths(6));
         materialInOut.setStorageWorker(materialOrderDto.getStorageWorker());
         materialInOut.setMaterialInOutStatus(MaterialInOutStatus.STORAGE);
         //발주 데이터 입고 완료처리
@@ -68,16 +67,19 @@ public class MaterialInOutService {
      */
     public void Out(Long workOrderId, LocalDateTime start, String worker){
         List<MaterialInOut> materialInOutList = materialInOutRepository.findByWorkOrders_WorkOrderId(workOrderId);
-        for(MaterialInOut materialInOut : materialInOutList){
-            if (materialInOut.getMaterialInOutStatus()!=MaterialInOutStatus.STORAGE) {
-                throw new IllegalArgumentException("자재가 입고되지 않았습니다.");
-            }
+        if(materialInOutList != null && materialInOutList.size() > 0){
+            for(MaterialInOut materialInOut : materialInOutList){
+                if (materialInOut.getMaterialInOutStatus()!=MaterialInOutStatus.STORAGE) {
+                    throw new IllegalArgumentException("자재가 입고되지 않았습니다.");
+                }
 
-            materialInOut.setMaterialInOutStatus(MaterialInOutStatus.RETRIEVAL);
-            materialInOut.setRetrievalDate(start);
-            materialInOut.setRetrievalWorker(worker);
-            materialInOutRepository.save(materialInOut);
+                materialInOut.setMaterialInOutStatus(MaterialInOutStatus.RETRIEVAL);
+                materialInOut.setRetrievalDate(start);
+                materialInOut.setRetrievalWorker(worker);
+                materialInOutRepository.save(materialInOut);
+            }
         }
+
 
 
 
@@ -152,5 +154,53 @@ public class MaterialInOutService {
                 orders.setOrdersStatus(OrdersStatus.STORAGECOMPLETED);
             }
         }
+    }
+
+    public void outpackaging(WorkPlan workPlan, LocalDateTime start, String worker) {
+        Long productId = workPlan.getProduct().getProductId();
+        //quantity 는 box 단위
+        //즙의 경우, 포장지는 30*quantity 필요, box 는 quantity  필요
+        //
+        Long quantity = workPlan.getQuantity();
+
+        if(productId == 1 || productId ==2){
+            //자재 입출고 테이블에서 입고된 box 선입선출
+            List<MaterialInOut> wrappingPaperList = materialInOutRepository.findAllByProduct_ProductIdOrderByStorageDateAsc(11L);
+            List<MaterialInOut> boxList = materialInOutRepository.findAllByProduct_ProductIdOrderByStorageDateAsc(12L);
+
+            for(MaterialInOut materialInOut : wrappingPaperList){
+               Long  wrappingQuantity = quantity*30;
+                if(wrappingQuantity >= materialInOut.getQuantity()){
+                    materialInOut.setMaterialInOutStatus(MaterialInOutStatus.RETRIEVAL);
+                    wrappingQuantity-=materialInOut.getQuantity();
+                    if(wrappingQuantity==0){break;}
+                }else{
+                    //기존 재고는 수량만 update
+                    materialInOut.setQuantity(materialInOut.getQuantity() - wrappingQuantity);
+                    //출고한 재고는 출고시킨 수량으로 insert
+                   MaterialInOut materialInOut1 = MaterialInOut.updateMaterialInOut(materialInOut, wrappingQuantity, start,worker);
+                    materialInOutRepository.save(materialInOut1);
+                    break;
+                }
+
+            }
+
+            for(MaterialInOut materialInOut : boxList){
+                if(quantity >= materialInOut.getQuantity()){
+                    materialInOut.setMaterialInOutStatus(MaterialInOutStatus.RETRIEVAL);
+                    quantity-=materialInOut.getQuantity();
+                    if(quantity==0){break;}
+                }else{
+                    //기존 재고는 수량만 update
+                    materialInOut.setQuantity(materialInOut.getQuantity() - quantity);
+                    //출고한 재고는 출고시킨 수량으로 insert
+                    MaterialInOut materialInOut1 = MaterialInOut.updateMaterialInOut(materialInOut, quantity, start,worker);
+                    materialInOutRepository.save(materialInOut1);
+                    break;
+                }
+
+            }
+        }
+
     }
 }
