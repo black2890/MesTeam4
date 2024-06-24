@@ -23,4 +23,6 @@ public class Product {
     private Long minProduction;
     private Long maxProduction;
     private Time leadTime;
+
+
 }

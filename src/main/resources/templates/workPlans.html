@@ -21,6 +21,28 @@
     </style>
     <script src='https://unpkg.com/fullcalendar@5.11.0/main.min.js'></script>
     <script src='https://unpkg.com/axios/dist/axios.min.js'></script>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <!-- jQuery and Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Bootstrap CSS (for modal) -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <!-- Bootstrap JS and jQuery (for modal) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <!-- FullCalendar and Axios libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core/main.min.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
@@ -29,34 +51,27 @@
                 events: function(fetchInfo, successCallback, failureCallback) {
                     axios.get('/api/workplans')
                         .then(response => {
-                            console.log(response.data);
                             var events = response.data.map(workPlan => {
                                 var color;
-                                if (workPlan.product && workPlan.product.productId) {
-                                    switch(workPlan.product.productId) {
-                                        case 1: color = 'red'; break;
-                                        case 2: color = 'green'; break;
-                                        case 3: color = 'blue'; break;
-                                        case 4: color = 'purple'; break;
-                                        default: color = 'gray';
-                                    }
-                                    var endDate = new Date(workPlan.end);
-                                    endDate.setDate(endDate.getDate() + 1);
-                                    return {
-                                        title: `Product ${workPlan.product.productId}`,
-                                        start: workPlan.start,
-                                        end: endDate.toISOString().split('T')[0],
-                                        color: color
-                                    };
-                                } else {
-                                    console.warn('Missing product information for workPlan:', workPlan);
-                                    return {
-                                        title: 'Undefined Product',
-                                        start: workPlan.start,
-                                        end: workPlan.end,
-                                        color: 'gray'
-                                    };
+                                switch(workPlan.productId) {
+                                    case 1: color = 'red'; break;
+                                    case 2: color = 'green'; break;
+                                    case 3: color = 'blue'; break;
+                                    case 4: color = 'purple'; break;
+                                    default: color = 'gray';
                                 }
+                                var startDate = new Date(workPlan.start);
+                                var endDate = new Date(workPlan.end);
+                                endDate.setDate(endDate.getDate() + 1); // 종료일 설정
+
+                                return {
+                                    title: workPlan.productName, // 제목을 제품명으로 설정
+                                    start: startDate,
+                                    end: endDate,
+                                    color: color,
+                                    display: 'block', // 바 형태로 표시
+                                    workPlanId: workPlan.workPlanId // workPlanId 추가
+                                };
                             });
                             successCallback(events);
                         })
@@ -64,15 +79,21 @@
                             console.error('Error fetching work plans', error);
                             failureCallback(error);
                         });
-                }
+                },
+                eventClick: function(info) {
+
+                },
             });
             calendar.render();
         });
+
+
     </script>
 </head>
 <body>
 <!-- 사이드바 영역 -->
 <div th:include="~{fragments/sidebar :: .sidebar}"></div>
 <div id='calendar'></div>
+
 </body>
 </html>

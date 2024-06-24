@@ -21,7 +21,7 @@ public interface OrdersRepository extends JpaRepository<Orders, Long> {
 
     @Query("SELECT o.product.productName, o.vendor.vendorName, SUM(o.quantity) " +
             "FROM Orders o " +
-//            "WHERE o.ordersStatus = 'PENDINGSTORAGE' " +
+            "WHERE o.ordersStatus = 'DELIVERED' " +
             "GROUP BY o.product.productName, o.vendor.vendorName")
     List<Object[]> findProductOrdersSummary();
 }

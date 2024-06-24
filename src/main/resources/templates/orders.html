@@ -358,7 +358,9 @@
                     type: 'POST',
                     data: formData,
                     success: function (response) {
+                        $('#orderModal').find('form')[0].reset();
                         $('#orderModal').modal('hide');
+
                         table.ajax.reload();
                     },
                     error: function (error) {
