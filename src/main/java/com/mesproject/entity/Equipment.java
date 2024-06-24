@@ -1,5 +1,6 @@
 package com.mesproject.entity;
 
+import com.mesproject.constant.EquipmentStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,15 +17,16 @@ public class Equipment {
     @GeneratedValue
     private Long equipmentId;
     private String equipmentName;
-
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "process_id")
     @ManyToOne
-    private Process processId;
+    private Process process;
     private String product;
-
     private Long productionCapacity;
-    private String equipmentStatus;
-    private LocalDateTime setupTime;
+    private String productionCapacityUnit;
+    private Long setupTime;
     private Long cycleHour;
-    private LocalDate acquisitionDate;
+    private LocalDateTime acquisitionDate;
+    @Enumerated(EnumType.STRING)
+    private EquipmentStatus equipmentStatus;
+
 }

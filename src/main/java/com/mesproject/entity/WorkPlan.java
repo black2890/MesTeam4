@@ -1,8 +1,6 @@
 package com.mesproject.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,7 +15,9 @@ public class WorkPlan {
     @GeneratedValue
     private Long workPlanId;
 
-    // private Long productId;
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
 
     private Long quantity;
     private LocalDateTime start;

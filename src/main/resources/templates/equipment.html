@@ -2,10 +2,10 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="/css/sidebar.css">
-    <title>설비현황</title>
+    <title>설비 정보</title>
 
     <style>
         <!--  사이드바 CSS 시작    -->
@@ -19,12 +19,8 @@
             padding: 20px;
         }
 
-        .sub-menu {
-            display: none; /* 기본적으로 하위 메뉴는 숨김 */
-        }
-
-        .sub-menu.show {
-            display: block; /* show 클래스가 추가되면 보이도록 설정 */
+        .table th, td {
+            text-align: center;
         }
 
     </style>
@@ -88,71 +84,185 @@
     </div>
 
     <div class="content">
-        <h1>설비현황</h1>
+        <h1>설비 정보</h1>
 
         <table id="equipmentTable" class="display table table-bordered" style="width:100%">
             <thead>
-            <tr>
-                <th>설비ID</th>
-                <th>설비명</th>
-                <th>설비 유형</th>
-                <th>생산 제품</th>
-                <th>생산 가능량</th>
-                <th>설비 상태</th>
-                <th>생산 준비 시간</th>
-                <th>생산 시간</th>
-                <th>설비 도입 시기</th>
-            </tr>
+                <tr>
+                    <th>설비ID</th>
+                    <th>설비명</th>
+                    <th>설비 공정 유형</th>
+                    <th>생산 제품</th>
+                    <th>생산 가능량(ea/h)</th>
+                    <th>생산 준비 시간(min)</th>
+                    <th>Cycle 시간</th>
+                    <th>설비 도입 시기</th>
+                    <th>설비 상태</th>
+                    <th>설비 상태 변경<br><input type="checkbox" id="checkall"></th>
+                </tr>
             </thead>
-
         </table>
+
+        <div style="margin-top:5px;" >
+            <button type="button" id="equipmentStatusButton" class="btn btn-primary float-right">설비상태변경</button>
+        </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-</body>
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/js/sideBar.js"></script>
 <script>
 
-    $("#equipmentTable").DataTable({
-        "serverSide":true,
-        "processing":true,
-        "ajax":{
-            "url":"/api/equipmentData",
-            "type":"POST",
-            "dataSrc":"data",
-        },
-        "columns":[
-            {"data":"equipmentId"},
-            {"data":"equipmentName"},
-            {"data":"equipmentType"},
-            {"data":"equipmentProduct"},
-            {"data":"productionCapacity"},
-            {"data":"equipmentStatus"},
-            {"data":"setupTime"},
-            {"data":"cycleHour"},
-            {"data":"acquisitionDate"},
-        ]
+    $(document).ready(function() {
+
+        var table = $("#equipmentTable").DataTable({
+            "serverSide": true,
+            "processing": true,
+            "ajax": {
+                "url": "/api/equipmentData",
+                "type": "POST",
+                "dataSrc": function(res) {
+                    var data = res.data;
+                    return data;
+                },
+                "data": function(d) {
+                    d.searchType = $("#dropdownMenuButton").text().trim(); // 드롭다운에서 선택된 검색 조건
+                    d.searchValue = $(".inputText").val(); // 검색어 입력값
+                }
+            },
+            "columns": [
+                {"data": "equipmentId"},
+                {"data": "equipmentName"},
+                {"data": "processType",
+                    "render": function(data) {
+                        // equipmentStatus 값에 따라 한글로 변환하여 반환
+                        if (data === 'CLEANING') {
+                            return '세척';
+                        } else if (data === 'EXTRACTION') {
+                            return '추출';
+                        } else if (data === 'FILTRATION') {
+                            return '전처리';
+                        } else if (data === 'STERILIZATION') {
+                            return '살균';
+                        } else if (data === 'FILLING') {
+                            return '충진';
+                        } else if (data === 'INSPECTION') {
+                            return '검사';
+                        } else if (data === 'PACKAGING') {
+                            return '포장';
+                        } else if (data === 'PERCOLATION') {
+                            return '여과';
+                        } else if (data === 'MIX') {
+                            return '혼합';
+                        } else {
+                            return data;  // 예기치 않은 경우 그대로 반환
+                        }},},
+                {"data": "product"},
+                {"data": "productionCapacity"},
+                {"data": "setupTime"},
+                {"data": "cycleHour"},
+                {"data": "acquisitionDate"},
+                {   "data": "equipmentStatus",
+                    "render": function(data) {
+                        // equipmentStatus 값에 따라 한글로 변환하여 반환
+                        if (data === 'AVAILABLE') {
+                            return '가용 가능';
+                        } else if (data === 'UNAVAILABLE') {
+                            return '중지';
+                        } else {
+                            return data;  // 예기치 않은 경우 그대로 반환
+                        }},
+        }
+            ],
+            columnDefs: [
+                {
+                    targets: 9,
+                    orderable: false,
+                    className: "select-checkbox",
+                    render: function () {
+                        return '<input type="checkbox" name="id[]" value="">';
+                    }
+                }
+            ],
+            select: {
+                style: "multi",
+                selector: "td:first-child"
+            }
+        });
+
+        function updateEquipmentStatus(status) {
+            var selectedData = [];
+            $('#equipmentTable tbody input[type="checkbox"]:checked').each(function () {
+                var data = table.row($(this).closest('tr')).data();
+                selectedData.push(data);
+            });
+
+            var equipmentIds = selectedData.map(function (item) {
+                return item.equipmentId;
+            });
+
+            var equipmentStatus = equipmentIds.map(function () {
+                // 현재 상태에 따라 새로운 상태를 설정
+                if (status === 'AVAILABLE') {
+                    return 'UNAVAILABLE';
+                } else if (status === 'UNAVAILABLE') {
+                    return 'AVAILABLE';
+                } else {
+                    throw new Error("Unexpected EquipmentStatus: " + status);
+                }
+            });
+
+            if (equipmentIds.length > 0) {
+                $.ajax({
+                    url: '/updateEquipmentStatus',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ equipmentIds: equipmentIds, equipmentStatus: equipmentStatus }),
+                    success: function () {
+                        table.ajax.reload();
+                    },
+                    error: function (error) {
+                        console.error("Error updating equipment status: ", error);
+                    }
+                });
+            } else {
+                alert(" 최소한 하나 이상의 데이터 행을 체크해주세요. ");
+            }
+        }
+
+        $('#equipmentStatusButton').on('click', function () {
+            var canEquipment = true;
+            $('#equipmentTable tbody input[type="checkbox"]:checked').each(function () {
+                var data = table.row($(this).closest('tr')).data();
+                if (data.equipmentStatus !== 'AVAILABLE' && data.equipmentStatus !== 'UNAVAILABLE') {
+                    canEquipment = false;
+                    return false;
+                }
+
+                updateEquipmentStatus(data.equipmentStatus);
+            });
+
+
+
+            if (canEquipment) {
+                alert("변경이 완료되었습니다.");
+            } else {
+                alert("변경될 수 있는 설비 상태가 아닙니다.");
+            }
+        });
+
+        $('#checkall').on('click', function(){
+            var rows = table.rows({ 'search': 'applied' }).nodes();
+            $('input[type="checkbox"]', rows).prop('checked', this.checked);
+        });
+
+        // DataTables의 기본 검색 필드 제거
+        $("#ordersTable_filter").remove();
+
     });
 
-    $("#equipmentTable_filter").remove();
-
-    var buttons = document.getElementsByClassName('sidebar-btn');
-    for (var i = 0; i < buttons.length; i++) {
-        buttons[i].addEventListener('click', toggleSubMenu);
-    }
-
-    function toggleSubMenu() {
-        // 클릭된 요소(this)의 다음 형제 요소(.sub-menu)를 가져옴
-        var subMenu = this.nextElementSibling;
-
-        // .sub-menu의 현재 상태를 확인하여 토글
-        if (subMenu.classList.contains('show')) {
-            subMenu.classList.remove('show'); // show 클래스가 있으면 제거하여 닫음
-        } else {
-            subMenu.classList.add('show'); // show 클래스가 없으면 추가하여 엶
-        }
-    }
-
 </script>
+
+</body>
 </html>
