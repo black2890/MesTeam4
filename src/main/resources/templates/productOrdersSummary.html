@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Product Orders Chart</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .chart-container {
@@ -27,6 +28,8 @@
     </style>
 </head>
 <body>
+<!-- 사이드바 영역 -->
+<div th:include="~{fragments/sidebar :: .sidebar}"></div>
 <div style="width: 80%; margin: auto;">
     <div class="chart-container">
         <canvas id="chart1"></canvas>

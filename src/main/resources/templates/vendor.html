@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title></title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
     <!-- Datatables CSS -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.css">
     <!-- Bootstrap CSS -->
@@ -19,6 +20,8 @@
     </style>
 </head>
 <body>
+<!-- 사이드바 영역 -->
+<div th:include="~{fragments/sidebar :: .sidebar}"></div>
 <div class="container mt-4">
     <button type="button" class="btn btn-primary mb-4 float-right" data-toggle="modal" data-target="#vendorModal">
         업체 등록

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Chart.js Example with Product Totals</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .chart-container {
@@ -25,6 +26,8 @@
     </style>
 </head>
 <body>
+<!-- 사이드바 영역 -->
+<div th:include="~{fragments/sidebar :: .sidebar}"></div>
 <div class="chart-container">
     <canvas id="stockChart" width="400" height="200"></canvas>
     <table id="productTotals" class="product-totals">

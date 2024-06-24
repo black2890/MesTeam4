@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Work Plan Calendar</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
     <link href='https://unpkg.com/fullcalendar@5.11.0/main.min.css' rel='stylesheet' />
     <style>
         body {
@@ -70,6 +71,8 @@
     </script>
 </head>
 <body>
+<!-- 사이드바 영역 -->
+<div th:include="~{fragments/sidebar :: .sidebar}"></div>
 <div id='calendar'></div>
 </body>
 </html>

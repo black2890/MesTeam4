@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Orders Management</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
     <!-- Datatables CSS -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.css">
     <!-- Bootstrap CSS -->
@@ -41,7 +42,10 @@
 
 <script src='https://unpkg.com/fullcalendar@5.11.0/main.min.js'></script>
 <script src='https://unpkg.com/axios/dist/axios.min.js'></script>
+<!-- 사이드바 영역 -->
+<div th:include="~{fragments/sidebar :: .sidebar}"></div>
 <div class="container mt-4">
+
     <button type="button" class="btn btn-primary mb-4 float-right" data-toggle="modal" data-target="#orderModal">
         수주 등록
     </button>

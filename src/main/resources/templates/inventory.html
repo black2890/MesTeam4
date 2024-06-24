@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title></title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
     <!-- Datatables CSS -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.css">
     <!-- Bootstrap CSS -->
@@ -20,6 +21,9 @@
 </head>
 <body>
 <div class="container mt-4">
+
+    <!-- 사이드바 영역 -->
+    <div th:include="~{fragments/sidebar :: .sidebar}"></div>
 
     <table id="example" class="display" style="width:100%">
         <thead>
