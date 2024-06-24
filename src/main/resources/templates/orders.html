@@ -360,6 +360,8 @@
                     success: function (response) {
                         $('#orderModal').modal('hide');
                         table.ajax.reload();
+                        // 모달 창의 입력 필드를 초기화
+                        $('#orderForm')[0].reset();
                     },
                     error: function (error) {
                         console.error("Error creating order: ", error);

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.Collections;
 import java.util.List;
 
 @Controller
@@ -45,5 +46,29 @@ public class WorkController {
         return ResponseEntity.ok()
                 .build();
     }
+    //다중 시작 처리
+    @PostMapping("/works/start")
+    public ResponseEntity<?> startWorks(@RequestBody List<Long> rnos){
+        Collections.sort(rnos);
+        for (Long rno: rnos){
+
+            workOrdersService.startWorks(rno);
+        }
+        return ResponseEntity.ok()
+                .build();
+    }
+    //다중 종료 처리
+    @PostMapping("/works/end")
+    public ResponseEntity<?> endWorks(@RequestBody List<Long> rnos){
+        Collections.sort(rnos);
+        for (Long rno: rnos){
+
+            workOrdersService.endWorks(rno);
+        }
+        return ResponseEntity.ok()
+                .build();
+    }
+
+
 
 }

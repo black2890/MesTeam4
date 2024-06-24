@@ -62,6 +62,9 @@ public class OrderService {
 
         if(product.getProductId()==1 || product.getProductId()==2){
             maxQuantity=333;
+            if(orderDto.getQuantity() ==1000){
+                orderDto.setQuantity(999L);
+            }
 
         }else if(product.getProductId()==3|| product.getProductId()==4){
             maxQuantity=160;
@@ -134,7 +137,7 @@ public class OrderService {
         List<OrdersMaterials> ordersMaterialsList = new ArrayList<>();
         List<OrdersPlan> ordersPlanList = new ArrayList<>();
 
-        int count =0;
+        int count =1;
         for(int i=0;i<numberOfProduction;i++){
 
             //발주, 입출고 엔티티생성
@@ -165,10 +168,35 @@ public class OrderService {
         productid가 1,2이면 2일
         productid가 3,4이면 1일
          */
+
+            /*
+            ex) quantity = 667
+            1) count =1, numberOfProduction =3
+            workplan1 : 333
+
+            2) count =2,numberOfProduction =3
+            workplan2 : 333
+
+            3) count=3, numberofProduction =3
+            workplan3: 1
+
+
+            ex) quantity =666
+            1) count =1 ,  numberofProduction = 2
+            workplan1 :333
+
+            2) count =2, numberofProduction =2
+            workplan2 : 333
+             */
             WorkPlan workPlan;
             if(count==numberOfProduction){
-                //처음에 count 가 0, numberofProduction 이 1
-                workPlan = WorkPlan.createWorkPlan(product,orderDto.getQuantity()%maxQuantity);
+                //처음에 count 가 1, numberofProduction 이 1
+                if(orderDto.getQuantity()%maxQuantity==0){
+                    workPlan = WorkPlan.createWorkPlan(product, (long) maxQuantity);
+                }else{
+                    workPlan = WorkPlan.createWorkPlan(product,orderDto.getQuantity()%maxQuantity);
+                }
+
             }else if(numberOfProduction ==1){
                 workPlan = WorkPlan.createWorkPlan(product,orderDto.getQuantity());
             }

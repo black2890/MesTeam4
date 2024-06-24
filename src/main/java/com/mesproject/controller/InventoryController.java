@@ -106,7 +106,7 @@ public class InventoryController {
             inventoryData.put("productName", inventory.getProduct().getProductName());
             inventoryData.put("quantity", inventory.getQuantity());
             inventoryData.put("inventoryStatus", inventory.getInventoryStatus());
-            // inventoryData.put("completedDate", inventory.getCompletedDate()); // Uncomment if you have this field
+             inventoryData.put("completedDate", inventory.getWorkPlan().getEnd()); // Uncomment if you have this field
             return inventoryData;
         }).collect(Collectors.toList());
 
