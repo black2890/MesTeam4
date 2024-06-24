@@ -1,5 +1,7 @@
 package com.mesproject.service;
 
+import com.mesproject.constant.EquipmentStatus;
+import com.mesproject.constant.OrdersStatus;
 import com.mesproject.dto.DataTableDto;
 import com.mesproject.dto.EquipmentDto;
 import com.mesproject.dto.OrdersDto;
@@ -12,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.thymeleaf.util.StringUtils;
@@ -65,6 +68,24 @@ public class EquipmentService {
         dto.setData(equipmentPage.getContent());
 
         return dto;
+    }
+
+    @Transactional
+    public void updateEquipmentStatus(List<Long> equipmentIds, List<EquipmentStatus> equipmentStatuses) {
+        // 여기서는 각 장비의 상태를 받아와서 업데이트하는 예시입니다.
+        for (int i = 0; i < equipmentIds.size(); i++) {
+            Long equipmentId = equipmentIds.get(i);
+            EquipmentStatus status = equipmentStatuses.get(i);
+
+            // 상태에 따라 업데이트 로직을 추가할 수 있습니다.
+            if ("AVAILABLE".equals(status.toString())) {
+                equipmentRepository.updateEquipmentStatusToAvailable(equipmentId);
+            } else if ("UNAVAILABLE".equals(status.toString())) {
+                equipmentRepository.updateEquipmentStatusToUnavailable(equipmentId);
+            } else {
+                throw new IllegalArgumentException("Unexpected Equipment Status: " + status);
+            }
+        }
     }
 
 }

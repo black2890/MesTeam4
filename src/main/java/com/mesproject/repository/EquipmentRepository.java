@@ -1,12 +1,15 @@
 package com.mesproject.repository;
 
+import com.mesproject.constant.EquipmentStatus;
 import com.mesproject.dto.EquipmentDto;
 import com.mesproject.dto.MaterialInOutDto;
 import com.mesproject.entity.Equipment;
 import com.mesproject.entity.Orders;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -27,4 +30,14 @@ public interface EquipmentRepository extends JpaRepository<Equipment, Long> {
     Page<EquipmentDto> findEquipmentBySearchOption(@Param("searchType") String searchType,
                                                        @Param("searchValue") String searchValue,
                                                        Pageable pageable);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Equipment e SET e.equipmentStatus = 'AVAILABLE' WHERE e.equipmentId = :equipmentId")
+    void updateEquipmentStatusToAvailable(@Param("equipmentId") Long equipmentId);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Equipment e SET e.equipmentStatus = 'UNAVAILABLE' WHERE e.equipmentId = :equipmentId")
+    void updateEquipmentStatusToUnavailable(@Param("equipmentId") Long equipmentId);
 }
