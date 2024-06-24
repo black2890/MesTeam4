@@ -66,4 +66,10 @@ public class ViewController {
 
         return "routing";
     }
+
+    @GetMapping(value="/processByInfo")
+    public String processByInfoPage() {
+
+        return "processByInfo";
+    }
 }
