@@ -24,6 +24,7 @@ public class MaterialInOutService {
     private  final OrdersRepository ordersRepository;
     private final OrdersMaterialsRepository ordersMaterialsRepository;
     private final WorkPlanRepository workPlanRepository;
+    private final ProductRepository productRepository;
 
 
    /*
@@ -160,16 +161,21 @@ public class MaterialInOutService {
         Long productId = workPlan.getProduct().getProductId();
         //quantity 는 box 단위
         //즙의 경우, 포장지는 30*quantity 필요, box 는 quantity  필요
-        //
+        //스틱 포장지 수 바꿔주기
         Long quantity = workPlan.getQuantity();
-
+        Long  wrappingQuantity = 0L;
         if(productId == 1 || productId ==2){
+            wrappingQuantity = quantity*30;
+        }
+        else if(productId == 3 || productId ==4){
+            wrappingQuantity = quantity*25;
+        }
             //자재 입출고 테이블에서 입고된 box 선입선출
             List<MaterialInOut> wrappingPaperList = materialInOutRepository.findAllByProduct_ProductIdOrderByStorageDateAsc(11L);
             List<MaterialInOut> boxList = materialInOutRepository.findAllByProduct_ProductIdOrderByStorageDateAsc(12L);
 
             for(MaterialInOut materialInOut : wrappingPaperList){
-               Long  wrappingQuantity = quantity*30;
+
                 if(wrappingQuantity >= materialInOut.getQuantity()){
                     materialInOut.setMaterialInOutStatus(MaterialInOutStatus.RETRIEVAL);
                     wrappingQuantity-=materialInOut.getQuantity();
@@ -200,7 +206,51 @@ public class MaterialInOutService {
                 }
 
             }
+            orderPackaging(11L);
+            orderPackaging(12L);
+
+
+
+
+    }
+    /*
+    box, 포장지 출고 후 , 일정 수량 이하로 떨어지면 자동 발주하는 메서드
+    1. 입출고 테이블에서 productid 로 데이터 전부조회 ( 상태=입고)
+    2. 입고인 데이터들의 수량 세기
+    3. 일정량 이하면 발주
+     */
+
+    public void orderPackaging(Long productId){
+            Long quantity = materialInOutRepository.sumQuantityByProductIdAndStatus(productId);
+
+            if(productId == 11L && quantity <=100000){
+
+                Product product = productRepository.findById(productId)
+                        .orElseThrow(EntityNotFoundException::new);
+                MaterialOrderDto materialOrderDto = new MaterialOrderDto();
+                materialOrderDto.setProductId(productId);
+                materialOrderDto.setMaterialOrderDate(LocalDateTime.now());
+                materialOrderDto.setQuantity(100000L);
+                MaterialOrders materialOrders = MaterialOrders.createMaterialOrders(materialOrderDto,product);
+                MaterialInOut materialInOut = MaterialInOut.createMaterialInOut(materialOrders);
+                materialOrdersRepository.save(materialOrders);
+                materialInOutRepository.save(materialInOut);
+            }
+
+            if(productId == 12L && quantity <=10000){
+
+            Product product = productRepository.findById(productId)
+                    .orElseThrow(EntityNotFoundException::new);
+            MaterialOrderDto materialOrderDto = new MaterialOrderDto();
+            materialOrderDto.setProductId(productId);
+            materialOrderDto.setMaterialOrderDate(LocalDateTime.now());
+            materialOrderDto.setQuantity(10000L);
+            MaterialOrders materialOrders = MaterialOrders.createMaterialOrders(materialOrderDto,product);
+            MaterialInOut materialInOut = MaterialInOut.createMaterialInOut(materialOrders);
+            materialOrdersRepository.save(materialOrders);
+            materialInOutRepository.save(materialInOut);
         }
 
     }
+
 }
