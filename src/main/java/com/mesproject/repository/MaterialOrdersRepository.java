@@ -16,9 +16,6 @@ import java.util.List;
 
 
 public interface MaterialOrdersRepository extends JpaRepository<MaterialOrders, Long> {
-}
-
-public interface MaterialOrdersRepository extends JpaRepository<MaterialOrders, Long> {
 
     @Query("SELECT NEW com.mesproject.dto.MaterialOrdersDto(mo.materialOrderId, mo.materialOrderDate, p.productName, mo.quantity, mo.deliveryDate, mo.materialOrdersStatus) " +
             "FROM MaterialOrders mo " +
@@ -33,4 +30,6 @@ public interface MaterialOrdersRepository extends JpaRepository<MaterialOrders, 
                                                              @Param("searchValue") String searchValue,
                                                              Pageable pageable);
 }
+
+
 

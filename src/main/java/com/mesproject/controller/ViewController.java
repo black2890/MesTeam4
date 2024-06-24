@@ -13,7 +13,7 @@ public class ViewController {
     }
 
     @GetMapping(value= "/orders")
-    public String orders() {return "orders";}
+    public String orders() {return "orders2";}
 
     @GetMapping(value= "/inventorys")
     public String inventory() {return "inventory";}
@@ -26,11 +26,12 @@ public class ViewController {
 
     @GetMapping(value= "/c")
     public String calendar(){return "workPlans";}
-    @GetMapping(value="/orders")
-    public String ordersPage() {
 
-        return "orders";
-    }
+//    @GetMapping(value="/orders")
+//    public String ordersPage() {
+//
+//        return "orders";
+//    }
 
     @GetMapping(value="/equipment")
     public String equipmentsPage() {
@@ -41,19 +42,19 @@ public class ViewController {
     @GetMapping(value="/materialOrders")
     public String materialOrdersPage() {
 
-        return "materialOrders";
+        return "materialOrders2";
     }
 
     @GetMapping(value="/materialInOut")
     public String materialInOutPage() {
 
-        return "materialInOut";
+        return "materialInOut2";
     }
 
     @GetMapping(value="/workOrders")
     public String workOrdersPage() {
 
-        return "workOrders";
+        return "workOrders2";
     }
 
     //기준정보 View

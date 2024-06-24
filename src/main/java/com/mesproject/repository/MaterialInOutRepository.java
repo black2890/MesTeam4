@@ -20,26 +20,23 @@ import java.util.List;
 public interface MaterialInOutRepository extends JpaRepository<MaterialInOut, Long> {
    List<MaterialInOut> findByWorkOrders_WorkOrderId(Long id);
    Optional<MaterialInOut> findByMaterialOrders_MaterialOrderId(Long id);
-}
 
-
-public interface MaterialInOutRepository extends JpaRepository<MaterialInOut, Long> {
-
-    @Query("SELECT NEW com.mesproject.dto.MaterialInOutDto(mi.inoutId, p.productName, wp.quantity, mi.expirationDate, mi.materialInOutStatus, mi.storageDate, mi.storageWorker, mi.retrievalDate, mi.retrievalWorker) " +
+    @Query("SELECT NEW com.mesproject.dto.MaterialInOutDto2(mi.inoutId, p.productName, wp.quantity, mi.expirationDate, mi.materialInOutStatus, mi.storageDate, mi.storageWorker, mi.retrievalDate, mi.retrievalWorker) " +
             "FROM MaterialInOut mi " +
             "LEFT JOIN mi.workOrders wo " +
             "LEFT JOIN wo.workPlan wp " +
             "LEFT JOIN wp.product p")
     Page<MaterialInOutDto> findMaterialInOut(Pageable pageable);
 
-    @Query("SELECT NEW com.mesproject.dto.MaterialInOutDto(mi.inoutId, p.productName, wp.quantity, mi.expirationDate, mi.materialInOutStatus, mi.storageDate, mi.storageWorker, mi.retrievalDate, mi.retrievalWorker) " +
+    @Query("SELECT NEW com.mesproject.dto.MaterialInOutDto2(mi.inoutId, p.productName, wp.quantity, mi.expirationDate, mi.materialInOutStatus, mi.storageDate, mi.storageWorker, mi.retrievalDate, mi.retrievalWorker) " +
             "FROM MaterialInOut mi " +
             "LEFT JOIN mi.workOrders wo " +
             "LEFT JOIN wo.workPlan wp " +
             "LEFT JOIN wp.product p " +
             "WHERE (:searchType = '제품명' AND p.productName LIKE %:searchValue%)")
     Page<MaterialInOutDto> findMaterialInOutBySearchOption(@Param("searchType") String searchType,
-                                                             @Param("searchValue") String searchValue,
-                                                             Pageable pageable);
+                                                           @Param("searchValue") String searchValue,
+                                                           Pageable pageable);
 }
+
 

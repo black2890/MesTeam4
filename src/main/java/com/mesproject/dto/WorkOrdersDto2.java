@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.sql.Time;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
@@ -14,18 +15,16 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @Setter
-public class WorkOrdersDto {
+public class WorkOrdersDto2 {
+
     private Long workOrderId;
+    private String productName;
     private ProcessType processType;
+    private String worker;
+    private LocalDateTime scheduledDate;
+    private Duration duration;
     private LocalDateTime start;
     private LocalDateTime end;
-    private Duration duration;
-    private LocalDateTime scheduledDate;
     private WorkOrdersStatus workOrdersStatus;
-    private String worker;
-
-    private String productName;
-    private String workName;
-   //private Time duration;
 
 }

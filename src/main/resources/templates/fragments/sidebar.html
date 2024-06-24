@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/sidebar.css">
+    <title>설비 정보</title>
+
+    <style>
+        <!--  사이드바 CSS 시작    -->
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .content {
+            margin-left: 250px; /* 사이드바의 폭만큼 왼쪽 마진 */
+            padding: 20px;
+        }
+
+        .table td {
+            text-align: center;
+        }
+
+    </style>
+</head>
+<div class="sidebar">
+    <div>
+        <h2 class="logo"><a href="#">MES</a></h2>
+    </div>
+    <ul>
+        <li>
+            <a href="#" class="sidebar-btn">수주관리</a>
+            <ul class="sub-menu">
+                <li><a href="/orders">수주 현황</a></li>
+            </ul>
+        </li>
+        <li>
+            <a href="#" class="sidebar-btn">자재관리</a>
+            <ul class="sub-menu">
+                <li><a href="/materialOrders">발주 현황</a></li>
+                <li><a href="/materialInOut">입출고 현황</a></li>
+            </ul>
+        </li>
+        <li>
+            <a href="#" class="sidebar-btn">생산관리</a>
+            <ul class="sub-menu">
+                <li><a href="/c">작업 계획</a></li>
+                <li><a href="/workOrders">작업 지시</a></li>
+
+            </ul>
+        </li>
+        <li>
+            <a href="#" class="sidebar-btn">현황관리</a>
+            <ul class="sub-menu">
+                <li><a href="#">공정별 생산량</a></li>
+                <li><a href="/inventoryChart">완제품 재고 현황</a></li>
+                <li><a href="#">생산 제품 현황</a></li>
+                <li><a href="/p">업체별 수주 현황</a></li>
+            </ul>
+        </li>
+        <li>
+            <a href="#" class="sidebar-btn">설비관리</a>
+            <ul class="sub-menu">
+                <li><a href="/equipment">설비 현황</a></li>
+
+            </ul>
+        </li>
+        <li>
+            <a href="#" class="sidebar-btn">기준정보관리</a>
+            <ul class="sub-menu">
+                <li><a href="/material">원자재 정보</a></li>
+                <li><a href="/product">제품 정보</a></li>
+                <li><a href="/process">공정 정보</a></li>
+                <li><a href="/routing">라우팅 정보</a></li>
+                <li><a href="/vendor">업체 정보 및 관리</a></li>
+            </ul>
+        </li>
+    </ul>
+</div>
