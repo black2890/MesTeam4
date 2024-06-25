@@ -1,0 +1,109 @@
+<canvas id="productionChart" width="800" height="400"></canvas>
+
+<div th:include="~{fragments/sidebar :: .sidebar}"></div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var ctx = document.getElementById('productionChart').getContext('2d');
+    var chartData = {
+        labels: [], // 종료일
+        datasets: [
+            {
+                label: '양배추즙',
+                data: [], // 양배추즙 생산량
+                borderColor: 'rgba(255, 99, 132, 1)',
+                fill: false
+            },
+            {
+                label: '흑마늘즙',
+                data: [], // 흑마늘즙 생산량
+                borderColor: 'rgba(54, 162, 235, 1)',
+                fill: false
+            },
+            {
+                label: '석류 젤리스틱',
+                data: [], // 석류 젤리스틱 생산량
+                borderColor: 'rgba(255, 206, 86, 1)',
+                fill: false
+            },
+            {
+                label: '매실 젤리스틱',
+                data: [], // 매실 젤리스틱 생산량
+                borderColor: 'rgba(75, 192, 192, 1)',
+                fill: false
+            }
+        ],
+        options: {
+            maintainAspectRatio: false,
+            responsive: true,
+            layout: {
+                padding: {
+                    left: 20,
+                    right: 20,
+                    top: 10,
+                    bottom: 10
+                }
+            },
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: 'day', // 일자로 설정되어 있음
+                    },
+                    scaleLabel: {
+                        display: true,
+                        labelString: '날짜'
+                    }
+                },
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    };
+
+    // AJAX로 데이터 가져오기
+    $.get('/api/production-data', function(data) {
+        data.forEach(function(item) {
+            chartData.labels.push(item.end);
+            chartData.datasets[0].data.push(item.productName === '양배추 즙' ? item.totalQuantity : 0);
+            chartData.datasets[1].data.push(item.productName === '흑마늘 즙' ? item.totalQuantity : 0);
+            chartData.datasets[2].data.push(item.productName === '석류 젤리스틱' ? item.totalQuantity : 0);
+            chartData.datasets[3].data.push(item.productName === '매실 젤리스틱' ? item.totalQuantity : 0);
+        });
+
+        var productionChart = new Chart(ctx, {
+            type: 'line',
+            data: chartData,
+            options: {
+                responsive: true,
+                title: {
+                    display: true,
+                    text: '제품별 생산량'
+                },
+                scales: {
+                    xAxes: [{
+                        type: 'time',
+                        time: {
+                            unit: 'day'
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: '날짜'
+                        }
+                    }],
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: '생산량'
+                        }
+                    }]
+                }
+            }
+        });
+    });
+</script>
+
+

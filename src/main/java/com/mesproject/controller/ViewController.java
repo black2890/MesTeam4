@@ -25,4 +25,7 @@ public class ViewController {
 
     @GetMapping(value= "/c")
     public String calendar(){return "workPlans";}
+
+    @GetMapping(value= "/pc")
+    public String pc() {return "productChart";}
 }

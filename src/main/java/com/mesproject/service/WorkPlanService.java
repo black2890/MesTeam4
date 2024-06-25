@@ -1,5 +1,6 @@
 package com.mesproject.service;
 
+import com.mesproject.dto.ProductionDataDto;
 import com.mesproject.dto.WorkPlanDto;
 import com.mesproject.entity.WorkOrders;
 import com.mesproject.entity.WorkPlan;
@@ -8,9 +9,9 @@ import com.mesproject.repository.WorkPlanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,23 +47,34 @@ public class WorkPlanService {
 
     }
 
-    public Map<String, Map<LocalDateTime, Long>> getProductionDataByEndDate() {
-        // Fetch all work plans within a certain date range (e.g., last 30 days)
-        LocalDateTime endDate = LocalDateTime.now();
-        LocalDateTime startDate = endDate.minusDays(30); // Adjust as needed
+//    public List<ProductionDataDto> getProductionDataByProduct() {
+//        return workPlanRepository.aggregateProductionDataByProduct();
+//    }
 
-        List<WorkPlan> workPlans = workPlanRepository.findByEndBetweenOrderByEndAsc(startDate, endDate);
+    public List<ProductionDataDto> getProductionDataByProduct() {
+        List<ProductionDataDto> productionDataList = workPlanRepository.aggregateProductionDataByProduct();
 
-        // Group work plans by product and aggregate quantities by end date
-        Map<String, Map<LocalDateTime, Long>> productionData = workPlans.stream()
-                .collect(Collectors.groupingBy(
-                        workPlan -> workPlan.getProduct().getProductName(),
-                        Collectors.groupingBy(WorkPlan::getEnd,
-                                Collectors.summingLong(WorkPlan::getQuantity)
-                        )
-                ));
+        // 일자를 기준으로 데이터를 합치는 작업
+        Map<LocalDate, ProductionDataDto> map = new LinkedHashMap<>();
+        for (ProductionDataDto dto : productionDataList) {
+            // LocalDateTime에서 LocalDate만 추출하여 키로 사용
+            LocalDate endDate = dto.getEnd().toLocalDate();
 
-        return productionData;
+            // 이미 같은 일자의 데이터가 있으면 수량을 더해줌
+            if (map.containsKey(endDate)) {
+                ProductionDataDto existingDto = map.get(endDate);
+                existingDto.setTotalQuantity(existingDto.getTotalQuantity() + dto.getTotalQuantity());
+            } else {
+                // 같은 일자의 데이터가 없으면 맵에 추가
+                map.put(endDate, dto);
+            }
+        }
+
+        // 맵의 값을 리스트로 변환하여 반환
+        return new ArrayList<>(map.values());
     }
+
 }
+
+
 
