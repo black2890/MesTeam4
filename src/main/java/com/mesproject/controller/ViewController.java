@@ -1,10 +1,18 @@
 package com.mesproject.controller;
 
+import com.mesproject.service.ProcessInfoService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.util.List;
+
+@RequiredArgsConstructor
 @Controller
 public class ViewController {
+
+    private final ProcessInfoService processInfoService;
 
     @GetMapping(value = "/")
     public String vendor(){
@@ -68,8 +76,10 @@ public class ViewController {
     }
 
     @GetMapping(value="/processByInfo")
-    public String processByInfoPage() {
+    public String processInfoPage(Model model) {
 
-        return "processByInfo";
+        List<String> processList = processInfoService.getProcessList();
+        model.addAttribute("processList", processList);
+        return "processInfo";
     }
 }

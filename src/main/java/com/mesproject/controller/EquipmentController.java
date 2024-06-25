@@ -25,7 +25,7 @@ public class EquipmentController {
         return equipmentService.getEquipmentData(formData);
     }
 
-    @PostMapping("/updateEquipmentStatus")
+    @PostMapping("/api/updateEquipmentStatus")
     public ResponseEntity<?> updateEquipmentStatus(@RequestBody EquipmentStatusUpdateRequest request) {
         // request에서 orderIds와 status를 가져와서 처리
         List<Long> equipmentIds = request.getEquipmentIds();

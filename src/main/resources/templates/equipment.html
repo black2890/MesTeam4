@@ -215,7 +215,7 @@
 
             if (equipmentIds.length > 0) {
                 $.ajax({
-                    url: '/updateEquipmentStatus',
+                    url: '/api/updateEquipmentStatus',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify({ equipmentIds: equipmentIds, equipmentStatus: equipmentStatus }),
@@ -242,8 +242,6 @@
 
                 updateEquipmentStatus(data.equipmentStatus);
             });
-
-
 
             if (canEquipment) {
                 alert("변경이 완료되었습니다.");
