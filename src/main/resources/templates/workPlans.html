@@ -4,61 +4,92 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Work Plan Calendar</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
-    <link href='https://unpkg.com/fullcalendar@5.11.0/main.min.css' rel='stylesheet' />
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+    <link href='https://unpkg.com/fullcalendar@5.11.0/main.min.css' rel='stylesheet'/>
     <style>
         body {
             font-family: Arial, sans-serif;
         }
+
         #calendar {
             max-width: 900px;
-            margin: 50px auto;  /* 상단 및 하단 50px, 좌우 자동 정렬 */
+            margin: 50px auto; /* 상단 및 하단 50px, 좌우 자동 정렬 */
             padding: 20px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             background-color: #ffffff;
         }
+
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0, 0, 0); /* Fallback color */
+            background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
     <script src='https://unpkg.com/fullcalendar@5.11.0/main.min.js'></script>
-    <script src='https://unpkg.com/axios/dist/axios.min.js'></script>
-
+    <script src='https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js'></script>
+    <script type="module" src="main.min.js"></script>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Axios -->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
     <!-- jQuery and Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-    <!-- Bootstrap CSS (for modal) -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-
-    <!-- Bootstrap JS and jQuery (for modal) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-
-    <!-- FullCalendar and Axios libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core/main.min.js"></script>
-
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
-                events: function(fetchInfo, successCallback, failureCallback) {
+                events: function (fetchInfo, successCallback, failureCallback) {
                     axios.get('/api/workplans')
                         .then(response => {
                             var events = response.data.map(workPlan => {
                                 var color;
-                                switch(workPlan.productId) {
-                                    case 1: color = 'red'; break;
-                                    case 2: color = 'green'; break;
-                                    case 3: color = 'blue'; break;
-                                    case 4: color = 'purple'; break;
-                                    default: color = 'gray';
+                                switch (workPlan.productId) {
+                                    case 1:
+                                        color = 'red';
+                                        break;
+                                    case 2:
+                                        color = 'green';
+                                        break;
+                                    case 3:
+                                        color = 'blue';
+                                        break;
+                                    case 4:
+                                        color = 'purple';
+                                        break;
+                                    default:
+                                        color = 'gray';
                                 }
                                 var startDate = new Date(workPlan.start);
                                 var endDate = new Date(workPlan.end);
@@ -80,13 +111,76 @@
                             failureCallback(error);
                         });
                 },
-                eventClick: function(info) {
-
+                eventClick: function (info) {
+                    var workPlanId = info.event.extendedProps.workPlanId;
+                    fetchWorkOrders(workPlanId);
                 },
             });
             calendar.render();
         });
 
+        function fetchWorkOrders(workPlanId) {
+            axios.get(`/api/workplan/${workPlanId}/workorders`)
+                .then(response => {
+                    var workOrders = response.data;
+                    showModal(workOrders);
+                })
+                .catch(error => {
+                    console.error('Error fetching work orders', error);
+                });
+        }
+
+        const statusMap = {
+            'PENDING': '대기',
+            'INPROGRESS': '진행중',
+            'COMPLETED': '완료'
+        };
+
+        const processTypeMap = {
+            'CLEANING': '세척',
+            'EXTRACTION': '추출',
+            'FILTRATION': '여과',
+            'STERILIZATION': '살균',
+            'FILLING':'충진',
+            'INSPECTION':'검사',
+            'PACKAGING':'포장'
+        };
+
+        function showModal(workOrders) {
+            var modal = $('#workOrderModal');
+            var tableBody = $('#workOrderTableBody');
+
+            // 테이블 내용 초기화
+            tableBody.empty();
+
+            // 작업 지시들을 테이블에 추가
+            workOrders.forEach(order => {
+                var row = `
+                    <tr>
+                        <td>${order.workOrderId}</td>
+                        <td>${processTypeMap[order.processType]}</td>
+                        <td>${order.start || ''}</td>
+                        <td>${order.end || ''}</td>
+                        <td>${order.duration}</td>
+                        <td>${order.scheduledDate}</td>
+                        <td>${statusMap[order.workOrdersStatus]}</td>
+                        <td>${order.worker || ''}</td>
+                    </tr>
+                `;
+                tableBody.append(row);
+            });
+
+            // 모달창 표시
+            modal.modal('show');
+        }
+
+        // 모달창 닫기 함수
+        function closeModal() {
+            $('#workOrderModal').modal('hide');
+        }
+
+        // 닫기 버튼 이벤트 리스너
+        $('#closeModal').click(closeModal);
 
     </script>
 </head>
@@ -94,6 +188,38 @@
 <!-- 사이드바 영역 -->
 <div th:include="~{fragments/sidebar :: .sidebar}"></div>
 <div id='calendar'></div>
+
+<div id="workOrderModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="workOrderModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="workOrderModalLabel">Work Orders</h5>
+                <button type="button" class="close" id="closeModal" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>작업 지시 번호</th>
+                        <th>프로세스 타입</th>
+                        <th>시작 시간</th>
+                        <th>종료 시간</th>
+                        <th>지속 시간</th>
+                        <th>예정 날짜</th>
+                        <th>작업 지시 상태</th>
+                        <th>작업자</th>
+                    </tr>
+                    </thead>
+                    <tbody id="workOrderTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

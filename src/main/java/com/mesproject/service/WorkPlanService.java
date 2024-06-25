@@ -1,13 +1,16 @@
 package com.mesproject.service;
 
 import com.mesproject.dto.ProductionDataDto;
+import com.mesproject.dto.WorkOrderDto;
 import com.mesproject.dto.WorkPlanDto;
 import com.mesproject.entity.WorkOrders;
 import com.mesproject.entity.WorkPlan;
 import com.mesproject.repository.WorkOrdersRepository;
 import com.mesproject.repository.WorkPlanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -74,6 +77,14 @@ public class WorkPlanService {
         return new ArrayList<>(map.values());
     }
 
+    public List<WorkOrderDto> getWorkOrdersByWorkPlanId(Long workPlanId) {
+        WorkPlan workPlan = workPlanRepository.findById(workPlanId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "WorkPlan not found with id " + workPlanId));
+
+        return workPlan.getWorkOrders().stream()
+                .map(order -> new WorkOrderDto(order))
+                .collect(Collectors.toList());
+    }
 }
 
 
