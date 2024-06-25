@@ -189,4 +189,20 @@ public class OrdersController {
     public List<Object[]> getProductOrdersSummary() {
         return ordersService.getProductOrdersSummary();
     }
+    @PostMapping("/get-estimated-date")
+    public ResponseEntity<Map<String, String>> getEstimatedDate(@RequestBody Map<String, Object> request) {
+        String productName = (String) request.get("productName");
+        String temp = (String) request.get("quantity");
+        int quantity = Integer.parseInt(temp);
+        Product product = productRepository.findByProductName(productName);
+
+        // 예상 납품 날짜를 계산하는 로직
+        LocalDate estimatedDate = orderService.calculateEstimatedDate(product, quantity);
+
+        // 응답으로 예상 납품 날짜를 반환
+        Map<String, String> response = new HashMap<>();
+        response.put("estimatedDate", estimatedDate.toString());
+
+        return ResponseEntity.ok(response);
+    }
 }

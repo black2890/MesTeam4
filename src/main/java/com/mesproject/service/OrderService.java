@@ -55,43 +55,9 @@ public class OrderService {
                               4이면, 매실, 콜라겐 발주
          */
 
-        // 생산횟수 계산
-        int numberOfProduction=0;
-        int maxQuantity=0;
+        Result result = getResult(orderDto, product);
 
-
-        if(product.getProductId()==1 || product.getProductId()==2){
-            maxQuantity=333;
-            if(orderDto.getQuantity() ==1000){
-                orderDto.setQuantity(999L);
-            }
-
-        }else if(product.getProductId()==3|| product.getProductId()==4){
-            maxQuantity=160;
-
-        }
-        if(orderDto.getQuantity()%maxQuantity ==0){
-            numberOfProduction = (int)(orderDto.getQuantity()/maxQuantity);
-        }else {
-            numberOfProduction = (int)(orderDto.getQuantity()/maxQuantity)+1;
-        }
-
-
-        //생산 시작일시 계산
-        //납품일에 맞춰서 생산일시 계산하는 로직필요
-        int productionPeriod = 0;
-        LocalDateTime deliveryDate = orderDto.getDeliveryDate();
-        LocalDateTime productionDate = null;
-
-        if(product.getProductId()==1 || product.getProductId()==2){
-            productionPeriod=2;
-            productionDate = deliveryDate.minusDays((long) productionPeriod *numberOfProduction/2 + 2);
-        }else if(product.getProductId()==3|| product.getProductId()==4){
-            productionPeriod=1;
-            productionDate = deliveryDate.minusDays(productionPeriod*numberOfProduction + 2);
-        }
-
-
+        LocalDateTime productionDate = getProductionDate(orderDto, product, result.numberOfProduction());
 
 
         Long materialId1=null;
@@ -136,9 +102,10 @@ public class OrderService {
         // 수주-작업계획 리스트 생성
         List<OrdersMaterials> ordersMaterialsList = new ArrayList<>();
         List<OrdersPlan> ordersPlanList = new ArrayList<>();
-
+        //반복문 들어가기전에 count= 1 로 설정
         int count =1;
-        for(int i=0;i<numberOfProduction;i++){
+
+        for(int i = 0; i< result.numberOfProduction(); i++){
 
             //발주, 입출고 엔티티생성
             Product product1 = productRepository.findById(materialId1)
@@ -200,30 +167,76 @@ public class OrderService {
             현재방식의 문제점 : workplan 3 을 333으로 저장해버림. 실제 생산량과 괴리 있음.
 
              */
-            WorkPlan workPlan;
-            if(count==numberOfProduction){
-                //처음에 count 가 1, numberofProduction 이 1
-                if(orderDto.getQuantity()%maxQuantity==0){
-                    workPlan = WorkPlan.createWorkPlan(product, (long) maxQuantity);
-                }else{
-                    workPlan = WorkPlan.createWorkPlan(product,orderDto.getQuantity()%maxQuantity);
-                }
 
-            }else if(numberOfProduction ==1){
-                workPlan = WorkPlan.createWorkPlan(product,orderDto.getQuantity());
+            WorkPlan workPlan;
+            if(count== result.numberOfProduction()) {
+                //처음에 count 가 1, numberofProduction 이 1
+                if (orderDto.getQuantity() % result.maxQuantity() == 0) {
+                    workPlan = WorkPlan.createWorkPlan(product, (long) result.maxQuantity());
+                } else {
+                    workPlan = WorkPlan.createWorkPlan(product, orderDto.getQuantity() % result.maxQuantity());
+                }
             }
+//            }else if(result.numberOfProduction() ==1){ //count != numberOfProduction
+//                workPlan = WorkPlan.createWorkPlan(product,orderDto.getQuantity());
+//            }
             else{
-                workPlan = WorkPlan.createWorkPlan(product, (long) maxQuantity);
+                workPlan = WorkPlan.createWorkPlan(product, (long) result.maxQuantity());
 
             }
             count++;
             //productiondate를 무작정 +2 or +1 해주는 건 안됨. 사이에 작업계획 있는지 확인해야
-            workPlan.setStart(productionDate);
-            if(orderDto.getProductId()==1 || orderDto.getProductId()==2){
-                workPlan.setEnd(productionDate.plusHours(44));
-                if(count!=1&& count%2==1){
-                productionDate = productionDate.plusDays(2);}
-            }else if(orderDto.getProductId()==3||orderDto.getProductId()==4){
+
+            if(orderDto.getProductId()==1||orderDto.getProductId()==2){
+
+                List<WorkPlan> workPlanList = workPlanRepository.findByProductIdAndStartDateAfter(1L,2L,LocalDateTime.now().toLocalDate().atStartOfDay());
+
+                if(workPlanList.isEmpty()){
+                    workPlan.setStart(productionDate);
+
+                }
+                else {
+
+                    for(WorkPlan temp:workPlanList){
+                        if(temp.getStart().toLocalDate().equals(productionDate.toLocalDate())){
+
+                            productionDate = productionDate.plusDays(1);
+
+                        }else{
+                            workPlan.setStart(productionDate);
+                            break;
+                        }
+
+                    }
+                }
+
+                //리스트에 데이터 받아와서 반복문 돌면서 겹치는 날짜 있는지 확인
+                workPlan.setEnd(productionDate.plusHours(22));
+                productionDate = productionDate.plusDays(1);
+            }
+
+            else if(orderDto.getProductId()==3||orderDto.getProductId()==4){
+
+                List<WorkPlan> workPlanList = workPlanRepository.findByProductIdAndStartDateAfter(3L,4L,LocalDateTime.now().toLocalDate().atStartOfDay());
+
+                if(workPlanList.isEmpty()){
+                    workPlan.setStart(productionDate);
+
+                }
+               else {
+                    for(WorkPlan temp:workPlanList){
+                        if(temp.getStart().toLocalDate().equals(productionDate.toLocalDate())){
+                            productionDate = productionDate.plusDays(1);
+
+                        }else{
+                            workPlan.setStart(productionDate);
+                            break;
+                        }
+
+                    }
+                }
+
+                //리스트에 데이터 받아와서 반복문 돌면서 겹치는 날짜 있는지 확인
                 workPlan.setEnd(productionDate.plusHours(22));
                 productionDate = productionDate.plusDays(1);
             }
@@ -266,6 +279,92 @@ public class OrderService {
 
 
         return order.getOrderId();
+    }
+
+    private static Result getResult(OrderDto orderDto, Product product) {
+        // 생산횟수 계산
+        int numberOfProduction=0;
+        int maxQuantity=0;
+
+
+        if(product.getProductId()==1 || product.getProductId()==2){
+            maxQuantity=333;
+            if(orderDto.getQuantity() ==1000){
+                orderDto.setQuantity(999L);
+            }
+
+        }else if(product.getProductId()==3|| product.getProductId()==4){
+            maxQuantity=160;
+
+        }
+        if(orderDto.getQuantity()%maxQuantity ==0){
+            numberOfProduction = (int)(orderDto.getQuantity()/maxQuantity);
+        }else {
+            numberOfProduction = (int)(orderDto.getQuantity()/maxQuantity)+1;
+        }
+        Result result = new Result(numberOfProduction, maxQuantity);
+        return result;
+    }
+
+    private record Result(int numberOfProduction, int maxQuantity) {
+    }
+
+    private static LocalDateTime getProductionDate(OrderDto orderDto, Product product, int numberOfProduction) {
+        //생산 시작일시 계산
+        //납품일에 맞춰서 생산일시 계산하는 로직필요
+        int productionPeriod = 0;
+        LocalDateTime deliveryDate = orderDto.getDeliveryDate();
+        LocalDateTime productionDate = null;
+
+        if(product.getProductId()==1 || product.getProductId()==2){
+            productionPeriod=2;
+            productionDate = deliveryDate.minusDays((long) productionPeriod * numberOfProduction /2 + 2);
+        }else if(product.getProductId()==3|| product.getProductId()==4){
+            productionPeriod=1;
+            productionDate = deliveryDate.minusDays(productionPeriod* numberOfProduction + 2);
+        }
+        return productionDate;
+    }
+
+    public LocalDate calculateEstimatedDate(Product product, int quantity){
+        if(product.getProductId()==3||product.getProductId()==4){
+
+            List<WorkPlan> workPlanList = workPlanRepository.findByProductIdAndStartDateAfter(
+                    3L,4L,LocalDateTime.now().toLocalDate().atStartOfDay().plusDays(1));
+
+            OrderDto orderDto = new OrderDto();
+            orderDto.setQuantity((long) quantity);
+            Result result = getResult(orderDto, product);
+
+            int numberOfProduction = result.numberOfProduction();
+            LocalDate productionDate = LocalDate.now().plusDays(1);
+
+            int count =0;
+            if(workPlanList.isEmpty()){
+                count=numberOfProduction;
+                return LocalDate.now().plusDays(count+3);
+
+            }
+
+            for(WorkPlan temp:workPlanList){
+                    if(temp.getStart().toLocalDate().equals(productionDate)){
+                        productionDate = productionDate.plusDays(1);
+
+                    }else{
+                        count++;
+                        productionDate = productionDate.plusDays(1);
+                    }
+                    if(count==numberOfProduction){
+                        return productionDate.plusDays(2);
+                    }
+
+            }
+
+
+
+        }
+        return null;
+        
     }
 
 

@@ -94,26 +94,6 @@ public class MaterialInOutService {
 
      */
 
-//    public void storageCompleted(Orders orders){
-//        Long orderId = orders.getOrderId();
-//        List<OrdersMaterials> ordersMaterialsList = ordersMaterialsRepository.findByOrders_OrderId(orderId);
-//        List<Long> materialIdList = new ArrayList<>();
-//        boolean isCompleted = true;
-//        for(OrdersMaterials ordersMaterials : ordersMaterialsList){
-//            materialIdList.add(ordersMaterials.getMaterialOrders().getMaterialOrderId());
-//        }
-//        for(Long id : materialIdList){
-//            MaterialOrders materialOrders = materialOrdersRepository.findById(id)
-//                    .orElseThrow(EntityNotFoundException::new);
-//            if(materialOrders.getMaterialOrdersStatus() != MaterialOrdersStatus.STORAGECOMPLETED){
-//                isCompleted = false;
-//            }
-//        }
-//        if(isCompleted){
-//            orders.setOrdersStatus(OrdersStatus.STORAGECOMPLETED);
-//        }
-//
-//    }
 
     //list null 처리 아직 안 함
     public void storageCompleted(MaterialOrders materialOrders){
