@@ -79,6 +79,7 @@ public class ViewController {
     public String processInfoPage(Model model) {
 
         List<String> processList = processInfoService.getProcessList();
+        model.addAttribute("btnText", processList.get(0));
         model.addAttribute("processList", processList);
         return "processInfo";
     }

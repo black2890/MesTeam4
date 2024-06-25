@@ -1,0 +1,13 @@
+.datepicker-icon {
+    position: absolute;
+    left: 0; /* 버튼을 왼쪽에 배치 */
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+}
+
+#datepicker {
+    padding-left: 30px; /* 아이콘과 텍스트 입력란 사이에 공간 확보 */
+}

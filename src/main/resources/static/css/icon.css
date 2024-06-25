@@ -1,0 +1,16 @@
+.icon {
+    width: 30px;  /* 아이콘의 너비 */
+    height: 30px; /* 아이콘의 높이 */
+    margin: 15px;
+    transition: transform 0.3s ease-in-out; /* 호버 시에 부드럽게 변화되도록 transition 효과 추가 */
+}
+
+.icon:hover {
+    transform: scale(1.2); /* 호버 시 아이콘을 1.2배 크기로 확대 */
+}
+
+/* 아이콘과 팝업을 감싸는 요소의 스타일 */
+.icon-container {
+    position: relative;
+    display: inline-block; /* 아이콘과 팝업을 인라인 블록으로 배치 */
+}

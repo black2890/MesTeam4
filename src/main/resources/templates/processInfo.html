@@ -2,9 +2,12 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="/css/sidebar.css">
+    <link rel="stylesheet" type="text/css" href="/css/icon.css">
+    <link rel="stylesheet" type="text/css" href="/css/datePicker.css">
     <title>공정 정보</title>
 
     <style>
@@ -89,8 +92,8 @@
     <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
 
         <div class="btn-group btn-group-lg" role="group">
-            <button type="button" class="btn btn-outline-primary dropdown-toggle" id="processDropdown" data-toggle="dropdown" >
-                공정 선택
+            <button type="button" class="btn btn-outline-primary dropdown-toggle" id="processDropdown"
+                    th:text="${btnText}" data-toggle="dropdown">
             </button>
             <ul class="dropdown-menu">
                 <li th:each="process : ${processList}">
@@ -104,6 +107,8 @@
 
     </div>
 
+    <input type="text" id="datepicker">
+
     <div>
         <canvas id="halfDoughnut-chart-1" width="500" height="500"></canvas>
         <canvas id="halfDoughnut-chart-2" width="500" height="500"></canvas>
@@ -113,86 +118,29 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="/js/sideBar.js"></script>
 <script type="text/javascript" src="/js/searchBar.js"></script>
+<script type="text/javascript" src="/js/halfDoughnutChart.js"></script>
+<script type="text/javascript" src="/js/datePicker.js"></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.14/index.global.min.js'></script>
 <script>
     let charts =[];
+    let selectedDate = new Date();
 
     $(document).ready(function() {
-        $.ajax({
-            url: '/api/createHalfDoughnutChart',
-            method: 'POST',
-            data: JSON.stringify({ process: selectedProcess }),
-            dataType: 'json',
-            success: function(response) {           // 요청 성공 시 실행되는 콜백 함수
-                const labels = response.labels;     // 서버에서 받아온 labels 데이터 (Array 형식)
-                const data = response.data;         // 서버에서 받아온 data 데이터 (Array 형식)
-                const titles = ["가동률", "생산량", "불량률"];
+        let btnText = $('#processDropdown').text().trim();
 
-                for (let i = 0; i < labels.length; i++) {
-                    if (charts[i]) {
-                        updateChart(charts[i], labels[i], data[i], titles[i]);
-                    } else {
-                        charts[i] = createHalfDoughnutChart(`halfDoughnut-chart-${i + 1}`, labels[i], data[i], titles[i]);
-                    }
-                }
-            },
-            error: function(xhr, status, error) {  // 요청 실패 시 실행되는 콜백 함수
-                console.error('Error while fetching data:', error);  // 에러 로깅
-            }
-        });
+        fetchChartData(btnText, selectedDate);
 
-        $('.dropdown-toggle').dropdown();  // 드롭다운 토글 기능 활성화
     });
 
-    // 차트 생성 메서드
-    function createHalfDoughnutChart(containerId, title, labels, data) {
-        const ctx = document.getElementById(containerId).getContext('2d');  //ctx = 그래픽 컨텍스트
-        const chartData = setHalfDoughnutChartData(labels, data);
-        const chartOptions = setHalfDoughnutChartOptions(title);
 
-        new Chart(ctx, {                                    // cavans Id에 차트 할당 및 생성
-            type: 'doughnut',                               // 차트 타입 지정
-            data: chartData,                                // 차트 데이터 지정
-            options: chartOptions                           // 차트 설정 지정
-        });
-    }
-
-    // 차트 업데이트 메서드
-    function updateChart(chart, labels, data, title) {
-        chart.data.labels = labels;
-        chart.data.datasets[0].data = data;
-        chart.options.title.text = title;
-        chart.update();
-    }
-
-    // 차트 데이터 설정 메서드
-    function setHalfDoughnutChartData(labels, data) {
-        return {
-            labels: labels,                                 // 데이터 범례 이름 => String / List<String>
-            datasets: [{
-                label: "24시간 대비 생산 시간 비중",
-                backgroundColor: ["#87CEEB", "#6495ED"],    // View 차트 데이터 색상 지정
-                data: data                                  // 데이터 값 => int / List<int>
-            }]
-        };
-    }
-
-    // 차트 옵션 설정 메서드
-    function setHalfDoughnutChartOptions(title) {
-        return {
-            rotation: 1 * Math.PI,                          // 차트 시작 지점 설정
-            circumference: 1 * Math.PI,                     // 차트 들레 설정
-            title: {                                        // 차트 제목 설정
-                display: true,                              // 차트 제목 표시 유무
-                text: title                                 // 차트 제목 텍스트 설정
-            }
-        };
-    }
+    $('.dropdown-toggle').dropdown();  // 드롭다운 토글 기능 활성화
 
     // 드롭다운 아이템 클릭 시 실행될 이벤트 리스너
     $(".dropdown-item").click(function() {
