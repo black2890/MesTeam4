@@ -23,11 +23,6 @@
             text-align: center;
         }
 
-        #percentage-label{
-            font-weight: bold;
-            margin-top: 10px;
-        }
-
     </style>
 </head>
 <body>
@@ -94,7 +89,7 @@
     <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
 
         <div class="btn-group btn-group-lg" role="group">
-            <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" >
+            <button type="button" class="btn btn-outline-primary dropdown-toggle" id="processDropdown" data-toggle="dropdown" >
                 공정 선택
             </button>
             <ul class="dropdown-menu">
@@ -118,8 +113,9 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js">
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="/js/sideBar.js"></script>
 <script type="text/javascript" src="/js/searchBar.js"></script>
@@ -149,6 +145,8 @@
                 console.error('Error while fetching data:', error);  // 에러 로깅
             }
         });
+
+        $('.dropdown-toggle').dropdown();  // 드롭다운 토글 기능 활성화
     });
 
     // 차트 생성 메서드
@@ -196,7 +194,14 @@
         };
     }
 
+    // 드롭다운 아이템 클릭 시 실행될 이벤트 리스너
+    $(".dropdown-item").click(function() {
+        // 선택된 드롭다운 아이템의 data-value 값을 가져옴
+        var selectedValue = $(this).attr("data-value");
 
+        // 선택된 값으로 버튼 텍스트 업데이트
+        $("#processDropdown").text(selectedValue);
+    });
 
 </script>
 

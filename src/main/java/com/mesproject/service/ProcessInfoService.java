@@ -14,7 +14,6 @@ public class ProcessInfoService {
     private final ProcessRepository processRepository;
 
     public List<String> getProcessList(){
-        List<String> processTypeList = processRepository.findDistinctProcessTypesOrdered();
-        return processTypeList;
+        return processRepository.findDistinctProcessTypesOrdered();
     }
 }
