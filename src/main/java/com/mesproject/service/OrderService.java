@@ -52,8 +52,6 @@ public class OrderService {
     public Long order(OrderDto orderDto){
 
 
-        //양배추즙 333box라고 가정 --> 이후 변경 필요
-
         Product product = productRepository.findById(orderDto.getProductId())
                 .orElseThrow(EntityNotFoundException::new);
 
