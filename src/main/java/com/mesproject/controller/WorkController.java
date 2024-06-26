@@ -5,6 +5,7 @@ import com.mesproject.entity.MaterialOrders;
 import com.mesproject.entity.WorkOrders;
 import com.mesproject.repository.WorkOrdersRepository;
 import com.mesproject.service.WorkOrdersService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -21,6 +22,7 @@ import java.util.List;
 public class WorkController {
     private final WorkOrdersService workOrdersService;
     private final WorkOrdersRepository workOrdersRepository;
+
 
     @GetMapping("/data/workOrders")
     public String workOrders(Model model){
@@ -50,9 +52,16 @@ public class WorkController {
     @PostMapping("/works/start")
     public ResponseEntity<?> startWorks(@RequestBody List<Long> rnos){
         Collections.sort(rnos);
-        for (Long rno: rnos){
 
-            workOrdersService.startWorks(rno);
+
+        for (Long rno: rnos){
+            WorkOrders workOrders = workOrdersRepository.findById(rno)
+                    .orElseThrow(EntityNotFoundException::new);
+            WorkOrdersDto workOrdersDto = new WorkOrdersDto();
+            workOrdersDto.setWorkOrderId(rno);
+            workOrdersDto.setStart(workOrders.getScheduledDate());
+            workOrdersDto.setWorker("김철수");
+            workOrdersService.start(workOrdersDto);
         }
         return ResponseEntity.ok()
                 .build();
@@ -61,6 +70,7 @@ public class WorkController {
     @PostMapping("/works/end")
     public ResponseEntity<?> endWorks(@RequestBody List<Long> rnos){
         Collections.sort(rnos);
+
         for (Long rno: rnos){
 
             workOrdersService.endWorks(rno);
