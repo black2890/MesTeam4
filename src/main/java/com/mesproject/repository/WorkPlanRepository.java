@@ -15,7 +15,7 @@ import java.util.Optional;
 
 public interface WorkPlanRepository extends JpaRepository<WorkPlan, Long> {
     @Query("SELECT wp FROM WorkPlan wp JOIN FETCH wp.product")
-    List<WorkPlan> findAllWithProducts();
+    List<WorkPlan> findAllWithProduct();
 
 
 
@@ -33,7 +33,7 @@ public interface WorkPlanRepository extends JpaRepository<WorkPlan, Long> {
     List<WorkPlan> findByProduct_ProductIdAndEnd(@Param("productId") Long productId, @Param("endDate") LocalDate endDate);
 
 
-    List<WorkPlan> findAllWithProduct();
+
 
     @Query("SELECT NEW com.mesproject.dto.ProductionDataDto(p.productName, SUM(wp.quantity), wp.end) " +
             "FROM WorkPlan wp " +
