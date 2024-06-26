@@ -130,12 +130,21 @@
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.14/index.global.min.js'></script>
 <script>
     let charts =[];
-    let selectedDate = new Date();
+    let initDate = new Date();
 
+    // 년, 월, 일 추출
+    const year = initDate.getFullYear();   // 년도
+    const month = ('0' + (initDate.getMonth() + 1)).slice(-2); // 월 (0부터 시작하므로 +1), 두 자리로 포맷팅
+    const day = ('0' + initDate.getDate()).slice(-2);        // 일, 두 자리로 포맷팅
+
+    // yy-mm-dd 형식으로 포맷팅
+    const searchDate = `${year}-${month}-${day}`;
+
+    // document의 최초 로드의 경우 1.공정 선택란 초기값과 2. 현재 일자 기준으로 Data 불러와 chart 비동기 구현
     $(document).ready(function() {
         let btnText = $('#processDropdown').text().trim();
 
-        fetchChartData(btnText, selectedDate);
+        fetchChartData(btnText, searchDate);
 
     });
 
