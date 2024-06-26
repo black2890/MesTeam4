@@ -69,11 +69,11 @@ public class OrdersService {
                     .orElseThrow(EntityNotFoundException::new);
             Long quantity = orders.getQuantity();
             Long productId = orders.getProduct().getProductId();
-            if(productId==1 || productId==2){
-                if(quantity ==1000){
-                    quantity =999L;
-                }
-            }
+//            if(productId==1 || productId==2){
+//                if(quantity ==1000){
+//                    quantity =999L;
+//                }
+//            }
             List<OrdersPlan> ordersPlanList = ordersPlanRepository.findByOrders_OrderIdOrderByOrders_OrderIdAsc(orderId);
             // 수주코드는 무조건 하나의 작업계획이라도 참조하게 되어있음.
             //아닌 경우 생기면 추후 고려

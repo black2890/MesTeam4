@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 
 public interface WorkPlanRepository extends JpaRepository<WorkPlan, Long> {
@@ -20,4 +21,6 @@ public interface WorkPlanRepository extends JpaRepository<WorkPlan, Long> {
     List<WorkPlan> findByProductIdAndStartDateAfter(@Param("productId1") Long productId1,
                                                     @Param("productId2") Long productId2,
                                                     @Param("startDate") LocalDateTime startDate);
+
+    Optional<WorkPlan> findFirstByProduct_ProductIdAndStartAfterOrderByStartDesc(Long productId, LocalDateTime startDate);
 }
