@@ -1,5 +1,6 @@
 package com.mesproject.repository;
 
+import com.mesproject.dto.ProductionDataDto;
 import com.mesproject.entity.WorkPlan;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -31,10 +32,15 @@ public interface WorkPlanRepository extends JpaRepository<WorkPlan, Long> {
     @Query("SELECT w FROM WorkPlan w WHERE w.product.productId = :productId AND FUNCTION('DATE', w.end) = :endDate")
     List<WorkPlan> findByProduct_ProductIdAndEnd(@Param("productId") Long productId, @Param("endDate") LocalDate endDate);
 
-//    @Query("SELECT wp FROM WorkPlan wp WHERE wp.product.productId = :productId " +
-//            "AND wp.start >= :startDate ORDER BY wp.start DESC, wp.workPlanId DESC")
-//    Optional<WorkPlan> findFirstByProductIdAndStartDateAfter(@Param("productId") Long productId,
-//                                                             @Param("startDate") LocalDateTime startDate,
-//                                                             Pageable pageable);
+
+    List<WorkPlan> findAllWithProduct();
+
+    @Query("SELECT NEW com.mesproject.dto.ProductionDataDto(p.productName, SUM(wp.quantity), wp.end) " +
+            "FROM WorkPlan wp " +
+            "JOIN wp.product p " +
+            "GROUP BY p.productName, wp.end " +
+            "ORDER BY wp.end")
+    List<ProductionDataDto> aggregateProductionDataByProduct();
+
 
 }

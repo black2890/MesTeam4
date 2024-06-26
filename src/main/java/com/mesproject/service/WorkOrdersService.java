@@ -323,4 +323,7 @@ public class WorkOrdersService {
         }
 
 
+    public List<WorkOrders> findByWorkPlanId(Long workPlanId) {
+        return workOrdersRepository.findByWorkPlan_WorkPlanId(workPlanId);
+    }
 }

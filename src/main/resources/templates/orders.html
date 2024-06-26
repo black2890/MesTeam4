@@ -391,7 +391,9 @@
                     type: 'POST',
                     data: formData,
                     success: function (response) {
+                        $('#orderModal').find('form')[0].reset();
                         $('#orderModal').modal('hide');
+
                         table.ajax.reload();
                         // 모달 창의 입력 필드를 초기화
                         $('#orderForm')[0].reset();
