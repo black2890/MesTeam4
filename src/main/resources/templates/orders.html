@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <title>Orders Management</title>
@@ -11,9 +11,10 @@
     <!-- FullCalendar CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css" rel="stylesheet">
     <style>
-        /* Center the table */
-        div.dataTables_wrapper {
-            text-align: center;
+        <!--  사이드바 CSS 시작    -->
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
         }
 
         table.dataTable {
@@ -131,8 +132,57 @@
                 </form>
             </div>
         </div>
+        <ul>
+            <li>
+                <a href="#" class="sidebar-btn">수주관리</a>
+                <ul class="sub-menu">
+                    <li><a href="#">주문 등록</a></li>
+                    <li><a href="#">주문 조회</a></li>
+                    <li><a href="#">주문 수정</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#" class="sidebar-btn">자재관리</a>
+                <ul class="sub-menu">
+                    <li><a href="#">재고 관리</a></li>
+                    <li><a href="#">발주 관리</a></li>
+                    <li><a href="#">입고 처리</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#" class="sidebar-btn">생산관리</a>
+                <ul class="sub-menu">
+                    <li><a href="#">작업 계획</a></li>
+                    <li><a href="#">공정 관리</a></li>
+                    <li><a href="#">품질 관리</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#" class="sidebar-btn">현황관리</a>
+                <ul class="sub-menu">
+                    <li><a href="#">실적 현황</a></li>
+                    <li><a href="#">품질 현황</a></li>
+                    <li><a href="#">비용 현황</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#" class="sidebar-btn">설비관리</a>
+                <ul class="sub-menu">
+                    <li><a href="#">설비 목록</a></li>
+                    <li><a href="#">설비 점검</a></li>
+                    <li><a href="#">설비 유지보수</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#" class="sidebar-btn">기준정보관리</a>
+                <ul class="sub-menu">
+                    <li><a href="#">고객 정보</a></li>
+                    <li><a href="#">공급업체 정보</a></li>
+                    <li><a href="#">제품 정보</a></li>
+                </ul>
+            </li>
+        </ul>
     </div>
-</div>
 
 <!-- FullCalendar Modal -->
 <div class="modal fade" id="calendarModal" tabindex="-1" role="dialog" aria-labelledby="calendarModalLabel"
@@ -149,14 +199,11 @@
                 <div id="calendar"></div>
             </div>
         </div>
-    </div>
-</div>
-
 
 <script>
-    $(document).ready(function () {
-        var table = $('#example').DataTable({
-            "processing": true,
+
+    $(document).ready(function() {
+        var table = $("#ordersTable").DataTable({
             "serverSide": true,
             "paging": true,
             "pageLength": 10,
@@ -171,6 +218,7 @@
             "columns": [
                 {"data": "orderId"},
                 {"data": "productName"},
+                {"data": "quantity"},
                 {"data": "vendorName"},
                 {"data": "quantity"},
                 {"data": "deliveryAddress"},
@@ -408,7 +456,9 @@
         });
 
     });
+
 </script>
 
 </body>
+
 </html>

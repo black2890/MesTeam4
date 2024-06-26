@@ -23,12 +23,15 @@ public class Orders {
     private Long orderId;
 
     @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="product_id")
+    @ManyToOne
+    @JoinColumn(name = "product_id")
     private Product product;
 
     @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="vendor_id")
+    @JoinColumn(name = "vendor_id")
     private Vendor vendor;
+    private Long workPlanId;
+    private Long materialOrderId;
 
     private Long quantity;
     private LocalDateTime deliveryDate;

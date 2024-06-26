@@ -24,10 +24,12 @@ public class Equipment {
 
     //나중에 enum 으로 고쳐야 함
     private String product;
-
     private Long productionCapacity;
-    private String equipmentStatus;
-    private LocalDateTime setupTime;
+    private String productionCapacityUnit;
+    private Long setupTime;
     private Long cycleHour;
-    private LocalDate acquisitionDate;
+    private LocalDateTime acquisitionDate;
+    @Enumerated(EnumType.STRING)
+    private EquipmentStatus equipmentStatus;
+
 }
