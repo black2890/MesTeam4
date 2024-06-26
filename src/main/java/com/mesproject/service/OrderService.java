@@ -69,7 +69,7 @@ public class OrderService {
         //  LocalDateTime productionDate = getProductionDate(orderDto, product, result.numberOfProduction());
         LocalDateTime productionDate =LocalDateTime.now().toLocalDate().atStartOfDay().plusDays(1);
 
-        Optional<WorkPlan> optionalWorkPlan = workPlanRepository.findFirstByProduct_ProductIdAndStartAfterOrderByStartDesc(
+        Optional<WorkPlan> optionalWorkPlan = workPlanRepository.findFirstByProduct_ProductIdAndStartAfterOrderByStartDescWorkPlanIdDesc(
                 product.getProductId(), productionDate
         );
 
@@ -211,7 +211,7 @@ public class OrderService {
 
                 //수주-작업계획 엔티티 생성 :  수주코드 저장은 createorder 에서
                 OrdersPlan tempOrdersPlan = OrdersPlan.createOrdersPlan(tempWorkPlan);
-                ordersPlanList.add(ordersPlan);
+                ordersPlanList.add(tempOrdersPlan);
 
 
             }
@@ -238,15 +238,15 @@ public class OrderService {
                 ordersMaterialsList.add(ordersMaterials1);
                 ordersMaterialsList.add(ordersMaterials2);
 
-                if(orderDto.getProductId()==1||orderDto.getProductId()==2){
+                if(orderDto.getProductId()==1||orderDto.getProductId()==2 && workPlan != null){
 
                     List<WorkPlan> workPlanList = workPlanRepository.findByProductIdAndStartDateAfter(1L,2L,productionDate);
 
                     if(workPlanList.isEmpty()){
                         workPlan.setStart(productionDate);
                         workPlan.setEnd(productionDate.plusHours(44));
-                        if(count!=1&& count%2==1){
-                            productionDate = productionDate.plusDays(2);}
+//                        if(count!=1&& count%2==1){
+//                            productionDate = productionDate.plusDays(2);}
 
                     }
                     else {
@@ -268,6 +268,10 @@ public class OrderService {
 
                             if(!isFirst){
                                 productionDate = productionDate.plusDays(2);
+                                isFirst = true;  // 1일차에 새 작업계획 편성 가능 여부
+                                isSecond = true;
+                                existFirst = false; //1일차 기존 작업계획 유무
+                                existSecond = false;
                                 continue;
                             }
                             productionDate = productionDate.plusDays(1);
@@ -291,6 +295,10 @@ public class OrderService {
                                 break;
                             }else{
                                 productionDate = productionDate.plusDays(1);
+                                isFirst = true;  // 1일차에 새 작업계획 편성 가능 여부
+                                isSecond = true;
+                                existFirst = false; //1일차 기존 작업계획 유무
+                                existSecond = false;
                             }
 
                         }
@@ -384,7 +392,7 @@ public class OrderService {
 
         LocalDateTime productionDate =LocalDateTime.now().toLocalDate().atStartOfDay().plusDays(1);
 
-        Optional<WorkPlan> optionalWorkPlan = staticWorkPlanRepository.findFirstByProduct_ProductIdAndStartAfterOrderByStartDesc(
+        Optional<WorkPlan> optionalWorkPlan = staticWorkPlanRepository.findFirstByProduct_ProductIdAndStartAfterOrderByStartDescWorkPlanIdDesc(
                 product.getProductId(), productionDate
         );
         WorkPlan tempWorkPlan = null;
@@ -414,7 +422,7 @@ public class OrderService {
             numberOfProduction = (int)(orderDto.getQuantity()/maxQuantity)+1;
         }
         //일단 스틱만 capa 고려 통합
-        if((product.getProductId()==3 || product.getProductId()==4 ) &&tempWorkPlan!=null && tempWorkPlan.getQuantity()!=maxQuantity){
+        if(tempWorkPlan!=null && tempWorkPlan.getQuantity()!=maxQuantity){
 
             if((tempWorkPlan.getQuantity()+orderDto.getQuantity())%maxQuantity ==0){
                 numberOfProduction = (int)((tempWorkPlan.getQuantity()+orderDto.getQuantity())/maxQuantity);

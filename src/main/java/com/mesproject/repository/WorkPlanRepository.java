@@ -22,5 +22,5 @@ public interface WorkPlanRepository extends JpaRepository<WorkPlan, Long> {
                                                     @Param("productId2") Long productId2,
                                                     @Param("startDate") LocalDateTime startDate);
 
-    Optional<WorkPlan> findFirstByProduct_ProductIdAndStartAfterOrderByStartDesc(Long productId, LocalDateTime startDate);
+    Optional<WorkPlan> findFirstByProduct_ProductIdAndStartAfterOrderByStartDescWorkPlanIdDesc(Long productId, LocalDateTime startDate);
 }
