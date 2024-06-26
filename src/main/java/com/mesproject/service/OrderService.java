@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.hibernate.jdbc.Work;
 import org.hibernate.query.Order;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
@@ -67,11 +69,14 @@ public class OrderService {
          */
 
         //  LocalDateTime productionDate = getProductionDate(orderDto, product, result.numberOfProduction());
-        LocalDateTime productionDate =LocalDateTime.now().toLocalDate().atStartOfDay().plusDays(1);
+        LocalDateTime productionDate =LocalDateTime.now().toLocalDate().plusDays(1).atStartOfDay();
 
-        Optional<WorkPlan> optionalWorkPlan = workPlanRepository.findFirstByProduct_ProductIdAndStartAfterOrderByStartDescWorkPlanIdDesc(
-                product.getProductId(), productionDate
-        );
+        Pageable pageable = PageRequest.of(0, 1); // 첫 번째 페이지의 첫 번째 결과만 가져옴
+        Optional<WorkPlan> optionalWorkPlan = workPlanRepository.findFirstByProduct_ProductIdAndStartGreaterThanEqualOrderByStartDescWorkPlanIdDesc(product.getProductId(), productionDate);
+
+//        Optional<WorkPlan> optionalWorkPlan = workPlanRepository.findFirstByProduct_ProductIdAndStartAfterOrderByStartDescWorkPlanIdDesc(
+//                product.getProductId(), productionDate
+//        );
 
 
         //maxquantity 설정, 생산횟수 계산
@@ -211,7 +216,9 @@ public class OrderService {
 
                 //수주-작업계획 엔티티 생성 :  수주코드 저장은 createorder 에서
                 OrdersPlan tempOrdersPlan = OrdersPlan.createOrdersPlan(tempWorkPlan);
+                workPlanRepository.save(tempWorkPlan);
                 ordersPlanList.add(tempOrdersPlan);
+
 
 
             }
@@ -239,6 +246,26 @@ public class OrderService {
                 ordersMaterialsList.add(ordersMaterials2);
 
                 if(orderDto.getProductId()==1||orderDto.getProductId()==2 && workPlan != null){
+                    Long checkProductId ;
+                    if(orderDto.getProductId() ==1){
+                        checkProductId= 2L;
+                    }else{
+                        checkProductId= 1L;
+                    }
+
+
+                    List<WorkPlan> tempWorkPlanList = workPlanRepository.findByProduct_ProductIdAndEnd(checkProductId, productionDate.minusDays(1).toLocalDate());
+                    if(!tempWorkPlanList.isEmpty()){
+                        while(tempWorkPlanList.size()>=2){
+                            productionDate = productionDate.plusDays(1);
+                            tempWorkPlanList = workPlanRepository.findByProduct_ProductIdAndEnd(checkProductId, productionDate.minusDays(1).toLocalDate());
+                        }
+
+                    }
+
+
+
+
 
                     List<WorkPlan> workPlanList = workPlanRepository.findByProductIdAndStartDateAfter(1L,2L,productionDate);
 
@@ -268,6 +295,15 @@ public class OrderService {
 
                             if(!isFirst){
                                 productionDate = productionDate.plusDays(2);
+
+                                tempWorkPlanList = workPlanRepository.findByProduct_ProductIdAndEnd(checkProductId, productionDate.minusDays(1).toLocalDate());
+                                if(!tempWorkPlanList.isEmpty()){
+                                    while(tempWorkPlanList.size()>=2){
+                                        productionDate = productionDate.plusDays(1);
+                                        tempWorkPlanList = workPlanRepository.findByProduct_ProductIdAndEnd(checkProductId, productionDate.minusDays(1).toLocalDate());
+                                    }
+
+                                }
                                 isFirst = true;  // 1일차에 새 작업계획 편성 가능 여부
                                 isSecond = true;
                                 existFirst = false; //1일차 기존 작업계획 유무
@@ -295,6 +331,15 @@ public class OrderService {
                                 break;
                             }else{
                                 productionDate = productionDate.plusDays(1);
+                                tempWorkPlanList = workPlanRepository.findByProduct_ProductIdAndEnd(checkProductId, productionDate.minusDays(1).toLocalDate());
+                                if(!tempWorkPlanList.isEmpty()){
+                                    while(tempWorkPlanList.size()>=2){
+                                        productionDate = productionDate.plusDays(1);
+                                        tempWorkPlanList = workPlanRepository.findByProduct_ProductIdAndEnd(checkProductId, productionDate.minusDays(1).toLocalDate());
+                                    }
+
+                                }
+
                                 isFirst = true;  // 1일차에 새 작업계획 편성 가능 여부
                                 isSecond = true;
                                 existFirst = false; //1일차 기존 작업계획 유무
@@ -392,7 +437,9 @@ public class OrderService {
 
         LocalDateTime productionDate =LocalDateTime.now().toLocalDate().atStartOfDay().plusDays(1);
 
-        Optional<WorkPlan> optionalWorkPlan = staticWorkPlanRepository.findFirstByProduct_ProductIdAndStartAfterOrderByStartDescWorkPlanIdDesc(
+        Pageable pageable = PageRequest.of(0, 1); // 첫 번째 페이지의 첫 번째 결과만 가져옴
+
+        Optional<WorkPlan> optionalWorkPlan = staticWorkPlanRepository.findFirstByProduct_ProductIdAndStartGreaterThanEqualOrderByStartDescWorkPlanIdDesc(
                 product.getProductId(), productionDate
         );
         WorkPlan tempWorkPlan = null;
@@ -537,6 +584,10 @@ public class OrderService {
                 isSecond = true;
                 existFirst = false; //1일차 기존 작업계획 유무
                 existSecond = false;
+
+                if(count!=numberOfProduction){
+                    return productionDate.plusDays(numberOfProduction-count+2);
+                }
 
 
             }
