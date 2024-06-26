@@ -38,7 +38,7 @@ public interface WorkOrdersRepository extends JpaRepository<WorkOrders, Long> {
             "FROM WorkOrders wo " +
             "WHERE wo.workName = :workName " +
             "AND FUNCTION('DATE_FORMAT', wo.end, '%Y-%m-%d') = :searchDate")
-    Long findTotalDurationByWorkNameAndEndDate(@Param("workName") String workName, @Param("searchDate") LocalDateTime searchDate);
+    Long findTotalDurationByWorkNameAndEnd(@Param("workName") String workName, @Param("searchDate") LocalDateTime searchDate);
 
     // 공정명과 검색 일자 기준으로 quantity List를 반환
     @Query("SELECT SUM(wo.workPlan.quantity) " +
@@ -46,8 +46,19 @@ public interface WorkOrdersRepository extends JpaRepository<WorkOrders, Long> {
             "WHERE wo.workName = :processName " +
             "AND FUNCTION('DATE_FORMAT', wo.end, '%Y-%m-%d') = :searchDate " +
             "GROUP BY wo.workName")
-    List<Long> findQuantityByProcessNameAndScheduledDate(@Param("processName") String processName,
+    List<Long> findQuantityByProcessNameAndSearchDate(@Param("processName") String processName,
                                                             @Param("searchDate") LocalDateTime searchDate);
+
+    @Query("SELECT SUM(iv.quantity) " +
+            "FROM WorkOrders wo " +
+            "JOIN Inventory iv ON wo.workPlan.id = iv.workPlan.id " +
+            "WHERE wo.workName = :processName " +
+            "AND FUNCTION('DATE_FORMAT', wo.end, '%Y-%m-%d') = :searchDate " +
+            "AND iv.inventoryStatus = 'STORAGECOMPLETED'")
+    Long findQuantityByInventoryStatusAndOrderPlanEnd(@Param("processName") String processName,
+                                                      @Param("searchDate") LocalDateTime searchDate);
+
+
 
 
 

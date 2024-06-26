@@ -12,7 +12,6 @@ import java.util.List;
 @Controller
 public class ViewController {
 
-    @GetMapping(value = "/vendor")
     private final ProcessInfoService processInfoService;
 
     @GetMapping(value = "/")
