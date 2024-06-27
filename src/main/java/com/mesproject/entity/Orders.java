@@ -37,6 +37,12 @@ public class Orders {
     @Enumerated(EnumType.STRING)
     private OrdersStatus ordersStatus;
 
+    private LocalDateTime deliveredDate;
+
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="delivery_vendor_id")
+    private Vendor deliveryVendor;
+
     @OneToMany(mappedBy = "orders",
             cascade = CascadeType.ALL
             ,orphanRemoval = true,

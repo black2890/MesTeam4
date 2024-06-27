@@ -143,11 +143,16 @@
                 success: function(response) {
                     $('#vendorModal').modal('hide');
                     table.ajax.reload();
+                    $('#vendorForm')[0].reset(); // 폼 초기화
                 },
                 error: function(error) {
                     console.log(error);
                 }
             });
+        });
+
+        $('#vendorModal').on('hidden.bs.modal', function () {
+            $(this).find('form')[0].reset();
         });
     });
 </script>
