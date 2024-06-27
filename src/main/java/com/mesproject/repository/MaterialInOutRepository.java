@@ -22,14 +22,14 @@ public interface MaterialInOutRepository extends JpaRepository<MaterialInOut, Lo
    Long sumQuantityByProductIdAndStatus(@Param("productId") Long productId);
 
 
-    @Query("SELECT NEW com.mesproject.dto.MaterialInOutDto(mi.inoutId, p.productName, wp.quantity, mi.expirationDate, mi.materialInOutStatus, mi.storageDate, mi.storageWorker, mi.retrievalDate, mi.retrievalWorker) " +
+    @Query("SELECT NEW com.mesproject.dto.MaterialInOutsDto(mi.inoutId, p.productName, wp.quantity, mi.expirationDate, mi.materialInOutStatus, mi.storageDate, mi.storageWorker, mi.retrievalDate, mi.retrievalWorker) " +
                 "FROM MaterialInOut mi " +
                 "LEFT JOIN mi.workOrders wo " +
                 "LEFT JOIN wo.workPlan wp " +
                 "LEFT JOIN wp.product p")
     Page<MaterialInOutDto> findMaterialInOut(Pageable pageable);
 
-    @Query("SELECT NEW com.mesproject.dto.MaterialInOutDto(mi.inoutId, p.productName, wp.quantity, mi.expirationDate, mi.materialInOutStatus, mi.storageDate, mi.storageWorker, mi.retrievalDate, mi.retrievalWorker) " +
+    @Query("SELECT NEW com.mesproject.dto.MaterialInOutsDto(mi.inoutId, p.productName, wp.quantity, mi.expirationDate, mi.materialInOutStatus, mi.storageDate, mi.storageWorker, mi.retrievalDate, mi.retrievalWorker) " +
             "FROM MaterialInOut mi " +
             "LEFT JOIN mi.workOrders wo " +
             "LEFT JOIN wo.workPlan wp " +

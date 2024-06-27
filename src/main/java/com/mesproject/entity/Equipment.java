@@ -18,7 +18,10 @@ public class Equipment {
     private Long equipmentId;
     private String equipmentName;
     //private String equipmentType;
-    private Long processId;
+
+    @JoinColumn(name = "process_id")
+    @ManyToOne
+    private Process process;
 
     //나중에 enum 으로 고쳐야 함
     private String product;

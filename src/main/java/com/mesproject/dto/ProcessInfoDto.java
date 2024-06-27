@@ -1,13 +1,14 @@
 package com.mesproject.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Controller;
 
 import java.time.LocalDateTime;
 
-@Controller
+@Data
 @Getter @Setter
 public class ProcessInfoDto {
 

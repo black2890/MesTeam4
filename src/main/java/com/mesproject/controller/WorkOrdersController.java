@@ -15,9 +15,9 @@ public class WorkOrdersController {
 
     private final WorkOrdersService workOrdersService;
 
-    @PostMapping("/api/workOrdersData") // Post api로 작업 지시 현황 데이터 반환 컨트롤러
-    public DataTableDto getWorkOrders(@RequestBody MultiValueMap<String, String> formData) {
-        return workOrdersService.getWorkOrdersData(formData);
-    }
+//    @PostMapping("/api/workOrdersData") // Post api로 작업 지시 현황 데이터 반환 컨트롤러
+//    public DataTableDto getWorkOrders(@RequestBody MultiValueMap<String, String> formData) {
+//        return workOrdersService.getWorkOrdersData(formData);
+//    }
 }
 

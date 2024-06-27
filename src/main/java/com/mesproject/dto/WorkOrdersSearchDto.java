@@ -9,16 +9,19 @@ import lombok.Setter;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
+
 @Getter
 @Setter
-public class WorkOrdersDto {
+@AllArgsConstructor
+public class WorkOrdersSearchDto {
     private Long workOrderId;
+    private String productName;
     private ProcessType processType;
+    private String worker;
+    private LocalDateTime scheduledDate;
+    private Duration duration;
     private LocalDateTime start;
     private LocalDateTime end;
-    private Duration duration;
-    private LocalDateTime scheduledDate;
     private WorkOrdersStatus workOrdersStatus;
-    private String worker;
 
 }

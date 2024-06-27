@@ -27,4 +27,3 @@ public interface MaterialOrdersRepository extends JpaRepository<MaterialOrders, 
                                                              @Param("searchValue") String searchValue,
                                                              Pageable pageable);
 }
-

@@ -1,15 +1,13 @@
 package com.mesproject.service;
 
-import com.mesproject.entity.WorkOrders;
 import com.mesproject.repository.ProcessRepository;
 import com.mesproject.repository.WorkOrdersRepository;
 import com.mesproject.repository.WorkPlanRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -49,11 +47,24 @@ public class ProcessInfoService {
 
     public List<Long> getDefectRateData(String processName, LocalDateTime searchDate){
 
-        String searchDateString = searchDate.toLocalDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         // 생산 계획량
-        workOrdersRepository.findQuantityByProcessNameAndSearchDate(processName, searchDate);
+        List<Long> planQuantities = workOrdersRepository.findQuantityByProcessNameAndSearchDate(processName, searchDate);
         // 실제 생산량
-        workOrdersRepository.findQuantityByInventoryStatusAndOrderPlanEnd(processName, searchDate);
+        List<Long> realQuantities = workOrdersRepository.findQuantityByInventoryStatusAndOrderPlanEnd(processName, searchDate);
+        // 리스트 초기화
+        List<Long> productionData = new ArrayList<>();
+
+        // 실제 생산량과 생산 계획량 - 실제 생산량을 계산하여 리스트에 추가
+        for (int i = 0; i < realQuantities.size(); i++) {
+            Long realQuantity = realQuantities.get(i);
+            Long planQuantity = planQuantities.get(i);
+
+            Long calDefectRate = (planQuantity-realQuantity)*100/(planQuantity*100);
+
+            productionData.add(calDefectRate);
+        }
+
+        return productionData;
 
     }
 

@@ -91,6 +91,7 @@ public class ViewController {
 
     @GetMapping(value="/processByInfo")
     public String processInfoPage(Model model) {
+        System.out.println("1");
 
         List<String> processList = processInfoService.getProcessList();
         model.addAttribute("btnText", processList.get(0));

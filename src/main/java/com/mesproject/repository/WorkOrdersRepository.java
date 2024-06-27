@@ -16,13 +16,13 @@ import java.util.List;
 
 public interface WorkOrdersRepository extends JpaRepository<WorkOrders, Long> {
 
-    @Query("SELECT NEW com.mesproject.dto.WorkOrdersDto(w.workOrderId, p.productName, w.workName, w.worker, w.scheduledDate, w.duration, w.start, w.end, w.workOrdersStatus) " +
+    @Query("SELECT NEW com.mesproject.dto.WorkOrdersSearchDto(w.workOrderId, p.productName, w.processType, w.worker, w.scheduledDate, w.duration, w.start, w.end, w.workOrdersStatus) " +
             "FROM WorkOrders w " +
             "LEFT JOIN w.workPlan wp " +
             "LEFT JOIN wp.product p")
     Page<WorkOrdersDto> findWorkOrders(Pageable pageable);
 
-    @Query("SELECT NEW com.mesproject.dto.WorkOrdersDto(w.workOrderId, p.productName, w.workName, w.worker, w.scheduledDate, w.duration, w.start, w.end, w.workOrdersStatus) " +
+    @Query("SELECT NEW com.mesproject.dto.WorkOrdersSearchDto(w.workOrderId, p.productName, w.processType, w.worker, w.scheduledDate, w.duration, w.start, w.end, w.workOrdersStatus) " +
             "FROM WorkOrders w " +
             "LEFT JOIN w.workPlan wp " +
             "LEFT JOIN wp.product p " +
@@ -40,22 +40,26 @@ public interface WorkOrdersRepository extends JpaRepository<WorkOrders, Long> {
             "AND FUNCTION('DATE_FORMAT', wo.end, '%Y-%m-%d') = :searchDate")
     Long findTotalDurationByWorkNameAndEnd(@Param("workName") String workName, @Param("searchDate") LocalDateTime searchDate);
 
-    // 공정명과 검색 일자 기준으로 quantity List를 반환
+    // 공정명과 검색 일자 기준으로 제품별 quantity 생산 계획량 List를 반환
     @Query("SELECT SUM(wo.workPlan.quantity) " +
             "FROM WorkOrders wo " +
-            "WHERE wo.workName = :processName " +
+            "WHERE wo.processType = :processName " +
             "AND FUNCTION('DATE_FORMAT', wo.end, '%Y-%m-%d') = :searchDate " +
-            "GROUP BY wo.workName")
+            "GROUP BY wo.workPlan.product.productName " +
+            "ORDER BY wo.workPlan.product.productName ")
     List<Long> findQuantityByProcessNameAndSearchDate(@Param("processName") String processName,
                                                             @Param("searchDate") LocalDateTime searchDate);
 
+    // 공정명과 검색 일자 기준으로 제품별 quantity 실제 생산량 List를 반환
     @Query("SELECT SUM(iv.quantity) " +
             "FROM WorkOrders wo " +
-            "JOIN Inventory iv ON wo.workPlan.id = iv.workPlan.id " +
-            "WHERE wo.workName = :processName " +
+            "JOIN Inventory iv ON wo.workPlan.workPlanId = iv.workPlan.workPlanId " +
+            "WHERE wo.processType = :processName " +
             "AND FUNCTION('DATE_FORMAT', wo.end, '%Y-%m-%d') = :searchDate " +
-            "AND iv.inventoryStatus = 'STORAGECOMPLETED'")
-    Long findQuantityByInventoryStatusAndOrderPlanEnd(@Param("processName") String processName,
+            "AND iv.inventoryStatus = 'STORAGECOMPLETED' " +
+            "GROUP BY wo.workPlan.product.productName " +
+            "ORDER BY wo.workPlan.product.productName ")
+    List<Long> findQuantityByInventoryStatusAndOrderPlanEnd(@Param("processName") String processName,
                                                       @Param("searchDate") LocalDateTime searchDate);
 
 

@@ -1,12 +1,16 @@
 // 메소드로 Ajax 요청을 수행하는 함수
 function fetchChartData(process, date) {
+
     $.ajax({
-        url: '/api/createHalfDoughnutChart',
+        url: '/api/createChart',
         method: 'POST',
-        data: JSON.stringify({ process: process, date: date }),
+        contentType: 'application/json',
+        data: JSON.stringify({ processText: process, searchDate: date }),
         dataType: 'json',
         success: function(response) {
-            const labels = response.labels;
+            const labels = [["가동 시간", "비가동 시간"],
+                ["매실 젤리스틱", "석류 젤리스틱", "양배추 즙", "흑마늘 즙"],
+                ["매실 젤리스틱", "석류 젤리스틱", "양배추 즙", "흑마늘 즙"]];
             const data = response.data;
             const titles = ["가동률", "생산량", "불량률"];
 
@@ -14,24 +18,29 @@ function fetchChartData(process, date) {
                 if (charts[i]) {
                     updateChart(charts[i], labels[i], data[i], titles[i]);
                 } else {
-                    charts[i] = createHalfDoughnutChart(`halfDoughnut-chart-${i + 1}`, labels[i], data[i], titles[i]);
+                    if(i===0){
+                        charts[i] = createChart(`chart-${i + 1}`, "doughnut", labels[i], data[i], titles[i]);
+                    } else {
+                        charts[i] = createChart(`chart-${i + 1}`, "bar", labels[i], data[i], titles[i]);
+                    }
                 }
             }
         },
         error: function(xhr, status, error) {
-            console.error('Error while fetching data:', error);
+            console.log(data);
+            console.error('fetch에러 발생', error);
         }
     });
 }
 
 // 차트 생성 메서드
-function createHalfDoughnutChart(containerId, title, labels, data) {
+function createChart(containerId, type, title, labels, data) {
     const ctx = document.getElementById(containerId).getContext('2d');  //ctx = 그래픽 컨텍스트
     const chartData = setHalfDoughnutChartData(labels, data);
     const chartOptions = setHalfDoughnutChartOptions(title);
 
     new Chart(ctx, {                                    // cavans Id에 차트 할당 및 생성
-        type: 'doughnut',                               // 차트 타입 지정
+        type: type,                                      // 차트 타입 지정
         data: chartData,                                // 차트 데이터 지정
         options: chartOptions                           // 차트 설정 지정
     });
