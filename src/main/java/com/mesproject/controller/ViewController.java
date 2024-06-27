@@ -28,4 +28,7 @@ public class ViewController {
 
     @GetMapping(value= "/pc")
     public String pc() {return "productChart";}
+
+    @GetMapping(value= "trace")
+    public String trace() {return "trace";}
 }

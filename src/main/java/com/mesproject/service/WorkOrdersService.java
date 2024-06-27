@@ -224,6 +224,8 @@ public class WorkOrdersService {
             case MIX:
                 materialInOutService.Out(workOrders.getWorkOrderId(),workOrdersDto.getStart(),workOrdersDto.getWorker());
                  break;
+            case PACKAGING:
+                materialInOutService.outpackaging(workPlan,workOrdersDto.getStart(),workOrdersDto.getWorker());
             default:
                 break;
 
@@ -274,6 +276,50 @@ public class WorkOrdersService {
                 workPlan.setWorkPlanStatus(WorkOrdersStatus.COMPLETED);
                 workPlanService.ProductionCompleted(workPlan);
             }
+        }
+    public void startWorks(Long workOrderId){
+        WorkOrders workOrders = workOrdersRepository.findById(workOrderId)
+                .orElseThrow(EntityNotFoundException::new);
+
+        WorkPlan workPlan = workOrders.getWorkPlan();
+        List<WorkOrders> workOrdersList = workPlan.getWorkOrders();
+
+        // 작업 시작 처리
+        workOrders.setWorkOrdersStatus(WorkOrdersStatus.INPROGRESS);
+
+        // 공정에 필요한 원자재 출고 처리
+        //포장지, box 도 출고해야 함( 생산량에 따라)
+        switch (workOrders.getProcessType()) {
+            case CLEANING:
+            case FILLING:
+            case MIX:
+                materialInOutService.Out(workOrders.getWorkOrderId(),null,null);
+                break;
+            default:
+                break;
+
+        }
+
+    }
+
+
+        public void endWorks(Long workOrderId){
+            WorkOrders workOrders = workOrdersRepository.findById(workOrderId)
+                    .orElseThrow(EntityNotFoundException::new);
+            workOrders.setWorkOrdersStatus(WorkOrdersStatus.COMPLETED);
+
+            WorkPlan workPlan = workOrders.getWorkPlan();
+            List<WorkOrders> workOrdersList = workPlan.getWorkOrders();
+
+            //마지막 공정이면 재고 데이터 생성
+            WorkOrders FinalWorkOrder = workOrdersList.get(workOrdersList.size() - 1);
+            if (Objects.equals(workOrders.getWorkOrderId(), FinalWorkOrder.getWorkOrderId())) {
+                Inventory inventory = Inventory.createInventory(workPlan);
+                inventoryRepository.save(inventory);
+                workPlan.setWorkPlanStatus(WorkOrdersStatus.COMPLETED);
+                workPlanService.ProductionCompleted(workPlan);
+            }
+
         }
 
 

@@ -1,11 +1,10 @@
 package com.mesproject.controller;
 
 import com.mesproject.constant.OrdersStatus;
+import com.mesproject.dto.OrderDetailsDto;
 import com.mesproject.dto.OrderDto;
 import com.mesproject.dto.OrderStatusUpdateRequest;
-import com.mesproject.entity.Orders;
-import com.mesproject.entity.Product;
-import com.mesproject.entity.Vendor;
+import com.mesproject.entity.*;
 import com.mesproject.repository.OrdersRepository;
 import com.mesproject.repository.ProductRepository;
 import com.mesproject.repository.VendorRepository;
@@ -16,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @RestController
 public class OrdersController {
@@ -188,5 +189,32 @@ public class OrdersController {
     @GetMapping("/api/product-orders-summary")
     public List<Object[]> getProductOrdersSummary() {
         return ordersService.getProductOrdersSummary();
+    }
+    @PostMapping("/get-estimated-date")
+    public ResponseEntity<Map<String, String>> getEstimatedDate(@RequestBody Map<String, Object> request) {
+        String productName = (String) request.get("productName");
+        String temp = (String) request.get("quantity");
+        int quantity = Integer.parseInt(temp);
+        Product product = productRepository.findByProductName(productName);
+
+        // 예상 납품 날짜를 계산하는 로직
+        LocalDate estimatedDate = orderService.calculateEstimatedDate(product, quantity);
+
+        // 응답으로 예상 납품 날짜를 반환
+        Map<String, String> response = new HashMap<>();
+        response.put("estimatedDate", estimatedDate.toString());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/api/orders/details")
+    public ResponseEntity<List<Map<String, Object>>> getOrderDetails(@RequestParam("orderId") Long orderId) {
+        List<Map<String, Object>> orderDetails = ordersService.getOrderDetails(orderId);
+        return ResponseEntity.ok(orderDetails);
+    }
+
+    @GetMapping("/api/orders/related")
+    public List<Map<String, Object>> getRelatedOrders(@RequestParam Long workPlanId) {
+        return orderService.getRelatedOrdersByWorkPlanId(workPlanId);
     }
 }

@@ -2,21 +2,23 @@ package com.mesproject.service;
 
 import com.mesproject.constant.InventoryStatus;
 import com.mesproject.constant.OrdersStatus;
-import com.mesproject.entity.Inventory;
-import com.mesproject.entity.Orders;
-import com.mesproject.entity.OrdersPlan;
-import com.mesproject.entity.WorkPlan;
+import com.mesproject.dto.OrderDetailsDto;
+import com.mesproject.entity.*;
 import com.mesproject.repository.InventoryRepository;
 import com.mesproject.repository.OrdersPlanRepository;
 import com.mesproject.repository.OrdersRepository;
 import com.mesproject.repository.WorkPlanRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+@Transactional
 @Service
 public class OrdersService {
 
@@ -66,6 +68,12 @@ public class OrdersService {
             Orders orders = ordersRepository.findById(orderId)
                     .orElseThrow(EntityNotFoundException::new);
             Long quantity = orders.getQuantity();
+            Long productId = orders.getProduct().getProductId();
+//            if(productId==1 || productId==2){
+//                if(quantity ==1000){
+//                    quantity =999L;
+//                }
+//            }
             List<OrdersPlan> ordersPlanList = ordersPlanRepository.findByOrders_OrderIdOrderByOrders_OrderIdAsc(orderId);
             // 수주코드는 무조건 하나의 작업계획이라도 참조하게 되어있음.
             //아닌 경우 생기면 추후 고려
@@ -85,13 +93,15 @@ public class OrdersService {
                     inventory.setQuantity(inventory.getQuantity() - quantity);
                     //출고한 재고는 출고시킨 수량으로 insert
                    Inventory  retrievalInventory = Inventory.updateInventory(workPlan, quantity);
+                   inventoryRepository.save(retrievalInventory);
                 }
 
             }
 
-
-
-
         }
+    }
+
+    public List<Map<String, Object>> getOrderDetails(Long orderId) {
+        return ordersRepository.findRelatedDataByOrderId(orderId);
     }
 }

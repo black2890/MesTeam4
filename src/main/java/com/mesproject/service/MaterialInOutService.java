@@ -1,9 +1,6 @@
 package com.mesproject.service;
 
-import com.mesproject.constant.MaterialInOutStatus;
-import com.mesproject.constant.MaterialOrdersStatus;
-import com.mesproject.constant.OrdersStatus;
-import com.mesproject.constant.WorkOrdersStatus;
+import com.mesproject.constant.*;
 import com.mesproject.dto.MaterialInOutDto;
 import com.mesproject.dto.MaterialOrderDto;
 import com.mesproject.entity.*;
@@ -26,6 +23,8 @@ public class MaterialInOutService {
     private final MaterialOrdersRepository materialOrdersRepository;
     private  final OrdersRepository ordersRepository;
     private final OrdersMaterialsRepository ordersMaterialsRepository;
+    private final WorkPlanRepository workPlanRepository;
+    private final ProductRepository productRepository;
 
 
    /*
@@ -52,6 +51,7 @@ public class MaterialInOutService {
         }
         //입고 데이터에 입고일, 입고자, 입고상태 저장
         materialInOut.setStorageDate(materialOrderDto.getStorageDate());
+        materialInOut.setExpirationDate(materialOrderDto.getStorageDate().plusMonths(6));
         materialInOut.setStorageWorker(materialOrderDto.getStorageWorker());
         materialInOut.setMaterialInOutStatus(MaterialInOutStatus.STORAGE);
         //발주 데이터 입고 완료처리
@@ -68,16 +68,19 @@ public class MaterialInOutService {
      */
     public void Out(Long workOrderId, LocalDateTime start, String worker){
         List<MaterialInOut> materialInOutList = materialInOutRepository.findByWorkOrders_WorkOrderId(workOrderId);
-        for(MaterialInOut materialInOut : materialInOutList){
-            if (materialInOut.getMaterialInOutStatus()!=MaterialInOutStatus.STORAGE) {
-                throw new IllegalArgumentException("자재가 입고되지 않았습니다.");
-            }
+        if(materialInOutList != null && materialInOutList.size() > 0){
+            for(MaterialInOut materialInOut : materialInOutList){
+                if (materialInOut.getMaterialInOutStatus()!=MaterialInOutStatus.STORAGE) {
+                    throw new IllegalArgumentException("자재가 입고되지 않았습니다.");
+                }
 
-            materialInOut.setMaterialInOutStatus(MaterialInOutStatus.RETRIEVAL);
-            materialInOut.setRetrievalDate(start);
-            materialInOut.setRetrievalWorker(worker);
-            materialInOutRepository.save(materialInOut);
+                materialInOut.setMaterialInOutStatus(MaterialInOutStatus.RETRIEVAL);
+                materialInOut.setRetrievalDate(start);
+                materialInOut.setRetrievalWorker(worker);
+                materialInOutRepository.save(materialInOut);
+            }
         }
+
 
 
 
@@ -91,26 +94,6 @@ public class MaterialInOutService {
 
      */
 
-//    public void storageCompleted(Orders orders){
-//        Long orderId = orders.getOrderId();
-//        List<OrdersMaterials> ordersMaterialsList = ordersMaterialsRepository.findByOrders_OrderId(orderId);
-//        List<Long> materialIdList = new ArrayList<>();
-//        boolean isCompleted = true;
-//        for(OrdersMaterials ordersMaterials : ordersMaterialsList){
-//            materialIdList.add(ordersMaterials.getMaterialOrders().getMaterialOrderId());
-//        }
-//        for(Long id : materialIdList){
-//            MaterialOrders materialOrders = materialOrdersRepository.findById(id)
-//                    .orElseThrow(EntityNotFoundException::new);
-//            if(materialOrders.getMaterialOrdersStatus() != MaterialOrdersStatus.STORAGECOMPLETED){
-//                isCompleted = false;
-//            }
-//        }
-//        if(isCompleted){
-//            orders.setOrdersStatus(OrdersStatus.STORAGECOMPLETED);
-//        }
-//
-//    }
 
     //list null 처리 아직 안 함
     public void storageCompleted(MaterialOrders materialOrders){
@@ -153,4 +136,101 @@ public class MaterialInOutService {
             }
         }
     }
+
+    public void outpackaging(WorkPlan workPlan, LocalDateTime start, String worker) {
+        Long productId = workPlan.getProduct().getProductId();
+        //quantity 는 box 단위
+        //즙의 경우, 포장지는 30*quantity 필요, box 는 quantity  필요
+        //스틱 포장지 수 바꿔주기
+        Long quantity = workPlan.getQuantity();
+        Long  wrappingQuantity = 0L;
+        if(productId == 1 || productId ==2){
+            wrappingQuantity = quantity*30;
+        }
+        else if(productId == 3 || productId ==4){
+            wrappingQuantity = quantity*25;
+        }
+            //자재 입출고 테이블에서 입고된 box 선입선출
+            List<MaterialInOut> wrappingPaperList = materialInOutRepository.findAllByProduct_ProductIdOrderByStorageDateAsc(11L);
+            List<MaterialInOut> boxList = materialInOutRepository.findAllByProduct_ProductIdOrderByStorageDateAsc(12L);
+
+            for(MaterialInOut materialInOut : wrappingPaperList){
+
+                if(wrappingQuantity >= materialInOut.getQuantity()){
+                    materialInOut.setMaterialInOutStatus(MaterialInOutStatus.RETRIEVAL);
+                    wrappingQuantity-=materialInOut.getQuantity();
+                    if(wrappingQuantity==0){break;}
+                }else{
+                    //기존 재고는 수량만 update
+                    materialInOut.setQuantity(materialInOut.getQuantity() - wrappingQuantity);
+                    //출고한 재고는 출고시킨 수량으로 insert
+                   MaterialInOut materialInOut1 = MaterialInOut.updateMaterialInOut(materialInOut, wrappingQuantity, start,worker);
+                    materialInOutRepository.save(materialInOut1);
+                    break;
+                }
+
+            }
+
+            for(MaterialInOut materialInOut : boxList){
+                if(quantity >= materialInOut.getQuantity()){
+                    materialInOut.setMaterialInOutStatus(MaterialInOutStatus.RETRIEVAL);
+                    quantity-=materialInOut.getQuantity();
+                    if(quantity==0){break;}
+                }else{
+                    //기존 재고는 수량만 update
+                    materialInOut.setQuantity(materialInOut.getQuantity() - quantity);
+                    //출고한 재고는 출고시킨 수량으로 insert
+                    MaterialInOut materialInOut1 = MaterialInOut.updateMaterialInOut(materialInOut, quantity, start,worker);
+                    materialInOutRepository.save(materialInOut1);
+                    break;
+                }
+
+            }
+            orderPackaging(11L);
+            orderPackaging(12L);
+
+
+
+
+    }
+    /*
+    box, 포장지 출고 후 , 일정 수량 이하로 떨어지면 자동 발주하는 메서드
+    1. 입출고 테이블에서 productid 로 데이터 전부조회 ( 상태=입고)
+    2. 입고인 데이터들의 수량 세기
+    3. 일정량 이하면 발주
+     */
+
+    public void orderPackaging(Long productId){
+            Long quantity = materialInOutRepository.sumQuantityByProductIdAndStatus(productId);
+
+            if(productId == 11L && quantity <=100000){
+
+                Product product = productRepository.findById(productId)
+                        .orElseThrow(EntityNotFoundException::new);
+                MaterialOrderDto materialOrderDto = new MaterialOrderDto();
+                materialOrderDto.setProductId(productId);
+                materialOrderDto.setMaterialOrderDate(LocalDateTime.now());
+                materialOrderDto.setQuantity(100000L);
+                MaterialOrders materialOrders = MaterialOrders.createMaterialOrders(materialOrderDto,product);
+                MaterialInOut materialInOut = MaterialInOut.createMaterialInOut(materialOrders);
+                materialOrdersRepository.save(materialOrders);
+                materialInOutRepository.save(materialInOut);
+            }
+
+            if(productId == 12L && quantity <=10000){
+
+            Product product = productRepository.findById(productId)
+                    .orElseThrow(EntityNotFoundException::new);
+            MaterialOrderDto materialOrderDto = new MaterialOrderDto();
+            materialOrderDto.setProductId(productId);
+            materialOrderDto.setMaterialOrderDate(LocalDateTime.now());
+            materialOrderDto.setQuantity(10000L);
+            MaterialOrders materialOrders = MaterialOrders.createMaterialOrders(materialOrderDto,product);
+            MaterialInOut materialInOut = MaterialInOut.createMaterialInOut(materialOrders);
+            materialOrdersRepository.save(materialOrders);
+            materialInOutRepository.save(materialInOut);
+        }
+
+    }
+
 }

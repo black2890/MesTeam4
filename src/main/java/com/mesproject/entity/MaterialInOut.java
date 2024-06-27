@@ -18,9 +18,15 @@ public class MaterialInOut {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long inoutId;
 
-    @OneToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="material_order_id")
     private MaterialOrders materialOrders;
+
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="product_id")
+    private Product product;
+
+    private Long quantity;
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="work_order_id")
@@ -40,9 +46,28 @@ public class MaterialInOut {
 
         MaterialInOut materialInOut = new MaterialInOut();
         materialInOut.setMaterialOrders(materialOrders);
+        materialInOut.setProduct(materialOrders.getProduct());
+        materialInOut.setQuantity(materialOrders.getQuantity());
         materialInOut.setMaterialInOutStatus(MaterialInOutStatus.PENDINGSTORAGE);
 
 
         return materialInOut;
+    }
+
+    public static MaterialInOut updateMaterialInOut(MaterialInOut materialInOut, Long quantity,LocalDateTime start, String worker){
+
+        MaterialInOut newMaterialInOut = new MaterialInOut();
+        newMaterialInOut.setMaterialOrders(materialInOut.getMaterialOrders());
+        newMaterialInOut.setProduct(materialInOut.getProduct());
+        newMaterialInOut.setQuantity(quantity);
+        newMaterialInOut.setWorkOrders(materialInOut.getWorkOrders());
+        newMaterialInOut.setExpirationDate(materialInOut.getExpirationDate());
+        newMaterialInOut.setMaterialInOutStatus(MaterialInOutStatus.RETRIEVAL);
+        newMaterialInOut.setStorageDate(materialInOut.getStorageDate());
+        newMaterialInOut.setRetrievalDate(start);
+        newMaterialInOut.setStorageWorker(materialInOut.getStorageWorker());
+        newMaterialInOut.setRetrievalWorker(worker);
+
+        return newMaterialInOut;
     }
 }

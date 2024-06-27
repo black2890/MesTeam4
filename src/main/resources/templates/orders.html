@@ -101,6 +101,11 @@
                         <input type="number" class="form-control" id="quantity" name="quantity" min="20" max="1000" required>
                     </div>
                     <div class="form-group">
+                        <label for="available">납품 가능일</label>
+                        <input type="text" class="form-control" id="available" name="available" min="20" max="1000">
+
+                    </div>
+                    <div class="form-group">
                         <label for="vendorName">Vendor</label>
                         <select class="form-control" id="vendorName" name="vendorName" required>
                             <!-- Options will be populated by JavaScript -->
@@ -215,6 +220,34 @@
                 }
             ]
         });
+
+        // 예상 납품 날짜를 가져오는 함수
+        function getEstimatedDate(productName, quantity) {
+            $.ajax({
+                url: '/get-estimated-date',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ productName: productName, quantity: quantity }),
+                success: function(response) {
+                    $('#available').val(response.estimatedDate);
+                },
+                error: function(error) {
+                    console.error("Error fetching estimated date: ", error);
+                }
+            });
+        }
+
+        // 제품명 또는 수량이 변경될 때 예상 납품 날짜를 요청
+        $('#productName, #quantity').on('change', function () {
+            var productName = $('#productName').val();
+            var quantity = $('#quantity').val();
+
+            // 두 값이 모두 존재할 때만 요청
+            if (productName && quantity) {
+                getEstimatedDate(productName, quantity);
+            }
+        });
+
 
         $('#example tbody').on('click', 'input[type="checkbox"]', function () {
             var data = table.row($(this).closest('tr')).data();
@@ -362,6 +395,8 @@
                         $('#orderModal').modal('hide');
 
                         table.ajax.reload();
+                        // 모달 창의 입력 필드를 초기화
+                        $('#orderForm')[0].reset();
                     },
                     error: function (error) {
                         console.error("Error creating order: ", error);
