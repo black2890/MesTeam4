@@ -138,8 +138,8 @@
                             완료
                         </button>
 
-                        <button class="btn btn-warning btn-icon-split" style="padding: 5px" onclick="startWorks()">일괄 시작</button>
-                        <button class="btn btn-danger btn-icon-split" style="padding: 5px" onclick="endWorks()">일괄 종료</button>
+                        <button class="btn btn-warning btn-icon-split" style="padding: 5px" onclick="startWorks()">일괄 시작 및 종료</button>
+
 
                         <div class="table-responsive">
                             <table data-order='[[1, "desc"]]' class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
@@ -556,29 +556,30 @@
                     return;
                 }
 
-                $.ajax({
-                    url: url,
-                    type: "POST",
-                    data: JSON.stringify(rno_arr),
-                    contentType: "application/json; charset-utf-8",
-                    // beforeSend : function (xhr){
-                    //     xhr.setRequestHeader(header, token);
-                    // },
-                    cache : false,
-                    success : function (){
-                        console.log("삭제 처리 되었습니다.");
-                    },
-                    error : function (request, error){
-                        if (request.status == '401'){
-                            alert("권한이 없습니다.");
-                            location.href='/users/login';
-                        }else {
-                            alert("삭제처리 오류");
-                            alert("code: " + request.status + "\n message : " + request.responseText + "\n error : " + error);
-                        }
-                    }
-                });
+
             })
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: JSON.stringify(rno_arr),
+                contentType: "application/json; charset-utf-8",
+                // beforeSend : function (xhr){
+                //     xhr.setRequestHeader(header, token);
+                // },
+                cache : false,
+                success : function (){
+                    console.log("삭제 처리 되었습니다.");
+                },
+                error : function (request, error){
+                    if (request.status == '401'){
+                        alert("권한이 없습니다.");
+                        location.href='/users/login';
+                    }else {
+                        alert("삭제처리 오류");
+                        alert("code: " + request.status + "\n message : " + request.responseText + "\n error : " + error);
+                    }
+                }
+            });
             alert("삭제 처리 되었습니다.");
             window.location.reload();
         }

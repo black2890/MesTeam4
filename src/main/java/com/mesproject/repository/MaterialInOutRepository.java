@@ -15,4 +15,7 @@ public interface MaterialInOutRepository extends JpaRepository<MaterialInOut, Lo
    @Query("SELECT SUM(m.quantity) FROM MaterialInOut m WHERE m.product.productId = :productId AND m.materialInOutStatus = 'STORAGE'")
    Long sumQuantityByProductIdAndStatus(@Param("productId") Long productId);
 
+   @Query("SELECT m.product.productName, SUM(m.quantity) FROM MaterialInOut m WHERE m.materialInOutStatus = 'STORAGE' GROUP BY m.product.productName")
+   List<Object[]> findMaterialTotalStockByProductNameAndStatus();
+
 }

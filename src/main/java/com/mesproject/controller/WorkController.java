@@ -52,7 +52,11 @@ public class WorkController {
     @PostMapping("/works/start")
     public ResponseEntity<?> startWorks(@RequestBody List<Long> rnos){
         Collections.sort(rnos);
+        System.out.println("출력===========================");
+        for(Long rno: rnos){
 
+            System.out.println(rno);
+        }
 
         for (Long rno: rnos){
             WorkOrders workOrders = workOrdersRepository.findById(rno)
@@ -61,7 +65,9 @@ public class WorkController {
             workOrdersDto.setWorkOrderId(rno);
             workOrdersDto.setStart(workOrders.getScheduledDate());
             workOrdersDto.setWorker("김철수");
+            workOrdersDto.setEnd(workOrders.getScheduledDate().plusHours(workOrders.getDuration().toHours()));
             workOrdersService.start(workOrdersDto);
+            workOrdersService.end(workOrdersDto);
         }
         return ResponseEntity.ok()
                 .build();

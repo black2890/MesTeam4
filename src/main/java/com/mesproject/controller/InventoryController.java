@@ -128,4 +128,8 @@ public class InventoryController {
     public Map<String, Integer> getTotalStock() {
         return inventoryService.getTotalStockByProductNameAndStatus();
     }
+    @GetMapping("/api/inventory/materialTotalStock")
+    public Map<String, Integer> getMaterialTotalStock() {
+        return inventoryService.getMaterialTotalStockByProductNameAndStatus();
+    }
 }

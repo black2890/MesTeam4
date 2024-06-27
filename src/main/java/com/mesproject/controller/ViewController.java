@@ -20,6 +20,9 @@ public class ViewController {
     @GetMapping(value= "/inventoryChart")
     public String inventoryChart(){return "inventoryChart";}
 
+    @GetMapping(value= "/MaterialInventoryChart")
+    public String MaterialInventoryChart(){return "MaterialInventoryChart";}
+
     @GetMapping(value= "/p")
     public String summary(){return "productOrdersSummary";}
 

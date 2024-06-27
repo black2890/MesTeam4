@@ -16,8 +16,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -205,4 +207,16 @@ public class OrdersController {
 
         return ResponseEntity.ok(response);
     }
+    @PostMapping("/upload-orders")
+    public ResponseEntity<?> uploadOrders(@RequestParam("file") MultipartFile file) {
+        try {
+            List<OrderDto> orders = orderService.parseExcelFile(file);
+            orders.forEach(orderService::order);
+            return ResponseEntity.ok("Orders processed successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing file: " + e.getMessage());
+        }
+    }
+
+
 }
