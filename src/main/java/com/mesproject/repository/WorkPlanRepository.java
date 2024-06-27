@@ -32,7 +32,10 @@ public interface WorkPlanRepository extends JpaRepository<WorkPlan, Long> {
     @Query("SELECT w FROM WorkPlan w WHERE w.product.productId = :productId AND FUNCTION('DATE', w.end) = :endDate")
     List<WorkPlan> findByProduct_ProductIdAndEnd(@Param("productId") Long productId, @Param("endDate") LocalDate endDate);
 
-
+    @Query("SELECT w FROM WorkPlan w WHERE (w.product.productId = :productId1 OR w.product.productId = :productId2) AND FUNCTION('DATE', w.end) = :endDate")
+    List<WorkPlan> findByProducts_ProductIdAndEnd(@Param("productId1") Long productId1,
+                                                  @Param("productId2") Long productId2,
+                                                  @Param("endDate") LocalDate endDate);
 
 
     @Query("SELECT NEW com.mesproject.dto.ProductionDataDto(p.productName, SUM(wp.quantity), wp.end) " +
