@@ -60,7 +60,9 @@ public class OrderService {
     즙은 하루만 비어있으면 그 때는 생산 못하고 이틀 비어있는 곳에 넣어야 함.
      */
     public Long order(OrderDto orderDto){
-
+        //불량률 고려 3% 추가 생산
+        long initialQuantity = orderDto.getQuantity();
+        orderDto.setQuantity((long) Math.ceil(orderDto.getQuantity() * 1.03));
 
         Product product = productRepository.findById(orderDto.getProductId())
                 .orElseThrow(EntityNotFoundException::new);
@@ -447,7 +449,7 @@ public class OrderService {
 
 
         }
-
+        orderDto.setQuantity((long) initialQuantity);
         //수주 생성
         Orders order = Orders.createOrder(ordersMaterialsList,ordersPlanList ,product,vendor,orderDto);
         ordersRepository.save(order);

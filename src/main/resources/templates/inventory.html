@@ -33,7 +33,7 @@
             <th>수량</th>
             <th>상태</th>
             <th>생산완료일</th>
-            <th><input type="checkbox" name="checkall" id="checkall"></th>
+
         </tr>
         </thead>
         <tbody>
@@ -55,7 +55,7 @@
 <script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.print.min.js"></script>
 <script>
     $(document).ready(function () {
-        var table =   $('#example').DataTable({
+        $('#example').DataTable({
             "processing": true,
             "serverSide": true,
             "paging": true,
@@ -87,22 +87,9 @@
                         }
                     }
                 },
-                 {"data": "completedDate"}
+                {"data": "completedDate"}
             ],
-            columnDefs: [
-                {
-                    targets: 7,
-                    orderable: false,
-                    className: "select-checkbox",
-                    render: function () {
-                        return '<input type="checkbox" name="id[]" value="">';
-                    }
-                }
-            ],
-            select: {
-                style: "multi",
-                selector: "td:first-child"
-            },
+
             "dom": '<"d-flex justify-content-between"lfB>tipr<"d-flex justify-content-between">',
             buttons: [
                 {
@@ -110,66 +97,8 @@
                     "text": '엑셀 다운로드',
                     "className": 'btn btn-outline-primary excelBtn',
                     "title": '재고 데이터'
-                },
-                {
-                    "text": '입고',
-                    "className": 'btn btn-success',
-                    "action": function () {
-                        // 버튼 클릭 시 실행할 동작
-
-                    }
                 }
-
             ]
-        });
-
-        $('#example tbody').on('click', 'input[type="checkbox"]', function () {
-            var data = table.row($(this).closest('tr')).data();
-
-        });
-        function updateOrderStatus() {
-
-            var selectedData = [];
-            $('#example tbody input[type="checkbox"]:checked').each(function () {
-                var data = table.row($(this).closest('tr')).data();
-                selectedData.push(data);
-            });
-
-            var inventoryIds = selectedData.map(function (item) {
-                return item.inventoryId;
-            });
-
-            if (inventoryIds.length > 0) {
-                $.ajax({
-                    url: '/inventoryIn',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ inventoryIds: inventoryIds}),
-                    success: function () {
-                        table.ajax.reload();
-                    },
-                    error: function (error) {
-                        console.error("Error updating order status: ", error);
-                    }
-                });
-            } else {
-                alert(" 최소한 하나 이상의 데이터 행을 체크해주세요. ");
-            }
-        }
-
-        $('#checkall').on('click', function(){
-            var rows = table.rows({ 'search': 'applied' }).nodes();
-            $('input[type="checkbox"]', rows).prop('checked', this.checked);
-        });
-
-        // Handle click on individual checkbox to maintain state of "select-all" checkbox
-        $('#example tbody').on('change', 'input[type="checkbox"]', function(){
-            if(!this.checked){
-                var el = $('#checkall').get(0);
-                if(el && el.checked && ('indeterminate' in el)){
-                    el.indeterminate = true;
-                }
-            }
         });
     });
 </script>

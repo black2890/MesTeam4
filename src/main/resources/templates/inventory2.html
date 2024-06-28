@@ -10,16 +10,8 @@
     <meta name="author" content="">
 
     <title>Code Q&A</title>
-    <!-- FullCalendar CSS -->
+
     <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css" rel="stylesheet">
-    <!-- Datatables CSS -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.css">
-    <!-- Bootstrap CSS -->
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
-
-
-
     <!-- Custom fonts for this template -->
     <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link
@@ -49,7 +41,6 @@
     <!-- Page level custom scripts -->
     <script src="/js/demo/datatables-demo.js"></script>
 
-
     <style>
         footer {
             background-color: #8D94C7;
@@ -65,14 +56,6 @@
 </head>
 
 <body id="page-top">
-<!-- FullCalendar JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-
-
-<script src='https://unpkg.com/fullcalendar@5.11.0/main.min.js'></script>
-<script src='https://unpkg.com/axios/dist/axios.min.js'></script>
 
 <!-- Page Wrapper -->
 <div id="wrapper">
@@ -134,53 +117,48 @@
 
                             </ul>
 
+                            <ul>
+
+
+                            </ul>
 
 
                         </div>
 
 
                         <button type="button" class="btn btn-primary mb-4 float-right" data-toggle="modal" data-target="#orderModal">
-                          출하
+                            입고
                         </button>
-                        <button type="button" class="btn btn-primary mb-4 float-right" data-toggle="modal" data-target="#orderModal2">
-                            배송완료
-                        </button>
-                        <div>
-                            <button id="downloadExcel" class="btn btn-primary">엑셀 다운로드</button>
-                        </div>
 
-
-
+<!--                        <button class="btn btn-warning btn-icon-split" style="padding: 5px" onclick="materialsIn()">일괄 입고</button>-->
 
                         <div class="table-responsive">
                             <table data-order='[[1, "desc"]]' class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
                                 <tr>
                                     <th>checkbox</th>
-                                    <th>주문번호</th>
+                                    <th>재고번호</th>
                                     <th>제품명</th>
-                                    <th>고객명</th>
                                     <th>수량</th>
-                                    <th>납품주소</th>
-                                    <th>배송업체</th>
-                                    <th>배송완료일</th>
                                     <th>상태</th>
+                                    <th>입고일</th>
+                                    <th>입고자</th>
+                                    <th>출고일</th>
+                                    <th>출고자</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <!-- Thymeleaf 반복문을 이용하여 데이터 출력 -->
-                                <tr th:each="shipment : ${shipments}">
-                                    <td><input class="replyCheckbox" type="checkbox" th:value="${shipment.getOrderId()}"/></td>
-                                    <td th:text="${shipment.getOrderId()}"></td>
-                                    <td th:text="${shipment.getProduct().getProductName()}"></td>
-                                    <td th:text="${shipment.getVendor().getVendorName()}"></td>
-                                    <td th:text="${shipment.getQuantity()}"></td>
-                                    <td th:text="${shipment.getDeliveryAddress()}"></td>
-                                    <td th:text="${shipment.getDeliveryVendor() != null ?
-                                    shipment.getDeliveryVendor().getVendorName() : ''}"></td>
-
-                                    <td th:text="${shipment.getActualDeliveryDate()}"></td>
-                                    <td th:text="${shipment.getOrdersStatus()}"></td>
+                                <tr th:each="inventory : ${inventories}">
+                                    <td><input class="replyCheckbox" type="checkbox" th:value="${inventory.getInventoryId()}"/></td>
+                                    <td th:text="${inventory.getInventoryId()}"></td>
+                                    <td th:text="${inventory.getProduct().getProductName()}"></td>
+                                    <td th:text="${inventory.getQuantity()}"></td>
+                                    <td th:text="${inventory.getStorageDate()}"></td>
+                                    <td th:text="${inventory.getStorageWorker()}"></td>
+                                    <td th:text="${inventory.getRetrievalDate()}"></td>
+                                    <td th:text="${inventory.getRetrievalWorker()}"></td>
+                                    <td th:text="${inventory.getInventoryStatus()}"></td>
 
                                 </tr>
                                 </tbody>
@@ -209,6 +187,7 @@
     <i class="fas fa-angle-up"></i>
 </a>
 
+
 <!-- workstart Modal -->
 <div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="orderModalLabel"
      aria-hidden="true">
@@ -232,10 +211,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="vendor">배송업체</label>
-                        <select class="form-control" id="vendor" name="vendor" required>
-                            <option th:each="vendor : ${vendors}" th:value="${vendor.getVendorName()}" th:text="${vendor.getVendorName()}"></option>
-                        </select>
+                        <label for="startDate">입고일시</label>
+                        <input type="datetime-local" class="form-control" id="startDate" name="startDate" required>
                     </div>
 
 
@@ -245,60 +222,6 @@
         </div>
     </div>
 </div>
-
-<!-- workend Modal -->
-<div class="modal fade" id="orderModal2" tabindex="-1" role="dialog" aria-labelledby="orderModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="orderModalLabel2">Create Order</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="orderForm2">
-
-                    <div class="form-group">
-                        <label for="deliveryDate">Delivery Date</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="deliveryDate" name="deliveryDate" readonly
-                                   required>
-                            <div class="input-group-append">
-                                <button type="button" class="btn btn-outline-secondary" id="selectDeliveryDate">Select
-                                    Date
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- FullCalendar Modal -->
-<div class="modal fade" id="calendarModal" tabindex="-1" role="dialog" aria-labelledby="calendarModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog" role="document" style="max-width:800px">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="calendarModalLabel">Select Delivery Date</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div id="calendar"></div>
-            </div>
-        </div>
-    </div>
-</div>
-
 
 <!-- 검색조건에 따라 입력창 띄우는 스크립트 -->
 <script>
@@ -352,101 +275,6 @@
 
 <!-- 검색에 따라 테이블을 띄워주는 스크립트 -->
 <script>
-    $(document).ready(function() {
-
-
-        $('#orderForm').on('submit', function (e) {
-            e.preventDefault();
-
-            var orderId= $('.replyCheckbox:checked').first().val();
-            var vendorName = $('#vendor').val();
-            var worker = $('#worker').val();
-
-            var status = $('.replyCheckbox:checked').first().closest('tr').find('td:eq(8)').text().trim();
-
-            // 상태가 "PRODUCTIONCOMPLETED"인지 확인합니다.
-            if (status !== "PRODUCTIONCOMPLETED") {
-                alert("선택된 주문의 상태가 생산완료가 아닙니다.");
-                return; // 함수 실행을 중단합니다.
-            }
-
-            const shipment = {
-                orderId : orderId,
-                vendorName : vendorName,
-                worker : worker
-
-            }
-
-            const url ="/shipment/start";
-            fetch(url, {
-                method: "POST", // PATCH 요청
-                headers: { // 전송 데이터 타입(JSON) 정보
-                    "Content-Type": "application/json"
-
-                },
-                body: JSON.stringify(shipment) //comment 객체를 JSON 문자열로 변환 전송
-            }).then(response => {
-                // HTTP 응답 코드에 따른 메시지 출력
-                const msg = (response.ok) ? "출하처리되었습니다." : "출하처리 실패했습니다.";
-                alert(msg);
-                // 현재 페이지 새로 고침
-                window.location.reload();
-            });
-
-        });
-
-        $('#orderForm2').on('submit', function (e) {
-            e.preventDefault();
-
-            var orderId= $('.replyCheckbox:checked').first().val();
-            var actualDeliveryDate = $('#deliveryDate').val();
-            var status = $('.replyCheckbox:checked').first().closest('tr').find('td:eq(8)').text().trim();
-
-            // 상태가 "RETRIEVALCOMPLETED"인지 확인합니다.
-            if (status !== "RETRIEVALCOMPLETED") {
-                alert("선택된 주문의 상태가 출하완료가 아닙니다.");
-                return; // 함수 실행을 중단합니다.
-            }
-
-            const shipment = {
-                orderId : orderId,
-                actualDeliveryDate : actualDeliveryDate
-
-            }
-
-            const url ="/shipment/end";
-            fetch(url, {
-                method: "POST", // PATCH 요청
-                headers: { // 전송 데이터 타입(JSON) 정보
-                    "Content-Type": "application/json"
-                    // ,'X-CSRF-Token': token,
-                    // 'header': header
-                },
-                body: JSON.stringify(shipment) //comment 객체를 JSON 문자열로 변환 전송
-            }).then(response => {
-                // HTTP 응답 코드에 따른 메시지 출력
-                const msg = (response.ok) ? "베송 완료처리되었습니다." : "배송 완료처리 실패했습니다.";
-                alert(msg);
-                // 현재 페이지 새로 고침
-                window.location.reload();
-            });
-
-        });
-
-        $('#selectDeliveryDate').on('click', function () {
-            $('#calendarModal').modal('show');
-        });
-
-        $('#calendar').fullCalendar({
-            selectable: true,
-            select: function(startDate) {
-                $('#deliveryDate').val(startDate.format('YYYY-MM-DD'));
-                $('#calendarModal').modal('hide');
-            }
-        });
-
-    });
-
     // $(document).ready(function() {
     //
     //     $('input[name="deleteCheckbox"]').change(function() {
@@ -586,18 +414,111 @@
     //     return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
     // }
 </script>
+
 <script>
-    document.getElementById('downloadExcel').addEventListener('click', function() {
-        // 테이블 데이터를 배열로 변환
-        var table = document.getElementById('dataTable');
-        var workbook = XLSX.utils.table_to_book(table, {sheet: "Sheet JS"});
 
-        // 엑셀 파일 다운로드
-        XLSX.writeFile(workbook, 'table_data.xlsx');
+    $(document).ready(function() {
+
+
+        $('#orderForm').on('submit', function (e) {
+            e.preventDefault();
+
+            var inventoryId = $('.replyCheckbox:checked').first().val();
+            var worker = $('#worker').val();
+            var startDate = $('#startDate').val();
+            var status = $('.replyCheckbox:checked').first().closest('tr').find('td:eq(8)').text().trim();
+            if (status !== "PENDINGSTORAGE") {
+                alert("선택된 재고의 상태가 입고대기 상태가 아닙니다.");
+                return; // 함수 실행을 중단합니다.
+            }
+
+
+            const work = {
+                inventoryId: inventoryId,
+                storageWorker: worker,
+                storageDate: startDate,
+
+            }
+
+            const url = "/inventory/in";
+            fetch(url, {
+                method: "POST", // PATCH 요청
+                headers: { // 전송 데이터 타입(JSON) 정보
+                    "Content-Type": "application/json"
+
+                },
+                body: JSON.stringify(work) //comment 객체를 JSON 문자열로 변환 전송
+            }).then(response => {
+                // HTTP 응답 코드에 따른 메시지 출력
+                const msg = (response.ok) ? "입고처리되었습니다." : "입고처리 실패했습니다.";
+                alert(msg);
+                // 현재 페이지 새로 고침
+                window.location.reload();
+            });
+
+        });
     });
+
 </script>
+<script>
+    //일괄 시작
+    function materialsIn(){
+        // var token = $("meta[name='_csrf']").attr("content");
+        // var header = $("meta[name='_csrf_header']").attr("content");
+        const checkboxes = document.querySelectorAll('.replyCheckbox:checked');
+        if (checkboxes.length === 0) {
+            alert("입고할 자재를 선택해주세요.");
+            return;
+        }
+        let checked = true;
+        var rno_arr = [];
+        var url = "/materials/in";
+
+        console.log(checkboxes);
 
 
+        if (checked){
+            checkboxes.forEach(checkbox => {
+                const checkedId = checkbox.closest('tr').querySelector('td:nth-child(2)').innerText;
+                rno_arr.push(checkedId);
+
+                console.log(rno_arr);
+
+                // 선택된 댓글이 없는 경우 알림
+                if (rno_arr.length === 0) {
+                    alert("입고할 자재를 선택해주세요.");
+                    return;
+                }
+
+
+            })
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: JSON.stringify(rno_arr),
+                contentType: "application/json; charset-utf-8",
+                // beforeSend : function (xhr){
+                //     xhr.setRequestHeader(header, token);
+                // },
+                cache : false,
+                success : function (){
+                    console.log("입고 처리 되었습니다.");
+                },
+                error : function (request, error){
+                    if (request.status == '401'){
+                        alert("권한이 없습니다.");
+                        location.href='/users/login';
+                    }else {
+                        alert("삭제처리 오류");
+                        alert("code: " + request.status + "\n message : " + request.responseText + "\n error : " + error);
+                    }
+                }
+            });
+            alert("삭제 처리 되었습니다.");
+            window.location.reload();
+        }
+    }
+</script>
 </body>
 
 </html>

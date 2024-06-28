@@ -1,6 +1,7 @@
 package com.mesproject.controller;
 
 import com.mesproject.constant.vendorType;
+import com.mesproject.repository.InventoryRepository;
 import com.mesproject.repository.VendorRepository;
 import com.mesproject.service.OrdersService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class ViewController {
     private final OrdersService ordersService;
     private final VendorRepository vendorRepository;
+    private final InventoryRepository inventoryRepository;
 
     @GetMapping(value = "/vendor")
     public String vendor() {
@@ -64,5 +66,10 @@ public class ViewController {
         model.addAttribute("vendors",vendorRepository.findByVendorType(vendorType.DELIVERY));
 
         return "shipment";
+    }
+    @GetMapping(value = "/data/inventories")
+    public String inventories(Model model) {
+        model.addAttribute("inventories",inventoryRepository.findAll());
+        return "inventory2";
     }
 }

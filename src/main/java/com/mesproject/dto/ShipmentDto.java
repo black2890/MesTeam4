@@ -10,5 +10,6 @@ public class ShipmentDto {
     private Long orderId;
     private String vendorName;
     private LocalDate actualDeliveryDate;
+    private String worker;
 
 }
