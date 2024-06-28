@@ -142,40 +142,41 @@ public class OrdersService {
 
     }
 
-    public void retrievalCompletedOne(Long orderId , String worker){
+    public void retrievalCompletedOne(Long orderId , String worker) {
         List<Long> workPlanIdList = new ArrayList<>();
 
 
-            Orders orders = ordersRepository.findById(orderId)
+        Orders orders = ordersRepository.findById(orderId)
+                .orElseThrow(EntityNotFoundException::new);
+        Long quantity = orders.getQuantity();
+        List<OrdersPlan> ordersPlanList = ordersPlanRepository.findByOrders_OrderIdOrderByOrders_OrderIdAsc(orderId);
+        // 수주코드는 무조건 하나의 작업계획이라도 참조하게 되어있음.
+        //아닌 경우 생기면 추후 고려
+        for (OrdersPlan ordersPlan : ordersPlanList) {
+            workPlanIdList.add(ordersPlan.getWorkPlan().getWorkPlanId());
+        }
+        //
+        for (Long workPlanId : workPlanIdList) {
+            WorkPlan workPlan = workPlanRepository.findById(workPlanId)
                     .orElseThrow(EntityNotFoundException::new);
-            Long quantity = orders.getQuantity();
-            List<OrdersPlan> ordersPlanList = ordersPlanRepository.findByOrders_OrderIdOrderByOrders_OrderIdAsc(orderId);
-            // 수주코드는 무조건 하나의 작업계획이라도 참조하게 되어있음.
-            //아닌 경우 생기면 추후 고려
-            for(OrdersPlan ordersPlan : ordersPlanList){
-                workPlanIdList.add(ordersPlan.getWorkPlan().getWorkPlanId());
+            Inventory inventory = inventoryRepository.findByWorkPlan_WorkPlanId(workPlanId);
+            if (quantity >= inventory.getQuantity()) {
+                inventory.setInventoryStatus(InventoryStatus.RETRIEVALCOMPLETED);
+                inventory.setRetrievalDate(LocalDateTime.now());
+                inventory.setRetrievalWorker(worker);
+                quantity -= inventory.getQuantity();
+            } else {
+                //기존 재고는 수량만 update
+                inventory.setQuantity(inventory.getQuantity() - quantity);
+                //출고한 재고는 출고시킨 수량으로 insert
+                Inventory retrievalInventory = Inventory.updateInventory(workPlan, quantity);
+                inventory.setRetrievalDate(LocalDateTime.now());
+                inventory.setRetrievalWorker(worker);
+                inventoryRepository.save(retrievalInventory);
             }
-            //
-            for(Long workPlanId : workPlanIdList){
-                WorkPlan workPlan = workPlanRepository.findById(workPlanId)
-                        .orElseThrow(EntityNotFoundException::new);
-                Inventory inventory = inventoryRepository.findByWorkPlan_WorkPlanId(workPlanId);
-                if(quantity >= inventory.getQuantity()){
-                    inventory.setInventoryStatus(InventoryStatus.RETRIEVALCOMPLETED);
-                    inventory.setRetrievalDate(LocalDateTime.now());
-                    inventory.setRetrievalWorker(worker);
-                    quantity-=inventory.getQuantity();
-                }else{
-                    //기존 재고는 수량만 update
-                    inventory.setQuantity(inventory.getQuantity() - quantity);
-                    //출고한 재고는 출고시킨 수량으로 insert
-                    Inventory  retrievalInventory = Inventory.updateInventory(workPlan, quantity);
-                    inventory.setRetrievalDate(LocalDateTime.now());
-                    inventory.setRetrievalWorker(worker);
-                    inventoryRepository.save(retrievalInventory);
-                }
 
-            }
+        }
+    }
 
 
 
