@@ -18,4 +18,6 @@ public class Vendor {
 
     @Enumerated(EnumType.STRING)
     private vendorType vendorType;
+
+    private boolean deleted = false;
 }
