@@ -37,6 +37,14 @@ public class Orders {
     @Enumerated(EnumType.STRING)
     private OrdersStatus ordersStatus;
 
+    private LocalDate regDate;
+
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="delivery_vendor_id")
+    private Vendor deliveryVendor;
+
+    private LocalDate actualDeliveryDate;
+
     @OneToMany(mappedBy = "orders",
             cascade = CascadeType.ALL
             ,orphanRemoval = true,
@@ -49,6 +57,7 @@ public class Orders {
             ,orphanRemoval = true,
             fetch=FetchType.LAZY)
     private List<OrdersPlan> ordersPlanList = new ArrayList<>();
+
 
     public void addOrdersMaterials(OrdersMaterials ordersMaterials){
 
@@ -89,6 +98,7 @@ public class Orders {
         order.setDeliveryDate(orderDto.getDeliveryDate());
         order.setDeliveryAddress(orderDto.getDeliveryAddress());
         order.setOrdersStatus(OrdersStatus.PENDINGSTORAGE);
+        order.setRegDate(LocalDate.now());
 
         return order;
     }

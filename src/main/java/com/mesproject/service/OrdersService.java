@@ -2,20 +2,16 @@ package com.mesproject.service;
 
 import com.mesproject.constant.InventoryStatus;
 import com.mesproject.constant.OrdersStatus;
-import com.mesproject.entity.Inventory;
-import com.mesproject.entity.Orders;
-import com.mesproject.entity.OrdersPlan;
-import com.mesproject.entity.WorkPlan;
-import com.mesproject.repository.InventoryRepository;
-import com.mesproject.repository.OrdersPlanRepository;
-import com.mesproject.repository.OrdersRepository;
-import com.mesproject.repository.WorkPlanRepository;
+import com.mesproject.dto.ShipmentDto;
+import com.mesproject.entity.*;
+import com.mesproject.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Transactional
@@ -31,8 +27,13 @@ public class OrdersService {
     private InventoryRepository inventoryRepository;
     @Autowired
     private WorkPlanRepository workPlanRepository;
+    @Autowired
+    private VendorRepository vendorRepository;
+
 
     public void updateOrderStatus(List<Long> orderIds, OrdersStatus status) {
+        //출하이면, 출하업체 입력받아서 저장해야함
+        //배송완료이면, 배송일 입력받아서 저장해야함
         ordersRepository.updateStatusByIds(orderIds, status);
         if(status ==OrdersStatus.RETRIEVALCOMPLETED){
             retrievalCompleted(orderIds);
@@ -102,5 +103,35 @@ public class OrdersService {
 
 
         }
+    }
+    public List<Orders> getCompletedOrders() {
+        List<OrdersStatus> statuses = Arrays.asList(
+                OrdersStatus.PRODUCTIONCOMPLETED,
+                OrdersStatus.RETRIEVALCOMPLETED,
+                OrdersStatus.DELIVERED
+        );
+        return ordersRepository.findByOrdersStatusIn(statuses);
+    }
+
+    public void shipmentStart(ShipmentDto shipmentDto) {
+        //출하이면, 출하업체 입력받아서 저장해야함
+        //배송완료이면, 배송일 입력받아서 저장해야함
+        Orders orders = ordersRepository.findById(shipmentDto.getOrderId())
+                .orElseThrow(EntityNotFoundException::new);
+
+        orders.setOrdersStatus(OrdersStatus.RETRIEVALCOMPLETED);
+        Vendor vendor = vendorRepository.findByVendorName(shipmentDto.getVendorName());
+        orders.setDeliveryVendor(vendor);
+
+    }
+
+    public void shipmentEnd(ShipmentDto shipmentDto) {
+        //출하이면, 출하업체 입력받아서 저장해야함
+        //배송완료이면, 배송일 입력받아서 저장해야함
+        Orders orders = ordersRepository.findById(shipmentDto.getOrderId())
+                .orElseThrow(EntityNotFoundException::new);
+        orders.setOrdersStatus(OrdersStatus.DELIVERED);
+        orders.setActualDeliveryDate(shipmentDto.getActualDeliveryDate());
+
     }
 }

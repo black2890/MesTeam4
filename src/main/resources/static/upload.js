@@ -18,6 +18,7 @@ document.getElementById('uploadForm').addEventListener('submit', function(event)
     })
         .then(response => {
             if (response.ok) {
+                $('#orderModal2').modal('hide');
                 return response.text();
             } else {
                 throw new Error('Error uploading file: ' + response.statusText);

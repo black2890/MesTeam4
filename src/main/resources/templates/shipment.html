@@ -68,6 +68,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
 
+<script src='https://unpkg.com/fullcalendar@5.11.0/main.min.js'></script>
+<script src='https://unpkg.com/axios/dist/axios.min.js'></script>
+
 <!-- Page Wrapper -->
 <div id="wrapper">
 
@@ -132,13 +135,13 @@
 
                         </div>
                         <button type="button" class="btn btn-primary mb-4 float-right" data-toggle="modal" data-target="#orderModal">
-                            시작
+                          출하
                         </button>
                         <button type="button" class="btn btn-primary mb-4 float-right" data-toggle="modal" data-target="#orderModal2">
-                            완료
+                            배송완료
                         </button>
 
-                        <button class="btn btn-warning btn-icon-split" style="padding: 5px" onclick="startWorks()">일괄 시작 및 종료</button>
+
 
 
                         <div class="table-responsive">
@@ -146,30 +149,30 @@
                                 <thead>
                                 <tr>
                                     <th>checkbox</th>
-                                    <th>작업번호</th>
+                                    <th>주문번호</th>
                                     <th>제품명</th>
-                                    <th>공정</th>
-                                    <th>담당자</th>
-                                    <th>예정일</th>
-                                    <th>소요시간</th>
-                                    <th>시작일시</th>
-                                    <th>완료일시</th>
+                                    <th>고객명</th>
+                                    <th>수량</th>
+                                    <th>납품주소</th>
+                                    <th>배송업체</th>
+                                    <th>배송완료일</th>
                                     <th>상태</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <!-- Thymeleaf 반복문을 이용하여 데이터 출력 -->
-                                <tr th:each="workOrder : ${workOrders}">
-                                    <td><input class="replyCheckbox" type="checkbox" th:value="${workOrder.getWorkOrderId()}"/></td>
-                                    <td th:text="${workOrder.getWorkOrderId()}"></td>
-                                    <td th:text="${workOrder.getWorkPlan().getProduct().getProductName()}"></td>
-                                    <td th:text="${workOrder.getProcessType()}"></td>
-                                    <td th:text="${workOrder.getWorker()}"></td>
-                                    <td th:text="${workOrder.getScheduledDate()}"></td>
-                                    <td th:text="${workOrder.getDuration()}"></td>
-                                    <td th:text="${workOrder.getStart()}"></td>
-                                    <td th:text="${workOrder.getEnd()}"></td>
-                                    <td th:text="${workOrder.getWorkOrdersStatus()}"></td>
+                                <tr th:each="shipment : ${shipments}">
+                                    <td><input class="replyCheckbox" type="checkbox" th:value="${shipment.getOrderId()}"/></td>
+                                    <td th:text="${shipment.getOrderId()}"></td>
+                                    <td th:text="${shipment.getProduct().getProductName()}"></td>
+                                    <td th:text="${shipment.getVendor().getVendorName()}"></td>
+                                    <td th:text="${shipment.getQuantity()}"></td>
+                                    <td th:text="${shipment.getDeliveryAddress()}"></td>
+                                    <td th:text="${shipment.getDeliveryVendor() != null ?
+                                    shipment.getDeliveryVendor().getVendorName() : ''}"></td>
+
+                                    <td th:text="${shipment.getActualDeliveryDate()}"></td>
+                                    <td th:text="${shipment.getOrdersStatus()}"></td>
 
                                 </tr>
                                 </tbody>
@@ -212,17 +215,10 @@
             <div class="modal-body">
                 <form id="orderForm">
                     <div class="form-group">
-                        <label for="worker">담당자</label>
-                        <select class="form-control" id="worker" name="worker" required>
-                            <option value="김길동">김길동</option>
-                            <option value="이길동">이길동</option>
-                            <option value="박길동">박길동</option>
+                        <label for="vendor">배송업체</label>
+                        <select class="form-control" id="vendor" name="vendor" required>
+                            <option th:each="vendor : ${vendors}" th:value="${vendor.getVendorName()}" th:text="${vendor.getVendorName()}"></option>
                         </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="startDate">시작일시</label>
-                        <input type="datetime-local" class="form-control" id="startDate" name="startDate" required>
                     </div>
 
 
@@ -248,8 +244,16 @@
                 <form id="orderForm2">
 
                     <div class="form-group">
-                        <label for="endDate">종료일시</label>
-                        <input type="datetime-local" class="form-control" id="endDate" name="endDate" required>
+                        <label for="deliveryDate">Delivery Date</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="deliveryDate" name="deliveryDate" readonly
+                                   required>
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-outline-secondary" id="selectDeliveryDate">Select
+                                    Date
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
 
@@ -260,7 +264,23 @@
     </div>
 </div>
 
-
+<!-- FullCalendar Modal -->
+<div class="modal fade" id="calendarModal" tabindex="-1" role="dialog" aria-labelledby="calendarModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document" style="max-width:800px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="calendarModalLabel">Select Delivery Date</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="calendar"></div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <!-- 검색조건에 따라 입력창 띄우는 스크립트 -->
@@ -319,51 +339,63 @@
 
 
         $('#orderForm').on('submit', function (e) {
-        e.preventDefault();
+            e.preventDefault();
 
-        var workOrderId = $('.replyCheckbox:checked').first().val();
-        var worker = $('#worker').val();
-        var startDate = $('#startDate').val();
+            var orderId= $('.replyCheckbox:checked').first().val();
+            var vendorName = $('#vendor').val();
 
+            var status = $('.replyCheckbox:checked').first().closest('tr').find('td:eq(8)').text().trim();
 
-        const work = {
-            workOrderId : workOrderId,
-            worker : worker,
-            start : startDate,
+            // 상태가 "PRODUCTIONCOMPLETED"인지 확인합니다.
+            if (status !== "PRODUCTIONCOMPLETED") {
+                alert("선택된 주문의 상태가 생산완료가 아닙니다.");
+                return; // 함수 실행을 중단합니다.
+            }
 
-        }
+            const shipment = {
+                orderId : orderId,
+                vendorName : vendorName
 
-        const url ="/work/start";
-        fetch(url, {
+            }
+
+            const url ="/shipment/start";
+            fetch(url, {
                 method: "POST", // PATCH 요청
                 headers: { // 전송 데이터 타입(JSON) 정보
                     "Content-Type": "application/json"
-                    // ,'X-CSRF-Token': token,
-                    // 'header': header
+
                 },
-                body: JSON.stringify(work) //comment 객체를 JSON 문자열로 변환 전송
+                body: JSON.stringify(shipment) //comment 객체를 JSON 문자열로 변환 전송
             }).then(response => {
                 // HTTP 응답 코드에 따른 메시지 출력
-                const msg = (response.ok) ? "작업이 시작처리되었습니다." : "작업 시작처리 실패했습니다.";
+                const msg = (response.ok) ? "출하처리되었습니다." : "출하처리 실패했습니다.";
                 alert(msg);
                 // 현재 페이지 새로 고침
                 window.location.reload();
             });
 
-     });
+        });
 
         $('#orderForm2').on('submit', function (e) {
             e.preventDefault();
 
-            var workOrderId = $('.replyCheckbox:checked').first().val();
-            var endDate = $('#endDate').val();
+            var orderId= $('.replyCheckbox:checked').first().val();
+            var actualDeliveryDate = $('#deliveryDate').val();
+            var status = $('.replyCheckbox:checked').first().closest('tr').find('td:eq(8)').text().trim();
 
-            const work = {
-                workOrderId : workOrderId,
-                end : endDate,
+            // 상태가 "RETRIEVALCOMPLETED"인지 확인합니다.
+            if (status !== "RETRIEVALCOMPLETED") {
+                alert("선택된 주문의 상태가 출하완료가 아닙니다.");
+                return; // 함수 실행을 중단합니다.
+            }
+
+            const shipment = {
+                orderId : orderId,
+                actualDeliveryDate : actualDeliveryDate
 
             }
-            const url ="/work/end";
+
+            const url ="/shipment/end";
             fetch(url, {
                 method: "POST", // PATCH 요청
                 headers: { // 전송 데이터 타입(JSON) 정보
@@ -371,15 +403,27 @@
                     // ,'X-CSRF-Token': token,
                     // 'header': header
                 },
-                body: JSON.stringify(work) //comment 객체를 JSON 문자열로 변환 전송
+                body: JSON.stringify(shipment) //comment 객체를 JSON 문자열로 변환 전송
             }).then(response => {
                 // HTTP 응답 코드에 따른 메시지 출력
-                const msg = (response.ok) ? "작업이 시작처리되었습니다." : "작업 시작처리 실패했습니다.";
+                const msg = (response.ok) ? "베송 완료처리되었습니다." : "배송 완료처리 실패했습니다.";
                 alert(msg);
                 // 현재 페이지 새로 고침
                 window.location.reload();
             });
 
+        });
+
+        $('#selectDeliveryDate').on('click', function () {
+            $('#calendarModal').modal('show');
+        });
+
+        $('#calendar').fullCalendar({
+            selectable: true,
+            select: function(startDate) {
+                $('#deliveryDate').val(startDate.format('YYYY-MM-DD'));
+                $('#calendarModal').modal('hide');
+            }
         });
 
     });
@@ -524,69 +568,6 @@
     // }
 </script>
 
-
-<script>
-
-    //일괄 시작
-    function startWorks(){
-        // var token = $("meta[name='_csrf']").attr("content");
-        // var header = $("meta[name='_csrf_header']").attr("content");
-        const checkboxes = document.querySelectorAll('.replyCheckbox:checked');
-        if (checkboxes.length === 0) {
-            alert("시작할 작업을 선택해주세요.");
-            return;
-        }
-        let checked = true;
-        var rno_arr = [];
-        var url = "/works/start";
-
-        console.log(checkboxes);
-
-
-        if (checked){
-            checkboxes.forEach(checkbox => {
-                const checkedId = checkbox.closest('tr').querySelector('td:nth-child(2)').innerText;
-                rno_arr.push(checkedId);
-
-                console.log(rno_arr);
-
-                // 선택된 댓글이 없는 경우 알림
-                if (rno_arr.length === 0) {
-                    alert("시작할 작업을 선택해주세요.");
-                    return;
-                }
-
-
-            })
-            $.ajax({
-                url: url,
-                type: "POST",
-                data: JSON.stringify(rno_arr),
-                contentType: "application/json; charset-utf-8",
-                // beforeSend : function (xhr){
-                //     xhr.setRequestHeader(header, token);
-                // },
-                cache : false,
-                success : function (){
-                    console.log("삭제 처리 되었습니다.");
-                },
-                error : function (request, error){
-                    if (request.status == '401'){
-                        alert("권한이 없습니다.");
-                        location.href='/users/login';
-                    }else {
-                        alert("삭제처리 오류");
-                        alert("code: " + request.status + "\n message : " + request.responseText + "\n error : " + error);
-                    }
-                }
-            });
-            alert("삭제 처리 되었습니다.");
-            window.location.reload();
-        }
-    }
-
-
-</script>
 
 </body>
 

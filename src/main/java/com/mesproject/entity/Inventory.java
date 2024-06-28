@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -25,6 +28,10 @@ public class Inventory {
 
     @Enumerated(EnumType.STRING)
     private InventoryStatus inventoryStatus;
+
+
+    private LocalDateTime storageDate;
+    private LocalDateTime retrievalDate;
 
     public static Inventory createInventory(WorkPlan workPlan){
 

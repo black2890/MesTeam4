@@ -1,5 +1,6 @@
 package com.mesproject.repository;
 
+import com.mesproject.constant.OrdersStatus;
 import com.mesproject.entity.Orders;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -24,6 +25,9 @@ public interface OrdersRepository extends JpaRepository<Orders, Long> {
             "WHERE o.ordersStatus = 'DELIVERED' " +
             "GROUP BY o.product.productName, o.vendor.vendorName")
     List<Object[]> findProductOrdersSummary();
+
+    List<Orders> findByOrdersStatusIn(List<OrdersStatus> statuses);
+
 }
 
 

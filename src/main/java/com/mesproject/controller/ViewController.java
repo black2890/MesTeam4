@@ -1,10 +1,18 @@
 package com.mesproject.controller;
 
+import com.mesproject.constant.vendorType;
+import com.mesproject.repository.VendorRepository;
+import com.mesproject.service.OrdersService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+@RequiredArgsConstructor
 @Controller
 public class ViewController {
+    private final OrdersService ordersService;
+    private final VendorRepository vendorRepository;
 
     @GetMapping(value = "/vendor")
     public String vendor() {
@@ -49,5 +57,12 @@ public class ViewController {
     @GetMapping(value = "/upload")
     public String upload() {
         return "excel";
+    }
+    @GetMapping("/data/shipments")
+    public String getCompletedOrders(Model model) {
+        model.addAttribute("shipments", ordersService.getCompletedOrders());
+        model.addAttribute("vendors",vendorRepository.findByVendorType(vendorType.DELIVERY));
+
+        return "shipment";
     }
 }

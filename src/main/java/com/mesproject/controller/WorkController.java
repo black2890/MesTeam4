@@ -52,11 +52,6 @@ public class WorkController {
     @PostMapping("/works/start")
     public ResponseEntity<?> startWorks(@RequestBody List<Long> rnos){
         Collections.sort(rnos);
-        System.out.println("출력===========================");
-        for(Long rno: rnos){
-
-            System.out.println(rno);
-        }
 
         for (Long rno: rnos){
             WorkOrders workOrders = workOrdersRepository.findById(rno)
@@ -72,18 +67,7 @@ public class WorkController {
         return ResponseEntity.ok()
                 .build();
     }
-    //다중 종료 처리
-    @PostMapping("/works/end")
-    public ResponseEntity<?> endWorks(@RequestBody List<Long> rnos){
-        Collections.sort(rnos);
 
-        for (Long rno: rnos){
-
-            workOrdersService.endWorks(rno);
-        }
-        return ResponseEntity.ok()
-                .build();
-    }
 
 
 
