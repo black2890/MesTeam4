@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
+    <!-- Datatables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href='https://unpkg.com/fullcalendar@5.11.0/main.min.css' rel='stylesheet'/>
+    <style>
+
+        .chart-container {
+            display: flex; /* Flexbox를 사용하여 요소를 가로로 나열 */
+            justify-content: space-around; /* 각 요소 사이의 공간을 균등하게 배치 */
+            align-items: center; /* 요소를 세로 방향 가운데 정렬 */
+            width: 50%; /* 부모 요소 너비에 맞춤 */
+            margin-top: 20px; /* 원하는 만큼 상단 여백 설정 */
+        }
+
+        .chart-container canvas {
+            width: 40%; /* 각 캔버스 요소의 너비를 45%로 설정 */
+            height: auto; /* 높이 자동 조정 */
+            border: 1px solid #ccc; /* 테두리 추가 (선택사항) */
+        }
+
+        #calendar {
+            width: 48%; /* 원하는 너비 */
+            height: 40%;
+            margin: 0 auto; /* 가운데 정렬 */
+            border: 1px solid #ccc; /* 테두리 설정 */
+        }
+
+        /* table CSS*/
+        .progressTable {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 1100px; /* 테이블 전체 너비 설정 */
+            font-family: Arial, sans-serif;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        #progressTableTh {
+            background-color: #87CEEB;
+        }
+        .progress {
+            width: 100%; /* 진행 바 너비 100% */
+            height: 20px; /* 진행 바 높이 */
+        }
+        .progress-bar {
+            height: 100%; /* 진행 바 높이 100% */
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-4">
+
+    <!-- 사이드바 영역 -->
+    <div th:include="~{fragments/sidebar :: .sidebar}"></div>
+    <div id='calendar'></div>
+
+    <div class="chart-container">
+        <canvas id="mainChart-1"></canvas>
+        <canvas id="mainChart-2"></canvas>
+    </div>
+
+    <!--  테이블 영역  -->
+    <div th:each="workPlanProgress : ${workPlanProgresses}" class="progressTable">
+        <h2 th:text="${workPlanProgress.getProductName()}"></h2>
+        <table>
+            <thead>
+            <tr>
+                <th>공정</th>
+                <th th:each="processProgress : ${workPlanProgress.getProcessProgressList()}" th:text="${processProgress.getProcessType()}"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>진행도</td>
+                <td th:each="processProgress : ${workPlanProgress.getProcessProgressList()}" th:style="'width: ' + ${processProgress.getProgress()} + '%;'"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Datatables JS -->
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<!-- Datatables Buttons JS -->
+<script src="https://cdn.datatables.net/buttons/2.0.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.print.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+<!-- Full Calendar-->
+<script src='https://unpkg.com/fullcalendar@5.11.0/main.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js'></script>
+<script type="text/javascript" src="/js/Chart.js"></script>
+<script type="text/javascript" src="/js/ChartPrac.js"></script>
+<script type="text/javascript" src="/js/Calendar.js"></script>
+
+
+</body>
+</html>

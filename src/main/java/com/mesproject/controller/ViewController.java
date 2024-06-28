@@ -1,6 +1,8 @@
 package com.mesproject.controller;
 
+import com.mesproject.dto.WorkPlanProgressDto;
 import com.mesproject.service.ProcessInfoService;
+import com.mesproject.service.WorkPlanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,6 +15,16 @@ import java.util.List;
 public class ViewController {
 
     private final ProcessInfoService processInfoService;
+    private final WorkPlanService workPlanService;
+
+    @GetMapping("/main")
+    public String workPlanProgress(Model model) {
+
+        List<WorkPlanProgressDto> workPlanProgresses = workPlanService.getWorkPlanProgresses();
+
+        model.addAttribute("workPlanProgresses", workPlanProgresses);
+        return "main";
+    }
 
     @GetMapping(value = "/")
     public String vendor(){

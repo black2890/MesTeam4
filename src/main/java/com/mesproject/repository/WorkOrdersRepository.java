@@ -5,6 +5,7 @@ import com.mesproject.dto.OrdersDto;
 import com.mesproject.dto.WorkOrdersDto;
 import com.mesproject.entity.Orders;
 import com.mesproject.entity.WorkOrders;
+import com.mesproject.entity.WorkPlan;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -61,6 +62,12 @@ public interface WorkOrdersRepository extends JpaRepository<WorkOrders, Long> {
             "ORDER BY wo.workPlan.product.productName ")
     List<Long> findQuantityByInventoryStatusAndOrderPlanEnd(@Param("processName") String processName,
                                                       @Param("searchDate") LocalDateTime searchDate);
+
+    // 메인 화면 공정 진행도를 표현하기 위한 repository
+    @Query("SELECT wo.workPlan.workPlanId FROM WorkOrders wo WHERE wo.workOrdersStatus = 'INPROGRESS'")
+    List<Long> findWorkPlanIdsByWorkOrdersStatusInProgress();
+
+    List<WorkOrders> findByWorkPlan_WorkPlanId(Long workPlanId);
 
 
 

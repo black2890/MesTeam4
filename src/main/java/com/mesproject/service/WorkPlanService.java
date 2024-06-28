@@ -1,8 +1,8 @@
 package com.mesproject.service;
 
-import com.mesproject.dto.ProductionDataDto;
-import com.mesproject.dto.WorkOrderDto;
-import com.mesproject.dto.WorkPlanDto;
+import com.mesproject.constant.WorkOrdersStatus;
+import com.mesproject.dto.*;
+import com.mesproject.entity.Product;
 import com.mesproject.entity.WorkOrders;
 import com.mesproject.entity.WorkPlan;
 import com.mesproject.repository.WorkOrdersRepository;
@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -85,6 +86,49 @@ public class WorkPlanService {
                 .map(order -> new WorkOrderDto(order))
                 .collect(Collectors.toList());
     }
+
+    public List<WorkPlanProgressDto> getWorkPlanProgresses() {
+        List<Long> inProgressWorkPlanIds = workOrdersRepository.findWorkPlanIdsByWorkOrdersStatusInProgress();
+        List<WorkPlanProgressDto> workPlanProgresses = new ArrayList<>();
+
+        for (Long workPlanId : inProgressWorkPlanIds) {
+            List<WorkOrders> workOrders = workOrdersRepository.findByWorkPlan_WorkPlanId(workPlanId);
+            if (!workOrders.isEmpty()) {
+                WorkOrders representativeWorkOrder = workOrders.get(0);
+                WorkPlan workPlan = representativeWorkOrder.getWorkPlan();
+                Product product = workPlan.getProduct();
+
+                WorkPlanProgressDto progressDto = new WorkPlanProgressDto();
+                progressDto.setProductName(product.getProductName());
+
+                List<ProcessProgressDto> processProgressList = new ArrayList<>();
+                for (WorkOrders workOrder : workOrders) {
+                    ProcessProgressDto processProgressDto = new ProcessProgressDto();
+                    processProgressDto.setProcessType(workOrder.getProcessType());
+
+                    if (workOrder.getWorkOrdersStatus() == WorkOrdersStatus.PENDING) {
+                        processProgressDto.setProgress(0.0);
+                    } else if (workOrder.getWorkOrdersStatus() == WorkOrdersStatus.COMPLETED) {
+                        processProgressDto.setProgress(100.0);
+                    } else {
+                        Duration totalDuration = Duration.between(workOrder.getStart(), workOrder.getEnd());
+                        Duration elapsedDuration = Duration.between(workOrder.getStart(), LocalDateTime.now());
+                        double progress = (double) elapsedDuration.toMinutes() / totalDuration.toMinutes() * 100;
+                        processProgressDto.setProgress(progress);
+                    }
+
+                    processProgressList.add(processProgressDto);
+                }
+
+                progressDto.setProcessProgressList(processProgressList);
+                workPlanProgresses.add(progressDto);
+            }
+        }
+
+        return workPlanProgresses;
+    }
+
+
 }
 
 
