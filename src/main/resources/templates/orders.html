@@ -20,7 +20,10 @@
             margin: 0 auto;
             width: 80%;
         }
-
+        .fc-day-disabled {
+            background-color: #f0f0f0 !important;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -262,9 +265,11 @@
                 data: JSON.stringify({ productName: productName, quantity: quantity }),
                 success: function(response) {
                     $('#available').val(response.estimatedDate);
+                    $('#selectDeliveryDate').prop('disabled', false);
                 },
                 error: function(error) {
                     console.error("Error fetching estimated date: ", error);
+                    $('#selectDeliveryDate').prop('disabled', true);
                 }
             });
         }
@@ -277,6 +282,10 @@
             // 두 값이 모두 존재할 때만 요청
             if (productName && quantity) {
                 getEstimatedDate(productName, quantity);
+            } else {
+                // 하나라도 값이 없으면 예상 납품일을 초기화하고 배송일자 선택 버튼 비활성화
+                $('#available').val('');
+                $('#selectDeliveryDate').prop('disabled', true);
             }
         });
 
@@ -389,14 +398,52 @@
         populateSelects();
 
         $('#selectDeliveryDate').on('click', function () {
+            var estimatedDate = $('#available').val();
+
+            // 예상 납품일이 없으면 클릭을 막음
+            if (!estimatedDate) {
+                alert('제품명과 수량을 먼저 입력하여 예상 납품일을 확인해주세요.');
+                return false; // 클릭 이벤트 중지
+            }
+
             $('#calendarModal').modal('show');
         });
+
+        $('#selectDeliveryDate').prop('disabled', true);
 
         $('#calendar').fullCalendar({
             selectable: true,
             select: function(startDate) {
+                var availableDate = $('#available').val();
+                var selectedDate = startDate.format('YYYY-MM-DD');
+
+                // 비활성화 로직: 납품 가능일 이전의 날짜는 선택할 수 없도록 설정
+                if (moment(selectedDate).isBefore(availableDate, 'day')) {
+                    alert('납품 가능일 이전의 날짜는 선택할 수 없습니다.');
+                    return false;
+                }
                 $('#deliveryDate').val(startDate.format('YYYY-MM-DD'));
                 $('#calendarModal').modal('hide');
+            },
+            selectAllow: function(selectInfo) {
+                var availableDate = $('#available').val();
+                var selectedDate = selectInfo.start.format('YYYY-MM-DD');
+
+                // 납품 가능일 이전의 날짜는 선택할 수 없도록 설정
+                if (moment(selectedDate).isBefore(availableDate, 'day')) {
+                    return false;
+                }
+
+                return true;
+            },
+            dayRender: function(date, cell) {
+                var availableDate = $('#available').val();
+                var formattedDate = date.format('YYYY-MM-DD');
+
+                // 납품 가능일 이전의 날짜를 회색으로 표시
+                if (moment(formattedDate).isBefore(availableDate, 'day')) {
+                    cell.addClass('fc-day-disabled');
+                }
             }
         });
 
@@ -438,6 +485,7 @@
                 return false;
             }
         });
+
 
     });
 </script>

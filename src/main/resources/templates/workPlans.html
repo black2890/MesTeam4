@@ -13,7 +13,7 @@
 
         #calendar {
             max-width: 900px;
-            margin: 50px auto; /* 상단 및 하단 50px, 좌우 자동 정렬 */
+            margin: 50px auto;
             padding: 20px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
@@ -21,24 +21,24 @@
         }
 
         .modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 1; /* Sit on top */
+            display: none;
+            position: fixed;
+            z-index: 1;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgb(0, 0, 0); /* Fallback color */
-            background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+            overflow: auto;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.4);
         }
 
         .modal-content {
             background-color: #fefefe;
-            margin: 15% auto; /* 15% from the top and centered */
+            margin: 15% auto;
             padding: 20px;
             border: 1px solid #888;
-            width: 80%; /* Could be more or less, depending on screen size */
+            width: 80%;
         }
 
         .close {
@@ -53,6 +53,32 @@
             color: black;
             text-decoration: none;
             cursor: pointer;
+        }
+
+        #search-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #search-container input {
+            width: 200px;
+            padding: 8px;
+            margin-right: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        #search-container button {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        #search-container button:hover {
+            background-color: #0056b3;
         }
     </style>
     <script src='https://unpkg.com/fullcalendar@5.11.0/main.min.js'></script>
@@ -70,6 +96,7 @@
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
+                displayEventTime: false,
                 events: function (fetchInfo, successCallback, failureCallback) {
                     axios.get('/api/workplans')
                         .then(response => {
@@ -96,12 +123,12 @@
                                 // endDate.setDate(endDate.getDate() + 1); // 종료일 설정
 
                                 return {
-                                    title: workPlan.productName, // 제목을 제품명으로 설정
+                                    title: `${workPlan.productName} (${workPlan.workPlanId})`,
                                     start: startDate,
                                     end: endDate,
                                     color: color,
-                                    display: 'block', // 바 형태로 표시
-                                    workPlanId: workPlan.workPlanId // workPlanId 추가
+                                    display: 'block',
+                                    workPlanId: workPlan.workPlanId
                                 };
                             });
                             successCallback(events);
@@ -114,9 +141,14 @@
                 eventClick: function (info) {
                     var workPlanId = info.event.extendedProps.workPlanId;
                     fetchWorkOrders(workPlanId);
-                },
+                }
             });
             calendar.render();
+
+            document.getElementById('searchButton').addEventListener('click', function () {
+                var workPlanId = document.getElementById('searchInput').value;
+                searchWorkPlan(workPlanId, calendar);
+            });
         });
 
         function fetchWorkOrders(workPlanId) {
@@ -141,19 +173,17 @@
             'EXTRACTION': '추출',
             'FILTRATION': '여과',
             'STERILIZATION': '살균',
-            'FILLING':'충진',
-            'INSPECTION':'검사',
-            'PACKAGING':'포장'
+            'FILLING': '충진',
+            'INSPECTION': '검사',
+            'PACKAGING': '포장'
         };
 
         function showModal(workOrders) {
             var modal = $('#workOrderModal');
             var tableBody = $('#workOrderTableBody');
 
-            // 테이블 내용 초기화
             tableBody.empty();
 
-            // 작업 지시들을 테이블에 추가
             workOrders.forEach(order => {
                 var row = `
                     <tr>
@@ -170,24 +200,43 @@
                 tableBody.append(row);
             });
 
-            // 모달창 표시
             modal.modal('show');
         }
 
-        // 모달창 닫기 함수
         function closeModal() {
             $('#workOrderModal').modal('hide');
         }
 
-        // 닫기 버튼 이벤트 리스너
         $('#closeModal').click(closeModal);
 
+        function searchWorkPlan(workPlanId, calendar) {
+            axios.get(`/api/workplan/${workPlanId}`)
+                .then(response => {
+                    var workPlan = response.data;
+                    if (workPlan) {
+                        var startDate = new Date(workPlan.start);
+                        calendar.gotoDate(startDate); // 캘린더를 해당 날짜로 이동
+                    } else {
+                        alert('작업 계획을 찾을 수 없습니다.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error searching for work plan', error);
+                    alert('작업 계획을 찾을 수 없습니다.');
+                });
+        }
     </script>
 </head>
 <body>
 <!-- 사이드바 영역 -->
 <div th:include="~{fragments/sidebar :: .sidebar}"></div>
+<div id="search-container">
+    <input type="text" id="searchInput" placeholder="작업 계획 ID 입력">
+    <button id="searchButton">검색</button>
+</div>
 <div id='calendar'></div>
+<FullCalendar displayEventTime={false}
+/>
 
 <div id="workOrderModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="workOrderModalLabel"
      aria-hidden="true">

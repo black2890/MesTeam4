@@ -56,4 +56,21 @@ public class WorkPlanController {
         List<WorkOrderDto> workOrders = workPlanService.getWorkOrdersByWorkPlanId(workPlanId);
         return ResponseEntity.ok().body(workOrders);
     }
+
+    @GetMapping("/api/workplan/{workPlanId}")
+    public ResponseEntity<WorkPlanDto> getWorkPlan(@PathVariable Long workPlanId) {
+        Optional<WorkPlan> workPlan = workPlanRepository.findById(workPlanId);
+        if (workPlan.isPresent()) {
+            WorkPlan wp = workPlan.get();
+            WorkPlanDto workPlanDTO = new WorkPlanDto(
+                    wp.getWorkPlanId(),
+                    wp.getStart(),
+                    wp.getEnd(),
+                    wp.getProduct().getProductName() // Assuming getProductName() is a method in Product entity
+            );
+            return ResponseEntity.ok(workPlanDTO);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

@@ -5,6 +5,12 @@ import com.mesproject.constant.OrdersStatus;
 import com.mesproject.dto.ShipmentDto;
 import com.mesproject.entity.*;
 import com.mesproject.repository.*;
+import com.mesproject.dto.OrderDetailsDto;
+import com.mesproject.entity.*;
+import com.mesproject.repository.InventoryRepository;
+import com.mesproject.repository.OrdersPlanRepository;
+import com.mesproject.repository.OrdersRepository;
+import com.mesproject.repository.WorkPlanRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +20,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Transactional
 @Service
@@ -100,9 +108,6 @@ public class OrdersService {
 
             }
 
-
-
-
         }
     }
     public List<Orders> getCompletedOrders() {
@@ -176,5 +181,8 @@ public class OrdersService {
 
 
 
+
+    public List<Map<String, Object>> getOrderDetails(Long orderId) {
+        return ordersRepository.findRelatedDataByOrderId(orderId);
     }
 }

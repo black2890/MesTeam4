@@ -72,4 +72,8 @@ public class ViewController {
         model.addAttribute("inventories",inventoryRepository.findAll());
         return "inventory2";
     }
+
+
+    @GetMapping(value= "trace")
+    public String trace() {return "trace";}
 }
