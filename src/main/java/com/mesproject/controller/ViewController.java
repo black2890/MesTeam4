@@ -63,14 +63,6 @@ public class ViewController {
         return "productOrdersSummary";
     }
 
-    @GetMapping(value= "/pc")
-    public String pc() {return "productChart";}
-    @GetMapping(value="/orders")
-    public String ordersPage() {
-
-        return "orders";
-    }
-
     @GetMapping(value="/equipment")
     public String equipmentsPage() {
 

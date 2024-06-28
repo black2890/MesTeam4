@@ -98,14 +98,18 @@ public class WorkPlanService {
                 WorkPlan workPlan = representativeWorkOrder.getWorkPlan();
                 Product product = workPlan.getProduct();
 
+                // 계획 단위 DTO 생성
                 WorkPlanProgressDto progressDto = new WorkPlanProgressDto();
                 progressDto.setProductName(product.getProductName());
 
+                // 제품에 해당하는 공정 타입과 진행도를 담을 DTO 생성
                 List<ProcessProgressDto> processProgressList = new ArrayList<>();
+                // 각 작업 지시를 반복문을 통해 순환하며 ProcessType 공정 타입 지정
                 for (WorkOrders workOrder : workOrders) {
                     ProcessProgressDto processProgressDto = new ProcessProgressDto();
                     processProgressDto.setProcessType(workOrder.getProcessType());
 
+                    // 각 작업 지시의 상태에 따라 0~ 100% 진행도를 부여 및 계산하여 DTO에 Progress 진행도 저장.
                     if (workOrder.getWorkOrdersStatus() == WorkOrdersStatus.PENDING) {
                         processProgressDto.setProgress(0.0);
                     } else if (workOrder.getWorkOrdersStatus() == WorkOrdersStatus.COMPLETED) {
@@ -116,6 +120,7 @@ public class WorkPlanService {
                         double progress = (double) elapsedDuration.toMinutes() / totalDuration.toMinutes() * 100;
                         processProgressDto.setProgress(progress);
                     }
+
 
                     processProgressList.add(processProgressDto);
                 }

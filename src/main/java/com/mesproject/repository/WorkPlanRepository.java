@@ -38,9 +38,6 @@ public interface WorkPlanRepository extends JpaRepository<WorkPlan, Long> {
                                                   @Param("productId2") Long productId2,
                                                   @Param("endDate") LocalDate endDate);
 
-    @Query("SELECT wp FROM WorkPlan wp JOIN FETCH wp.product")
-    List<WorkPlan> findAllWithProduct();
-
     @Query("SELECT NEW com.mesproject.dto.ProductionDataDto(p.productName, SUM(wp.quantity), wp.end) " +
             "FROM WorkPlan wp " +
             "JOIN wp.product p " +
