@@ -1,6 +1,7 @@
 package com.mesproject.repository;
 
 import com.mesproject.dto.OrdersDto;
+import com.mesproject.constant.OrdersStatus;
 import com.mesproject.entity.Orders;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -38,6 +39,8 @@ public interface OrdersRepository extends JpaRepository<Orders, Long> {
             @Param("searchType") String searchType,
             @Param("searchValue") String searchValue,
             Pageable pageable);
+    List<Orders> findByOrdersStatusIn(List<OrdersStatus> statuses);
+
 }
 
 

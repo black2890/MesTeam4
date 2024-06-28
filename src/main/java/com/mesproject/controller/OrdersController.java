@@ -1,8 +1,11 @@
 package com.mesproject.controller;
 
 import com.mesproject.constant.OrdersStatus;
+import com.mesproject.constant.vendorType;
 import com.mesproject.dto.OrderDto;
 import com.mesproject.dto.OrderStatusUpdateRequest;
+import com.mesproject.dto.ShipmentDto;
+import com.mesproject.dto.WorkOrdersDto;
 import com.mesproject.entity.Orders;
 import com.mesproject.entity.Product;
 import com.mesproject.entity.Vendor;
@@ -16,8 +19,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -181,7 +187,7 @@ public class OrdersController {
         ordersService.updateOrderStatus(orderIds, (OrdersStatus) status);
 
 
-        ordersService.updateOrderStatus(request.getOrderIds(), request.getStatus());
+     //   ordersService.updateOrderStatus(request.getOrderIds(), request.getStatus());
         return ResponseEntity.ok().build();
     }
 
@@ -205,4 +211,33 @@ public class OrdersController {
 
         return ResponseEntity.ok(response);
     }
+    @PostMapping("/upload-orders")
+    public ResponseEntity<?> uploadOrders(@RequestParam("file") MultipartFile file) {
+        try {
+            List<OrderDto> orders = orderService.parseExcelFile(file);
+            orders.forEach(orderService::order);
+            return ResponseEntity.ok("Orders processed successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing file: " + e.getMessage());
+        }
+    }
+
+
+
+    @PostMapping("/shipment/start")
+    public ResponseEntity<?> shipmentStart(@RequestBody ShipmentDto shipmentDto){
+
+        ordersService.shipmentStart(shipmentDto);
+        return ResponseEntity.ok()
+                .build();
+    }
+
+    @PostMapping("/shipment/end")
+    public ResponseEntity<?> shipmentEnd(@RequestBody ShipmentDto shipmentDto){
+
+        ordersService.shipmentEnd(shipmentDto);
+        return ResponseEntity.ok()
+                .build();
+    }
+
 }

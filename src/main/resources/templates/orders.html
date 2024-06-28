@@ -50,6 +50,12 @@
     <button type="button" class="btn btn-primary mb-4 float-right" data-toggle="modal" data-target="#orderModal">
         수주 등록
     </button>
+    <!-- 버튼 -->
+    <button type="button" class="btn btn-primary mb-4 float-right" data-toggle="modal" data-target="#orderModal2">
+        일괄 등록
+    </button>
+
+
 
     <table id="example" class="display" style="width:100%">
         <thead>
@@ -69,8 +75,8 @@
     </table>
 
     <div style="margin-top:5px;" >
-    <button type="button" id="shipButton" class="btn btn-success float-right">출하</button>
-    <button type="button" id="deliverButton" class="btn btn-info float-right" style="margin-right: 10px;">배송완료</button>
+        <button type="button" id="shipButton" class="btn btn-success float-right">출하</button>
+        <button type="button" id="deliverButton" class="btn btn-info float-right" style="margin-right: 10px;">배송완료</button>
     </div>
 </div>
 
@@ -103,7 +109,7 @@
                     </div>
                     <div class="form-group">
                         <label for="available">납품 가능일</label>
-                        <input type="text" class="form-control" id="available" name="available" min="20" max="1000">
+                        <input type="text" class="form-control" id="available" name="available" min="20" max="1000" readonly>
 
                     </div>
                     <div class="form-group">
@@ -199,6 +205,35 @@
                 <div id="calendar"></div>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- 엑셀 모달 -->
+<div class="modal fade" id="orderModal2" tabindex="-1" role="dialog" aria-labelledby="orderModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="orderModalLabel2">Excel File Upload</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="uploadForm">
+                    <div class="form-group">
+                        <label for="fileInput">Select Excel File</label>
+                        <input type="file" class="form-control-file" id="fileInput" accept=".xlsx" />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </form>
+                <div class="mt-3">
+                    <a href="/orderexample.xlsx" class="btn btn-secondary" download>Download Excel Template</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script>
 
@@ -458,6 +493,8 @@
     });
 
 </script>
+
+<script src="upload.js"></script>
 
 </body>
 

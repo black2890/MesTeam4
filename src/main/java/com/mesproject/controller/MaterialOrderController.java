@@ -8,6 +8,7 @@ import com.mesproject.entity.OrdersMaterials;
 import com.mesproject.repository.MaterialInOutRepository;
 import com.mesproject.repository.MaterialOrdersRepository;
 import com.mesproject.service.MaterialInOutService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,10 +19,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -41,7 +39,7 @@ public class MaterialOrderController {
     }
 
     @PostMapping("/material/in")
-    public ResponseEntity<?> materialsIn(@RequestBody MaterialOrderDto materialOrderDto){
+    public ResponseEntity<?> materialIn(@RequestBody MaterialOrderDto materialOrderDto){
         materialInOutService.In(materialOrderDto);
 
         return ResponseEntity.ok()
@@ -54,6 +52,21 @@ public class MaterialOrderController {
         List<MaterialInOut> materialInOuts = materialInOutRepository.findAll();
         model.addAttribute("materialInOut", materialInOuts);
         return "materialInOut";
+    }
+    @PostMapping("/materials/in")
+    public ResponseEntity<?> materialsIn(@RequestBody List<Long> rnos){
+        Collections.sort(rnos);
+
+        for(Long rno: rnos){
+
+            MaterialOrderDto materialOrderDto = new MaterialOrderDto();
+            materialOrderDto.setMaterialOrderId(rno);
+            materialOrderDto.setStorageWorker("김철수");
+            materialInOutService.In(materialOrderDto);
+        }
+
+        return ResponseEntity.ok()
+                .build();
     }
 
 

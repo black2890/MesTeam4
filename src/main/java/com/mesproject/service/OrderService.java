@@ -8,17 +8,27 @@ import com.mesproject.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.jdbc.Work;
 import org.hibernate.query.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 @Service
@@ -50,7 +60,9 @@ public class OrderService {
     즙은 하루만 비어있으면 그 때는 생산 못하고 이틀 비어있는 곳에 넣어야 함.
      */
     public Long order(OrderDto orderDto){
-
+        //불량률 고려 3% 추가 생산
+        long initialQuantity = orderDto.getQuantity();
+        orderDto.setQuantity((long) Math.ceil(orderDto.getQuantity() * 1.03));
 
         Product product = productRepository.findById(orderDto.getProductId())
                 .orElseThrow(EntityNotFoundException::new);
@@ -69,12 +81,9 @@ public class OrderService {
         //  LocalDateTime productionDate = getProductionDate(orderDto, product, result.numberOfProduction());
         LocalDateTime productionDate =LocalDateTime.now().toLocalDate().plusDays(1).atStartOfDay();
 
-        Pageable pageable = PageRequest.of(0, 1); // 첫 번째 페이지의 첫 번째 결과만 가져옴
+
         Optional<WorkPlan> optionalWorkPlan = workPlanRepository.findFirstByProduct_ProductIdAndStartGreaterThanEqualOrderByStartDescWorkPlanIdDesc(product.getProductId(), productionDate);
 
-//        Optional<WorkPlan> optionalWorkPlan = workPlanRepository.findFirstByProduct_ProductIdAndStartAfterOrderByStartDescWorkPlanIdDesc(
-//                product.getProductId(), productionDate
-//        );
 
 
         //maxquantity 설정, 생산횟수 계산
@@ -146,12 +155,7 @@ public class OrderService {
         int count =1;
 
 
-
-
-
         for(int i = 0; i< result.numberOfProduction(); i++){
-
-
             //작업계획 생성
         /*
         productid가 1,2이면 2일
@@ -174,7 +178,6 @@ public class OrderService {
                 }
 
             }else{
-
                 if(count== 1) {
 
 
@@ -260,6 +263,16 @@ public class OrderService {
                         }
 
                     }
+                    //추출기 사용할 수 있는지 확인
+                    List<WorkPlan> tempWorkPlanList2 = workPlanRepository.findByProducts_ProductIdAndEnd(1L, 2L, productionDate.toLocalDate());
+                    if(!tempWorkPlanList2.isEmpty()){
+                        while(tempWorkPlanList2.size()>=2){
+                            productionDate = productionDate.plusDays(1);
+                            tempWorkPlanList2 = workPlanRepository.findByProducts_ProductIdAndEnd(1L, 2L, productionDate.toLocalDate());
+                        }
+
+                    }
+
 
 
 
@@ -270,8 +283,7 @@ public class OrderService {
                     if(workPlanList.isEmpty()){
                         workPlan.setStart(productionDate);
                         workPlan.setEnd(productionDate.plusHours(44));
-//                        if(count!=1&& count%2==1){
-//                            productionDate = productionDate.plusDays(2);}
+
 
                     }
                     else {
@@ -285,7 +297,7 @@ public class OrderService {
                             if(temp.getStart().toLocalDate().equals(productionDate.toLocalDate()) && !existFirst){
                                 existFirst = true;
                                 continue;
-                            }else if(temp.getStart().toLocalDate().equals(productionDate.toLocalDate()) && existFirst){
+                            }else if(temp.getStart().toLocalDate().equals(productionDate.toLocalDate()) && existFirst ){
                                 isFirst = false;
                             }else{
                                 isFirst = true;
@@ -299,6 +311,16 @@ public class OrderService {
                                     while(tempWorkPlanList.size()>=2){
                                         productionDate = productionDate.plusDays(1);
                                         tempWorkPlanList = workPlanRepository.findByProduct_ProductIdAndEnd(checkProductId, productionDate.minusDays(1).toLocalDate());
+                                    }
+
+                                }
+
+                                //추출기 사용할 수 있는지 확인
+                               tempWorkPlanList2 = workPlanRepository.findByProducts_ProductIdAndEnd(1L, 2L, productionDate.toLocalDate());
+                                if(!tempWorkPlanList2.isEmpty()){
+                                    while(tempWorkPlanList2.size()>=2){
+                                        productionDate = productionDate.plusDays(1);
+                                        tempWorkPlanList2 =workPlanRepository.findByProducts_ProductIdAndEnd(1L, 2L, productionDate.toLocalDate());
                                     }
 
                                 }
@@ -334,6 +356,15 @@ public class OrderService {
                                     while(tempWorkPlanList.size()>=2){
                                         productionDate = productionDate.plusDays(1);
                                         tempWorkPlanList = workPlanRepository.findByProduct_ProductIdAndEnd(checkProductId, productionDate.minusDays(1).toLocalDate());
+                                    }
+
+                                }
+                                //추출기 사용할 수 있는지 확인
+                                tempWorkPlanList2 = workPlanRepository.findByProducts_ProductIdAndEnd(1L, 2L, productionDate.toLocalDate());
+                                if(!tempWorkPlanList2.isEmpty()){
+                                    while(tempWorkPlanList2.size()>=2){
+                                        productionDate = productionDate.plusDays(1);
+                                        tempWorkPlanList2 = workPlanRepository.findByProducts_ProductIdAndEnd(1L, 2L, productionDate.toLocalDate());
                                     }
 
                                 }
@@ -418,7 +449,7 @@ public class OrderService {
 
 
         }
-
+        orderDto.setQuantity((long) initialQuantity);
         //수주 생성
         Orders order = Orders.createOrder(ordersMaterialsList,ordersPlanList ,product,vendor,orderDto);
         ordersRepository.save(order);
@@ -431,11 +462,13 @@ public class OrderService {
         // 생산횟수 계산
         int numberOfProduction=0;
         int maxQuantity=0;
+        boolean isIntegratedGlobal = false;
+
 
 
         LocalDateTime productionDate =LocalDateTime.now().toLocalDate().atStartOfDay().plusDays(1);
 
-        Pageable pageable = PageRequest.of(0, 1); // 첫 번째 페이지의 첫 번째 결과만 가져옴
+
 
         Optional<WorkPlan> optionalWorkPlan = staticWorkPlanRepository.findFirstByProduct_ProductIdAndStartGreaterThanEqualOrderByStartDescWorkPlanIdDesc(
                 product.getProductId(), productionDate
@@ -468,6 +501,7 @@ public class OrderService {
         }
         //일단 스틱만 capa 고려 통합
         if(tempWorkPlan!=null && tempWorkPlan.getQuantity()!=maxQuantity){
+            isIntegratedGlobal = true;
 
             if((tempWorkPlan.getQuantity()+orderDto.getQuantity())%maxQuantity ==0){
                 numberOfProduction = (int)((tempWorkPlan.getQuantity()+orderDto.getQuantity())/maxQuantity);
@@ -477,7 +511,7 @@ public class OrderService {
 
         }
 
-        Result result = new Result(numberOfProduction, maxQuantity);
+        Result result = new Result(numberOfProduction, maxQuantity,isIntegratedGlobal);
         return result;
     }
 
@@ -491,7 +525,9 @@ public class OrderService {
         this.ordersMaterialsRepository = ordersMaterialsRepository;
     }
 
-    private record Result(int numberOfProduction, int maxQuantity) {
+
+
+    private record Result(int numberOfProduction, int maxQuantity, boolean isIntegratedGlobal) {
     }
 
     private static LocalDateTime getProductionDate(OrderDto orderDto, Product product, int numberOfProduction) {
@@ -511,8 +547,36 @@ public class OrderService {
         return productionDate;
     }
 
+    //capa 통합 여부 고려해야 함
     public LocalDate calculateEstimatedDate(Product product, int quantity){
         if(product.getProductId()==1||product.getProductId()==2){
+
+            LocalDate productionDate = LocalDate.now().plusDays(1);
+            Long checkProductId ;
+            if(product.getProductId() ==1){
+                checkProductId= 2L;
+            }else{
+                checkProductId= 1L;
+            }
+
+
+            List<WorkPlan> tempWorkPlanList = workPlanRepository.findByProduct_ProductIdAndEnd(checkProductId, productionDate.minusDays(1));
+            if(!tempWorkPlanList.isEmpty()){
+                while(tempWorkPlanList.size()>=2){
+                    productionDate = productionDate.plusDays(1);
+                    tempWorkPlanList = workPlanRepository.findByProduct_ProductIdAndEnd(checkProductId, productionDate.minusDays(1));
+                }
+
+            }
+            //추출기 사용할 수 있는지 확인
+            List<WorkPlan>  tempWorkPlanList2 = workPlanRepository.findByProducts_ProductIdAndEnd(1L, 2L, productionDate);
+            if(!tempWorkPlanList2.isEmpty()){
+                while(tempWorkPlanList2.size()>=2){
+                    productionDate = productionDate.plusDays(1);
+                    tempWorkPlanList2 =workPlanRepository.findByProducts_ProductIdAndEnd(1L, 2L, productionDate);
+                }
+
+            }
 
             List<WorkPlan> workPlanList = workPlanRepository.findByProductIdAndStartDateAfter(
                     1L,2L,LocalDateTime.now().toLocalDate().atStartOfDay().plusDays(1));
@@ -521,13 +585,21 @@ public class OrderService {
             orderDto.setQuantity((long) quantity);
             Result result = getResult(orderDto, product);
 
-            int numberOfProduction = result.numberOfProduction();
-            LocalDate productionDate = LocalDate.now().plusDays(1);
+            //capa 통합 가능하면 생산횟수 -1
+            int numberOfProduction=0;
+            if(result.isIntegratedGlobal()){
+                numberOfProduction = result.numberOfProduction()-1;
+            }else{
+                numberOfProduction = result.numberOfProduction();
+            }
+
+
 
             int count =0;
             if(workPlanList.isEmpty()){
+                //생산완료 후 3일 뒤 배송완료
                 count=numberOfProduction;
-                return LocalDate.now().plusDays(count+3);
+                return productionDate.plusDays(count+3);
 
             }
 
@@ -550,6 +622,26 @@ public class OrderService {
                 }
 
                 if(!isFirst){
+                    productionDate = productionDate.plusDays(2);
+
+                    tempWorkPlanList = workPlanRepository.findByProduct_ProductIdAndEnd(checkProductId, productionDate.minusDays(1));
+                    if(!tempWorkPlanList.isEmpty()){
+                        while(tempWorkPlanList.size()>=2){
+                            productionDate = productionDate.plusDays(1);
+                            tempWorkPlanList = workPlanRepository.findByProduct_ProductIdAndEnd(checkProductId, productionDate.minusDays(1));
+                        }
+
+                    }
+
+                    //추출기 사용할 수 있는지 확인
+                    tempWorkPlanList2 = workPlanRepository.findByProducts_ProductIdAndEnd(1L, 2L, productionDate);
+                    if(!tempWorkPlanList2.isEmpty()){
+                        while(tempWorkPlanList2.size()>=2){
+                            productionDate = productionDate.plusDays(1);
+                            tempWorkPlanList2 =workPlanRepository.findByProducts_ProductIdAndEnd(1L, 2L, productionDate);
+                        }
+
+                    }
                     isFirst = true;  // 1일차에 새 작업계획 편성 가능 여부
                     isSecond = true;
                     existFirst = false; //1일차 기존 작업계획 유무
@@ -571,11 +663,33 @@ public class OrderService {
 
                 //조건 모두 만족하면 생산계획 편성, 그렇지 않으면 productiondate++
                 if(isFirst && isSecond){
-                    productionDate = productionDate.minusDays(1);
                     count++;
+                    if(count==numberOfProduction){
+                        //생산완료후 3일뒤 배송완료
+                        return productionDate.plusDays(3);
+                    }
+                    productionDate = productionDate.minusDays(1);
+
 
                 }else{
                     productionDate = productionDate.plusDays(1);
+                    tempWorkPlanList = workPlanRepository.findByProduct_ProductIdAndEnd(checkProductId, productionDate.minusDays(1));
+                    if(!tempWorkPlanList.isEmpty()){
+                        while(tempWorkPlanList.size()>=2){
+                            productionDate = productionDate.plusDays(1);
+                            tempWorkPlanList = workPlanRepository.findByProduct_ProductIdAndEnd(checkProductId, productionDate.minusDays(1));
+                        }
+
+                    }
+                    //추출기 사용할 수 있는지 확인
+                    tempWorkPlanList2 = workPlanRepository.findByProducts_ProductIdAndEnd(1L, 2L, productionDate);
+                    if(!tempWorkPlanList2.isEmpty()){
+                        while(tempWorkPlanList2.size()>=2){
+                            productionDate = productionDate.plusDays(1);
+                            tempWorkPlanList2 =workPlanRepository.findByProducts_ProductIdAndEnd(1L, 2L, productionDate);
+                        }
+
+                    }
                 }
 
                 isFirst = true;  // 1일차에 새 작업계획 편성 가능 여부
@@ -583,9 +697,7 @@ public class OrderService {
                 existFirst = false; //1일차 기존 작업계획 유무
                 existSecond = false;
 
-                if(count!=numberOfProduction){
-                    return productionDate.plusDays(numberOfProduction-count+2);
-                }
+
 
 
             }
@@ -604,13 +716,20 @@ public class OrderService {
             orderDto.setQuantity((long) quantity);
             Result result = getResult(orderDto, product);
 
-            int numberOfProduction = result.numberOfProduction();
+            int numberOfProduction=0;
+            if(result.isIntegratedGlobal()){
+                numberOfProduction = result.numberOfProduction()-1;
+            }else{
+                numberOfProduction = result.numberOfProduction();
+            }
+
             LocalDate productionDate = LocalDate.now().plusDays(1);
 
             int count =0;
             if(workPlanList.isEmpty()){
+                //생산완료 후 3일 뒤 배송완료
                 count=numberOfProduction;
-                return LocalDate.now().plusDays(count+2);
+                return productionDate.plusDays(count+3);
 
             }
 
@@ -620,15 +739,18 @@ public class OrderService {
 
                     }else{
                         count++;
+                        if(count==numberOfProduction){
+                            //생산완료 후 3일 뒤 배송완료
+                            return productionDate.plusDays(3);
+                        }
                         productionDate = productionDate.plusDays(1);
                     }
-                    if(count==numberOfProduction){
-                        return productionDate.plusDays(2);
-                    }
+
 
             }
 
             if(count!=numberOfProduction){
+                //이미 productiondate +1 된 상태로 넘어옴
                 return productionDate.plusDays(numberOfProduction-count+2);
             }
 
@@ -637,6 +759,53 @@ public class OrderService {
     return null;
         
     }
+    public List<OrderDto> parseExcelFile(MultipartFile file) throws Exception {
+        List<OrderDto> orders = new ArrayList<>();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        try (InputStream is = file.getInputStream();
+             Workbook workbook = new XSSFWorkbook(is)) {
+            Sheet sheet = workbook.getSheetAt(0);
+            for (Row row : sheet) {
+                if (row.getRowNum() == 0) {
+                    continue; // Skip header row
+                }
+
+
+                OrderDto orderDto = new OrderDto();
+                orderDto.setProductId((long) row.getCell(0).getNumericCellValue());
+                orderDto.setVendorId((long) row.getCell(1).getNumericCellValue());
+                orderDto.setQuantity((long) row.getCell(2).getNumericCellValue());
+      //          row.getCell(3).getStringCellValue();
+//                Date date = sdf.parse(row.getCell(3).getStringCellValue());
+                Date date = row.getCell(3).getDateCellValue();
+                LocalDateTime localDateTime = new java.sql.Timestamp(date.getTime()).toLocalDateTime();
+
+
+//
+//                orderDto.setDeliveryDate(parseDate(row.getCell(3).getDateCellValue()));
+    //            orderDto.setDeliveryDate(LocalDateTime.parse(sdf.format(row.getCell(3).getDateCellValue())));
+
+                orderDto.setDeliveryDate(localDateTime);
+                orderDto.setDeliveryAddress(row.getCell(4).getStringCellValue());
+
+                orders.add(orderDto);
+            }
+        }
+        return orders;
+    }
+
+    public LocalDate parseDate(String dateString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        try {
+            return LocalDate.parse(dateString, formatter);
+        } catch (DateTimeParseException e) {
+            throw new RuntimeException("Invalid date format. Please use yyyy-MM-dd format.");
+        }
+    }
+
+// 엑셀 파싱 코드에서
+
 
 
 
