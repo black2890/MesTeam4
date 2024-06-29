@@ -43,14 +43,14 @@ public class MaterialInOutService {
 
 
         // deliveryDate 가져오기
-        LocalDate deliveryDate = materialOrders.getDeliveryDate();
+        LocalDateTime deliveryDate = materialOrders.getDeliveryDate();
         if(materialOrderDto.getStorageDate() ==null){
-            materialOrderDto.setStorageDate(deliveryDate.atStartOfDay());
+            materialOrderDto.setStorageDate(deliveryDate);
         }
 
         // storageDate가 deliveryDate 이후인지 확인
 
-        if (materialOrderDto.getStorageDate().isBefore(deliveryDate.atStartOfDay())) {
+        if (materialOrderDto.getStorageDate().isBefore(deliveryDate)) {
             throw new IllegalArgumentException("발주일 기준, 원자재 lead time 이 지나지 않았습니다.");
         }
         //입고 데이터에 입고일, 입고자, 입고상태 저장

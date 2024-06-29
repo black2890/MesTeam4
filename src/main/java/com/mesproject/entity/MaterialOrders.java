@@ -23,7 +23,7 @@ public class MaterialOrders {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long materialOrderId;
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch=FetchType.EAGER)
     @JoinColumn(name="product_id")
     private Product product;
 
@@ -34,7 +34,7 @@ public class MaterialOrders {
     private LocalDateTime materialOrderDate;
     // private LocalDateTime deliveryDate;
 
-    private LocalDate deliveryDate;
+    private LocalDateTime deliveryDate;
     private Long quantity;
 
     @Enumerated(EnumType.STRING)
@@ -48,7 +48,7 @@ public class MaterialOrders {
         materialOrders.setMaterialOrdersStatus(MaterialOrdersStatus.PENDINGSTORAGE);
         LocalDateTime materialOrderDate = materialOrderDto.getMaterialOrderDate();
         materialOrders.setMaterialOrderDate(materialOrderDate);
-        materialOrders.setDeliveryDate(MaterialDeliveryDateCalculator.calculateDeliveryDate(materialOrderDate,product.getProductId()));
+        materialOrders.setDeliveryDate(MaterialDeliveryDateCalculator.calculateDeliveryDate(materialOrderDate,product.getProductId()).atStartOfDay());
 //        materialOrders.setDeliveryDate(materialOrderDto.getDeliveryDate());
 //        if(product.getProductId()==5||product.getProductId()==6||product.getProductId()==7){
 //            materialOrders.setMaterialOrderDate(materialOrderDto.getDeliveryDate().minusDays(2));
