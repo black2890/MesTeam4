@@ -472,6 +472,13 @@
         if (checked){
             checkboxes.forEach(checkbox => {
                 const checkedId = checkbox.closest('tr').querySelector('td:nth-child(2)').innerText;
+                // var status = checkbox.closest('tr').find('td:eq(6)').text().trim();
+                var status = $('.replyCheckbox:checked').first().closest('tr').find('td:eq(6)').text().trim();
+                if (status !== "PENDINGSTORAGE") {
+                    alert("선택된 자재의 상태가 입고대기 상태가 아닙니다.");
+                    return; // 함수 실행을 중단합니다.
+                }
+
                 rno_arr.push(checkedId);
 
                 console.log(rno_arr);
@@ -481,6 +488,7 @@
                     alert("입고할 자재를 선택해주세요.");
                     return;
                 }
+
 
 
             })
@@ -501,12 +509,12 @@
                         alert("권한이 없습니다.");
                         location.href='/users/login';
                     }else {
-                        alert("삭제처리 오류");
+                        alert("입고처리 오류");
                         alert("code: " + request.status + "\n message : " + request.responseText + "\n error : " + error);
                     }
                 }
             });
-            alert("삭제 처리 되었습니다.");
+            // alert("입고 처리 되었습니다.");
             window.location.reload();
         }
     }
