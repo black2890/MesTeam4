@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Code Q&A</title>
+    <title>MES</title>
     <!-- FullCalendar CSS -->
     <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css" rel="stylesheet">
@@ -95,7 +95,7 @@
                 <!-- DataTales Example -->
                 <div class="card shadow mb-4">
                     <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">댓글 관리</h6>
+                        <h6 class="m-0 font-weight-bold text-primary">출하 현황</h6>
                     </div>
 
                     <!--검색 및 버튼-->
@@ -181,6 +181,15 @@
 
                                     <td th:text="${shipment.getActualDeliveryDate()}"></td>
                                     <td th:text="${shipment.getOrdersStatus()}"></td>
+                                    <td th:if="${shipment.getOrdersStatus() == T(com.mesproject.constant.OrdersStatus).PRODUCTIONCOMPLETED}"
+                                        data-status="PRODUCTIONCOMPLETED">출하예정</td>
+                                    <td th:if="${shipment.getOrdersStatus() == T(com.mesproject.constant.OrdersStatus).RETRIEVALCOMPLETED}"
+                                        data-status="RETRIEVALCOMPLETED">출하완료</td>
+                                    <td th:if="${shipment.getOrdersStatus() == T(com.mesproject.constant.OrdersStatus).DELIVERED}"
+                                        data-status="DELIVERED">배송완료</td>
+
+
+
 
                                 </tr>
                                 </tbody>

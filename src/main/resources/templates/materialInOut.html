@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Code Q&A</title>
+    <title>MES</title>
 
     <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
     <!-- Custom fonts for this template -->
@@ -78,7 +78,7 @@
                 <!-- DataTales Example -->
                 <div class="card shadow mb-4">
                     <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">댓글 관리</h6>
+                        <h6 class="m-0 font-weight-bold text-primary">입출고 현황</h6>
                     </div>
 
                     <!--검색 및 버튼-->
@@ -134,12 +134,13 @@
                                     <th>입출고번호</th>
                                     <th>제품명</th>
                                     <th>수량</th>
-                                    <th>유통기한</th>
-                                    <th>상태</th>
-                                    <th>입고일</th>
                                     <th>입고자</th>
-                                    <th>출고일</th>
+                                    <th>입고일</th>
+                                    <th>상태</th>
+                                    <th>보관기한</th>
                                     <th>출고자</th>
+                                    <th>출고일</th>
+
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -149,12 +150,19 @@
                                     <td th:text="${material.getInoutId()}"></td>
                                     <td th:text="${material.getProduct().getProductName()}"></td>
                                     <td th:text="${material.getQuantity()}"></td>
-                                    <td th:text="${material.getExpirationDate()}"></td>
-                                    <td th:text="${material.getMaterialInOutStatus()}"></td>
-                                    <td th:text="${material.getStorageDate()}"></td>
                                     <td th:text="${material.getStorageWorker()}"></td>
-                                    <td th:text="${material.getRetrievalDate()}"></td>
+                                    <td th:text="${#temporals.format(material.getStorageDate(), 'yyyy-MM-dd')}"></td>
+
+                                    <td th:text="${#temporals.format(material.getExpirationDate(), 'yyyy-MM-dd')}"></td>
                                     <td th:text="${material.getRetrievalWorker()}"></td>
+                                    <td th:text="${#temporals.format(material.getRetrievalDate(), 'yyyy-MM-dd')}"></td>
+                                    <td th:if="${material.getMaterialInOutStatus() == T(com.mesproject.constant.MaterialInOutStatus).PENDINGSTORAGE}"
+                                        data-status="PENDINGSTORAGE">입고대기</td>
+                                    <td th:if="${material.getMaterialInOutStatus() == T(com.mesproject.constant.MaterialInOutStatus).STORAGE}"
+                                        data-status = "STORAGE">입고완료</td>
+                                    <td th:if="${material.getMaterialInOutStatus() == T(com.mesproject.constant.MaterialInOutStatus).RETRIEVAL}"
+                                        data-status="RETRIEVAL">출고완료</td>
+
                                 </tr>
                                 </tbody>
                             </table>
@@ -374,136 +382,6 @@
     // }
 </script>
 
-<script>
-
-//    //체크 항목 입고
-//    function materialIn(){
-//        // var token = $("meta[name='_csrf']").attr("content");
-//        // var header = $("meta[name='_csrf_header']").attr("content");
-//        const checkboxes = document.querySelectorAll('.replyCheckbox:checked');
-//        if (checkboxes.length === 0) {
-//            alert("입고할 항목을 선택해주세요.");
-//            return;
-//        }
-//        let checked = true;
-//        var rno_arr = [];
-//        var url = "/material/in";
-//
-//        console.log(checkboxes);
-//
-//
-//
-//        checkboxes.forEach(checkbox => {
-//            var boardRow = $(this).closest('tr');
-//            // const replyCondition = checkbox.closest('tr').querySelector('td:nth-child(6)').innerText;
-//            // if (replyCondition !== "N"){
-//            //     alert("선택한 댓글중 이미 삭제된 댓글이 있습니다.");
-//            //     checked = false;
-//            // }
-//        });
-//
-//        if (checked){
-//            checkboxes.forEach(checkbox => {
-//                const checkedId = checkbox.closest('tr').querySelector('td:nth-child(2)').innerText;
-//                //   rno_arr.push(checkedId);
-//
-//                // console.log(rno_arr);
-//                //
-//                // // 선택된 댓글이 없는 경우 알림
-//                // if (rno_arr.length === 0) {
-//                //     alert("삭제할 댓글을 선택해주세요.");
-//                //     return;
-//                // }
-//
-//                $.ajax({
-//                    url: url,
-//                    type: "POST",
-//                    data: JSON.stringify(checkedId),
-//                    contentType: "application/json; charset-utf-8",
-//                    // beforeSend : function (xhr){
-//                    //     xhr.setRequestHeader(header, token);
-//                    // },
-//                    cache : false,
-//                    success : function (){
-//                        console.log("입고 처리 되었습니다.");
-//                    },
-//                    error : function (request, error){
-//                        if (request.status == '401'){
-//
-//                        }else {
-//                            alert("삭제처리 오류");
-//                            alert("code: " + request.status + "\n message : " + request.responseText + "\n error : " + error);
-//                        }
-//                    }
-//                });
-//            })
-//            alert("삭제 처리 되었습니다.");
-//            window.location.reload();
-//        }
-//    }
-    //
-    //    //체크 댓글 복구
-    //    function restoreCheckedReplies(){
-    //        // var token = $("meta[name='_csrf']").attr("content");
-    //        // var header = $("meta[name='_csrf_header']").attr("content");
-    //        const checkboxes = document.querySelectorAll('.replyCheckbox:checked');
-    //        if (checkboxes.length === 0) {
-    //            alert("복원할 댓글을 선택해주세요.");
-    //            return;
-    //        }
-    //        let checked = true;
-    //        var rno_arr = [];
-    //        var url = "/replies/restoreReplies";
-    //
-    //        console.log(checkboxes);
-    //
-    //
-    //
-    //        checkboxes.forEach(checkbox => {
-    //            const replyCondition = checkbox.closest('tr').querySelector('td:nth-child(6)').innerText;
-    //            console.log("restore: " + replyCondition);
-    //            if (replyCondition !== "Y"){
-    //                alert("선택한 댓글중 삭제되지 않은 댓글이 있습니다.");
-    //                checked = false;
-    //            }
-    //        });
-    //
-    //        if (checked){
-    //            checkboxes.forEach(checkbox => {
-    //
-    //                const checkedId = checkbox.closest('tr').querySelector('td:nth-child(2)').innerText;
-    //                rno_arr.push(checkedId);
-    //
-    //                console.log(rno_arr);
-    //
-    //                $.ajax({
-    //                    url: url,
-    //                    type: "POST",
-    //                    data: JSON.stringify(rno_arr),
-    //                    contentType: "application/json; charset-utf-8",
-    //                    // beforeSend : function (xhr){
-    //                    //     xhr.setRequestHeader(header, token);
-    //                    // },
-    //                    cache : false,
-    //                    success : function (){
-    //                        console.log("복구 처리 되었습니다.");
-    //                    },
-    //                    error : function (request, error){
-    //                        if (request.status == '401'){
-    //                            alert("권한이 없습니다.");
-    //                            location.href='/users/login';
-    //                        }else {
-    //                            alert("복구처리 오류");
-    //                            alert("code: " + request.status + "\n message : " + request.responseText + "\n error : " + error);
-    //                        }
-    //                    }
-    //                });
-    //            })
-    //            alert("복구 처리 되었습니다.");
-    //            window.location.reload();
-    //        }
-    //    }
-</script>
 </body>
 
 </html>

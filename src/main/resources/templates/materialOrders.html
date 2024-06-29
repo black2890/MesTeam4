@@ -140,7 +140,7 @@
                                     <th>제품명</th>
                                     <th>수량</th>
                                     <th>발주일</th>
-                                    <th>납품예정일</th>
+                                    <th>납기일</th>
                                     <th>상태</th>
                                 </tr>
                                 </thead>
@@ -152,11 +152,11 @@
 
                                     <td th:text="${material.getProduct().getProductName()}"></td>
                                     <td th:text="${material.getQuantity()}"></td>
-                                    <td th:text="${#temporals.format(material.materialOrderDate, 'yyyy-MM-dd')}"></td>
-                                    <td th:text="${#temporals.format(material.deliveryDate, 'yyyy-MM-dd')}"></td>
-                                    <td th:if="${material.materialOrdersStatus == T(com.mesproject.constant.MaterialOrdersStatus).PENDINGSTORAGE}"
+                                    <td th:text="${#temporals.format(material.getMaterialOrderDate(), 'yyyy-MM-dd')}"></td>
+                                    <td th:text="${#temporals.format(material.getDeliveryDate(), 'yyyy-MM-dd')}"></td>
+                                    <td th:if="${material.getMaterialOrdersStatus() == T(com.mesproject.constant.MaterialOrdersStatus).PENDINGSTORAGE}"
                                         data-status="PENDINGSTORAGE">입고대기</td>
-                                    <td th:if="${material.materialOrdersStatus == T(com.mesproject.constant.MaterialOrdersStatus).STORAGECOMPLETED}"
+                                    <td th:if="${material.getMaterialOrdersStatus() == T(com.mesproject.constant.MaterialOrdersStatus).STORAGECOMPLETED}"
                                         data-status = "STORAGECOMPLETED">입고완료</td>
                                 </tr>
                                 </tbody>
@@ -341,7 +341,7 @@
                 $('<th>').text('제품명').appendTo(headerRow);
                 $('<th>').text('수량').appendTo(headerRow);
                 $('<th>').text('발주일').appendTo(headerRow);
-                $('<th>').text('납품예정일').appendTo(headerRow);
+                $('<th>').text('납기일').appendTo(headerRow);
                 $('<th>').text('상태').appendTo(headerRow);
 
 

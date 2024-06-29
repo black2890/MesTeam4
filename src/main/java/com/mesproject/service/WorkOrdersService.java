@@ -16,7 +16,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -326,4 +329,27 @@ public class WorkOrdersService {
     public List<WorkOrders> findByWorkPlanId(Long workPlanId) {
         return workOrdersRepository.findByWorkPlan_WorkPlanId(workPlanId);
     }
+    public List<WorkOrders> searchDateReplies(String condition, String start, String end) {
+        LocalDateTime startDateTime = convertStringToLocalDateTime(start, false);
+
+        if (end == null || end.isEmpty()) {
+            return workOrdersRepository.findByDailyWorkOrders(startDateTime.toLocalDate());
+
+        } else {
+            LocalDateTime endDateTime = convertStringToLocalDateTime(end, true);
+
+            List<WorkOrders> workOrdersList = new ArrayList<>();
+
+        }
+
+        // 검색 조건이 잘못된 경우 처리
+        throw new IllegalArgumentException("Invalid search condition: " + condition);
+    }
+    // 날짜 문자열을 LocalDateTime으로 변환하는 유틸리티 메서드
+    private LocalDateTime convertStringToLocalDateTime(String dateStr, boolean isEndOfDay) {
+        LocalDate localDate = LocalDate.parse(dateStr, DateTimeFormatter.ISO_DATE);
+        return isEndOfDay ? LocalDateTime.of(localDate, LocalTime.MAX) : LocalDateTime.of(localDate, LocalTime.MIN);
+    }
+
+
 }
