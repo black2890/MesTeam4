@@ -70,6 +70,7 @@
     </div>
 
     <!--  테이블 영역  -->
+    <!--    각 제품에 해당하는 작업 계획 리스트 마다 <H2> 태그 및 테이블 생성 -->
     <div th:each="workPlanProgress : ${workPlanProgresses}" class="progressTable">
         <h2 th:text="${workPlanProgress.getProductName()}"></h2>
         <table>
@@ -82,7 +83,9 @@
             <tbody>
             <tr>
                 <td>진행도</td>
-                <td th:each="processProgress : ${workPlanProgress.getProcessProgressList()}" th:style="'width: ' + ${processProgress.getProgress()} + '%;'"></td>
+                <td th:each="processProgress : ${workPlanProgress.processProgressList}">
+                    <div th:style="'width:' + ${processProgress.progress} + '%; background-color: #87CEEB; height: 20px;'"></div>
+                </td>
             </tr>
             </tbody>
         </table>

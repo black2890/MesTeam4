@@ -63,10 +63,12 @@ public interface WorkOrdersRepository extends JpaRepository<WorkOrders, Long> {
     List<Long> findQuantityByInventoryStatusAndOrderPlanEnd(@Param("processName") String processName,
                                                       @Param("searchDate") LocalDateTime searchDate);
 
-    // 메인 화면 공정 진행도를 표현하기 위한 repository
+    // -------------- 메인 화면 메소드 ----------------
+    // 작업 지시 상태가 '진행중'인 작업 지시에 해당하는 작업 계획 ID 리스트 반환
     @Query("SELECT wo.workPlan.workPlanId FROM WorkOrders wo WHERE wo.workOrdersStatus = 'INPROGRESS'")
     List<Long> findWorkPlanIdsByWorkOrdersStatusInProgress();
 
+    // 작업 계획 아이디에 해당하는 모든 작업 지시 내역 반환
     List<WorkOrders> findByWorkPlan_WorkPlanId(Long workPlanId);
 
 
