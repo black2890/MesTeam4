@@ -136,6 +136,7 @@ public class ViewController {
     public String upload() {
         return "excel";
     }
+    
     @GetMapping("/data/shipments")
     public String getCompletedOrders(Model model) {
         model.addAttribute("shipments", ordersService.getCompletedOrders());
@@ -143,6 +144,7 @@ public class ViewController {
 
         return "shipment";
     }
+
     @GetMapping(value = "/data/inventories")
     public String inventories(Model model) {
         model.addAttribute("inventories",inventoryRepository.findAll());

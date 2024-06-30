@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -98,6 +99,9 @@ public class WorkPlanService {
         // 작업 계획 진행률을 담는 dto 리스트 생성
         List<WorkPlanProgressDto> workPlanProgresses = new ArrayList<>();
 
+        // 소수점 설정 포멧
+        DecimalFormat df = new DecimalFormat("#.#");
+
         // 작업 지시에서 진행중인 작업 계획 아이디 리스트에서
         // 아이디 각각에 대한 작업 지시를 담는 리스트 생성 및 선언
         for (Long workPlanId : inProgressWorkPlanIds) {
@@ -139,7 +143,9 @@ public class WorkPlanService {
                         Duration totalDuration = Duration.between(workOrder.getStart(), workOrder.getEnd());
                         Duration elapsedDuration = Duration.between(workOrder.getStart(), LocalDateTime.now());
                         double progress = (double) elapsedDuration.toMinutes() / totalDuration.toMinutes() * 100;
-                        processProgressDto.setProgress(progress);
+                        if(progress>=100)progress=99.9;
+                        String formattedProgress = df.format(progress);
+                        processProgressDto.setProgress(Double.parseDouble(formattedProgress));
                     }
 
                     // 작업 지시를 나타내는 작업 계획에서 각 공정 종류 및 진행률 할당
