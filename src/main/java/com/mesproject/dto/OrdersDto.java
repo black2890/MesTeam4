@@ -34,9 +34,14 @@ public class OrdersDto {
     private LocalDate regDate;
 
     public  static OrdersDto createOrdersDto(Orders orders){
+      String vendorName = "";
+        if(orders.getVendor() != null){
+            vendorName = orders.getVendor().getVendorName();
+      }
+      
         return new OrdersDto(orders.getOrderId(),
                 orders.getProduct().getProductName(),
-                orders.getVendor().getVendorName(),
+                vendorName,
                 orders.getQuantity(),
                 orders.getDeliveryDate(),
                 orders.getDeliveryAddress(),

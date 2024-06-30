@@ -2,6 +2,7 @@ package com.mesproject.service;
 
 import com.mesproject.constant.InventoryStatus;
 import com.mesproject.constant.OrdersStatus;
+import com.mesproject.dto.OrderDto;
 import com.mesproject.dto.ShipmentDto;
 import com.mesproject.entity.*;
 import com.mesproject.repository.*;
@@ -38,6 +39,8 @@ public class OrdersService {
     private WorkPlanRepository workPlanRepository;
     @Autowired
     private VendorRepository vendorRepository;
+    @Autowired
+    private OrderService orderService;
 
 
     public void updateOrderStatus(List<Long> orderIds, OrdersStatus status) {
@@ -142,6 +145,9 @@ public class OrdersService {
 
     }
 
+    /*
+    출고시킨 뒤, 재고 일정량 이하로 떨어지면 생산계획 편성.
+     */
     public void retrievalCompletedOne(Long orderId , String worker) {
         List<Long> workPlanIdList = new ArrayList<>();
 
@@ -165,6 +171,8 @@ public class OrdersService {
                 inventory.setRetrievalDate(LocalDateTime.now());
                 inventory.setRetrievalWorker(worker);
                 quantity -= inventory.getQuantity();
+                checkStock(inventory.getProduct().getProductId());
+
             } else {
                 //기존 재고는 수량만 update
                 inventory.setQuantity(inventory.getQuantity() - quantity);
@@ -173,11 +181,27 @@ public class OrdersService {
                 inventory.setRetrievalDate(LocalDateTime.now());
                 inventory.setRetrievalWorker(worker);
                 inventoryRepository.save(retrievalInventory);
+                checkStock(inventory.getProduct().getProductId());
             }
 
         }
     }
+    public void checkStock(Long productId){
+            Long tempQuantity = inventoryRepository.sumQuantityByProductIdAndStatus(productId);
+            if(tempQuantity != null && tempQuantity<1000){
 
+                OrderDto orderDto = new OrderDto();
+                orderDto.setProductId(productId);
+                orderDto.setQuantity(1000-tempQuantity);
+                orderService.order(orderDto);
+
+            } else if (tempQuantity ==null) {
+                OrderDto orderDto = new OrderDto();
+                orderDto.setProductId(productId);
+                orderDto.setQuantity(1000L);
+                orderService.order(orderDto);
+            }
+    }
 
 
 
@@ -186,4 +210,6 @@ public class OrdersService {
     public List<Map<String, Object>> getOrderDetails(Long orderId) {
         return ordersRepository.findRelatedDataByOrderId(orderId);
     }
+
+
 }

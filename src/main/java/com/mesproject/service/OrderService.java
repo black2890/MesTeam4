@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -67,8 +68,12 @@ public class OrderService {
         Product product = productRepository.findById(orderDto.getProductId())
                 .orElseThrow(EntityNotFoundException::new);
 
-        Vendor vendor = vendorRepository.findById(orderDto.getVendorId())
-                .orElseThrow(EntityNotFoundException::new);
+        Vendor vendor = null;
+        if(orderDto.getVendorId() != null){
+            vendor = vendorRepository.findById(orderDto.getVendorId())
+                    .orElseThrow(EntityNotFoundException::new);
+        }
+
         /*
         수량에 따라, 발주량, 생산계획 조정 필요
          */
@@ -141,7 +146,7 @@ public class OrderService {
         if(orderDto.getProductId()==1 || orderDto.getProductId()==2){
             materialOrderDto2.setQuantity(50L);
         }else if(orderDto.getProductId()==3||orderDto.getProductId()==4){
-            materialOrderDto2.setQuantity(20L);
+            materialOrderDto2.setQuantity(24L);
         }
 
 
@@ -232,19 +237,24 @@ public class OrderService {
                 materialOrdersRepository.save(materialOrders1);
                 materialInOutRepository.save(materialInOut1);
 
-
-                Product product2 = productRepository.findById(materialId2)
-                        .orElseThrow(EntityNotFoundException::new);
-                MaterialOrders materialOrders2 = MaterialOrders.createMaterialOrders(materialOrderDto2, product2);
-                MaterialInOut materialInOut2 = MaterialInOut.createMaterialInOut(materialOrders2);
-                materialOrdersRepository.save(materialOrders2);
-                materialInOutRepository.save(materialInOut2);
-
+                MaterialInOut materialInOut2 =null;
+             if(materialId2!=10L || materialId2==10L &&
+                     materialInOutRepository.sumQuantityByProductIdAndStatus(materialId2)
+                             +materialInOutRepository.sumQuantityByProductIdAndPendingStatus(materialId2)<8) {
+                 Product product2 = productRepository.findById(materialId2)
+                         .orElseThrow(EntityNotFoundException::new);
+                 MaterialOrders materialOrders2 = MaterialOrders.createMaterialOrders(materialOrderDto2, product2);
+                 materialInOut2 = MaterialInOut.createMaterialInOut(materialOrders2);
+                 materialOrdersRepository.save(materialOrders2);
+                 materialInOutRepository.save(materialInOut2);
+                 OrdersMaterials ordersMaterials2 = OrdersMaterials.createOrdersMaterials(materialOrders2);
+                 ordersMaterialsList.add(ordersMaterials2);
+             }
                 //수주-발주 엔티티 생성 : 수주코드 저장은 createorder 에서
                 OrdersMaterials ordersMaterials1 = OrdersMaterials.createOrdersMaterials(materialOrders1);
-                OrdersMaterials ordersMaterials2 = OrdersMaterials.createOrdersMaterials(materialOrders2);
+
                 ordersMaterialsList.add(ordersMaterials1);
-                ordersMaterialsList.add(ordersMaterials2);
+
 
                 if(orderDto.getProductId()==1||orderDto.getProductId()==2 && workPlan != null){
                     Long checkProductId ;
@@ -427,18 +437,19 @@ public class OrderService {
         양배추, 흑마늘에 세척 저장
         벌꿀에 충진 저장
 
+        혼합에 석류, 매실,콜라겐 저장
          */
                 for(WorkOrders workOrders : workOrdersList){
                     if(workOrders.getProcessType()== ProcessType.CLEANING){
                         materialInOut1.setWorkOrders(workOrders);
                     }
-                    else if(workOrders.getProcessType()== ProcessType.FILLING){
+                    else if( materialId2 == 7L && workOrders.getProcessType()== ProcessType.FILLING){
                         materialInOut2.setWorkOrders(workOrders);
 
                     }
-                    else if(workOrders.getProcessType()== ProcessType.MIX){
+                    else if( workOrders.getProcessType()== ProcessType.MIX){
                         materialInOut1.setWorkOrders(workOrders);
-                        materialInOut2.setWorkOrders(workOrders);
+                        //materialInOut2.setWorkOrders(workOrders);
                     }
                 }
             }
@@ -779,7 +790,7 @@ public class OrderService {
                 //          row.getCell(3).getStringCellValue();
 //                Date date = sdf.parse(row.getCell(3).getStringCellValue());
                 Date date = row.getCell(3).getDateCellValue();
-                LocalDateTime localDateTime = new java.sql.Timestamp(date.getTime()).toLocalDateTime();
+                LocalDateTime localDateTime = new Timestamp(date.getTime()).toLocalDateTime();
 
 
 //

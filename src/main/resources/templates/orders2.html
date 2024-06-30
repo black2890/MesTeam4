@@ -118,11 +118,15 @@
                                 <tr th:each="order : ${orders}">
                                     <td><input class="replyCheckbox" type="checkbox" th:value="${order.getOrderId()}"/></td>
                                     <td th:text="${order.getOrderId()}"></td>
-                                    <td th:text="${order.getVendorName()}"></td>
+
+                                    <td th:text="${order.getVendorName() != null ?
+                                    order.getVendorName() : ''}"></td>
                                     <td th:text="${order.getProductName()}"></td>
                                     <td th:text="${order.getQuantity()}"></td>
-                                    <td th:text="${order.getDeliveryAddress()}"></td>
-                                    <td th:text=" ${#temporals.format(order.getDeliveryDate(), 'yyyy.MM.dd')}"></td>
+                                    <td th:text="${order.getDeliveryAddress() != null ?
+                                    order.getDeliveryAddress() : ''}"></td>
+
+                                    <td th:text="${#temporals.format(order.getDeliveryDate(), 'yyyy.MM.dd')}"></td>
 
 
 
