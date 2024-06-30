@@ -18,17 +18,17 @@ public class MaterialInOut {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long inoutId;
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch=FetchType.EAGER)
     @JoinColumn(name="material_order_id")
     private MaterialOrders materialOrders;
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch=FetchType.EAGER)
     @JoinColumn(name="product_id")
     private Product product;
 
     private Long quantity;
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch=FetchType.EAGER)
     @JoinColumn(name="work_order_id")
     private WorkOrders workOrders;
 

@@ -127,7 +127,7 @@ public class OrderService {
         // 납품예정일 저장해야함(지금 기준 이틀 뒤?, 원래는 생산 일정에 맞춰 발주하는 게 맞음)--> 첫 생산계획 3일 전?
         MaterialOrderDto materialOrderDto1 = new MaterialOrderDto();
         materialOrderDto1.setProductId(materialId1);
-        materialOrderDto1.setMaterialOrderDate(productionDate.minusDays(7));
+        materialOrderDto1.setMaterialOrderDate(LocalDateTime.now());
         //     materialOrderDto1.setDeliveryDate(productionDate);
         if(orderDto.getProductId()==1 || orderDto.getProductId()==2){
             materialOrderDto1.setQuantity(1000L);
@@ -136,7 +136,7 @@ public class OrderService {
         }
         MaterialOrderDto materialOrderDto2 = new MaterialOrderDto();
         materialOrderDto2.setProductId(materialId2);
-        materialOrderDto2.setMaterialOrderDate(productionDate.minusDays(7));
+        materialOrderDto2.setMaterialOrderDate(LocalDateTime.now());
         //  materialOrderDto2.setDeliveryDate(productionDate);
         if(orderDto.getProductId()==1 || orderDto.getProductId()==2){
             materialOrderDto2.setQuantity(50L);

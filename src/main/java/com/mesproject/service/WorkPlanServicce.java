@@ -48,6 +48,17 @@ public class WorkPlanServicce{
                 //반복문 돌면서 그 작업계획이 완료되었는지 확인
                 for(Long workplanId : workPlanIdList){
                    WorkPlan workplan =  workPlanRepository.findById(workplanId)
+
+
+
+
+
+
+
+
+
+
+
                            .orElseThrow(EntityNotFoundException::new);
                    if(workplan.getWorkPlanStatus()!= WorkOrdersStatus.COMPLETED){
                        isCompleted = false;

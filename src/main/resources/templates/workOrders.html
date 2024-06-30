@@ -99,7 +99,7 @@
                                 <!--검색-->
                                 <select class="form-control" style="width: auto;" id="searchCondition">
 
-                                    <option value="regdate">예정일시</option>
+                                    <option value="regdate">예정일</option>
 
                                 </select>
                                 <!-- 검색어 입력란 -->
@@ -280,52 +280,52 @@
 
 <!-- 검색조건에 따라 입력창 띄우는 스크립트 -->
 <script>
-    // // 페이지 로드 시 실행
-    // $(document).ready(function() {
-    //     // 검색 조건이 바뀔 때마다 이벤트 리스너 등록
-    //     $('#searchCondition').change(function() {
-    //         handleSearchConditionChange();
-    //     });
-    //
-    //     // 초기 실행
-    //     handleSearchConditionChange();
-    // });
-    //
-    // // 검색 조건에 따라 검색어 입력창과 날짜 선택창을 토글하는 함수
-    // function handleSearchConditionChange() {
-    //     var searchCondition = $('#searchCondition').val();
-    //     if (searchCondition === "regdate" || searchCondition === "deletetime" || searchCondition === "recovertime") {
-    //         // 날짜 선택창 표시
-    //         $('#startTime').removeClass('d-none');
-    //         $('#endTime').removeClass('d-none');
-    //         // 검색어 입력창 숨김
-    //         $('#searchKeyword').addClass('d-none');
-    //         $('#searchButton').removeClass('d-none');
-    //         // 삭제 여부 선택 숨김
-    //         $('#deleteCheckBox').addClass('d-none');
-    //     }else if (searchCondition === "replycondition") {
-    //         // 삭제 여부 선택 표시
-    //         $('#deleteCheckBox').removeClass('d-none');
-    //         // 검색어 입력창 숨김
-    //         $('#searchKeyword').addClass('d-none');
-    //         // 날짜 선택창 숨김
-    //         $('#startTime').addClass('d-none');
-    //         $('#endTime').addClass('d-none');
-    //         // 검색 버튼 표시
-    //         $('#searchButton').addClass('d-none');
-    //     }
-    //     else {
-    //         // 검색어 입력창 표시
-    //         $('#searchKeyword').removeClass('d-none');
-    //         // 날짜 선택창 숨김
-    //         $('#startTime').addClass('d-none');
-    //         $('#endTime').addClass('d-none');
-    //         // 삭제 여부 선택 숨김
-    //         $('#deleteCheckBox').addClass('d-none');
-    //         // 검색 버튼 표시
-    //         $('#searchButton').removeClass('d-none');
-    //     }
-    // }
+    // 페이지 로드 시 실행
+    $(document).ready(function() {
+        // 검색 조건이 바뀔 때마다 이벤트 리스너 등록
+        $('#searchCondition').change(function() {
+            handleSearchConditionChange();
+        });
+
+        // 초기 실행
+        handleSearchConditionChange();
+    });
+
+    // 검색 조건에 따라 검색어 입력창과 날짜 선택창을 토글하는 함수
+    function handleSearchConditionChange() {
+        var searchCondition = $('#searchCondition').val();
+        if (searchCondition === "regdate" || searchCondition === "deletetime" || searchCondition === "recovertime") {
+            // 날짜 선택창 표시
+            $('#startTime').removeClass('d-none');
+            // $('#endTime').removeClass('d-none');
+            // 검색어 입력창 숨김
+            $('#searchKeyword').addClass('d-none');
+            $('#searchButton').removeClass('d-none');
+            // 삭제 여부 선택 숨김
+            $('#deleteCheckBox').addClass('d-none');
+        }else if (searchCondition === "replycondition") {
+            // 삭제 여부 선택 표시
+            $('#deleteCheckBox').removeClass('d-none');
+            // 검색어 입력창 숨김
+            $('#searchKeyword').addClass('d-none');
+            // 날짜 선택창 숨김
+            $('#startTime').addClass('d-none');
+            $('#endTime').addClass('d-none');
+            // 검색 버튼 표시
+            $('#searchButton').addClass('d-none');
+        }
+        else {
+            // 검색어 입력창 표시
+            $('#searchKeyword').removeClass('d-none');
+            // 날짜 선택창 숨김
+            $('#startTime').addClass('d-none');
+            $('#endTime').addClass('d-none');
+            // 삭제 여부 선택 숨김
+            $('#deleteCheckBox').addClass('d-none');
+            // 검색 버튼 표시
+            $('#searchButton').removeClass('d-none');
+        }
+    }
 </script>
 
 <!-- 검색에 따라 테이블을 띄워주는 스크립트 -->
@@ -442,9 +442,9 @@
     function filterTable(searchCondition, searchKeyword, starttime, endtime,deleteCondition) {
         // AJAX를 사용하여 서버에 검색 요청을 보냅니다.
         $.ajax({
-            url: '/boardAPI/searchReplies', // 검색을 처리하는 서버 엔드포인트 URL
+            url: '/workOrder/search', // 검색을 처리하는 서버 엔드포인트 URL
             type: 'GET',
-            data: { condition: searchCondition, keyword: searchKeyword, start: starttime, end: endtime, deleteCondition: deleteCondition },
+            data: { start: starttime },
             success: function (data) {
                 // 검색 결과를 받아옵니다.
                 var searchData = data;
@@ -462,37 +462,79 @@
                 // 테이블 헤더 생성
                 var headerRow = $('<tr>').appendTo(thead);
                 $('<th>').text('checkbox').appendTo(headerRow);
-                $('<th>').text('번호').appendTo(headerRow);
-                $('<th>').text('작성자').appendTo(headerRow);
-                $('<th>').text('내용').appendTo(headerRow);
-                $('<th>').text('작성일').appendTo(headerRow);
-                $('<th>').text('삭제여부').appendTo(headerRow);
-                $('<th>').text('삭제일시').appendTo(headerRow);
-                $('<th>').text('복원일시').appendTo(headerRow);
+                $('<th>').text('작업번호').appendTo(headerRow);
+                $('<th>').text('제품명').appendTo(headerRow);
+                $('<th>').text('공정').appendTo(headerRow);
+                $('<th>').text('담당자').appendTo(headerRow);
+                $('<th>').text('예정일시').appendTo(headerRow);
+                $('<th>').text('소요시간').appendTo(headerRow);
+                $('<th>').text('시작일시').appendTo(headerRow);
+                $('<th>').text('완료일시').appendTo(headerRow);
+                $('<th>').text('상태').appendTo(headerRow);
 
 
                 // 데이터 출력
-                searchData.forEach(function (reply) {
+                searchData.forEach(function (workOrder) {
                     var newRow = $('<tr>').appendTo(tbody);
-                    $('<td><input class="userCheckbox" type="checkbox"/>').appendTo(newRow);
-                    $('<td>').text(reply.id).appendTo(newRow);
-                    $('<td>').text(reply.nickname).appendTo(newRow);
-                    $('<td>').text(reply.content).appendTo(newRow);
 
-                    $('<td>').text(formatDate(new Date(reply.regdate))).appendTo(newRow);
-                    $('<td>').text(reply.reply_condition).appendTo(newRow);
+                    $('<td><input class="replyCheckbox" type="checkbox" value="' + workOrder.workOrderId + '"/>').appendTo(newRow);
+                    $('<td>').text(workOrder.workOrderId).appendTo(newRow);
+                    $('<td>').text(workOrder.productName).appendTo(newRow);
 
-
-                    if(reply.delete_time ==null){
-                        $('<td>').text("").appendTo(newRow);
-                    }else{
-                        $('<td>').text(formatDate(new Date(reply.delete_time))).appendTo(newRow);
+                    var processTypeText = '';
+                    switch (workOrder.processType) {
+                        case 'CLEANING':
+                            processTypeText = '세척';
+                            break;
+                        case 'EXTRACTION':
+                            processTypeText = '추출';
+                            break;
+                        case 'FILTRATION':
+                            processTypeText = '여과';
+                            break;
+                        case 'STERILIZATION':
+                            processTypeText = '살균';
+                            break;
+                        case 'FILLING':
+                            processTypeText = '충진';
+                            break;
+                        case 'INSPECTION':
+                            processTypeText = '검사';
+                            break;
+                        case 'PACKAGING':
+                            processTypeText = '포장';
+                            break;
+                        case 'MIX':
+                            processTypeText = '혼합';
+                            break;
+                        case 'COOLING':
+                            processTypeText = '냉각';
+                            break;
                     }
-                    if(reply.recover_time ==null){
-                        $('<td>').text("").appendTo(newRow);
-                    }else{
-                        $('<td>').text(formatDate(new Date(reply.recover_time))).appendTo(newRow);
+                    $('<td>').text(processTypeText).appendTo(newRow);
+
+                    $('<td>').text(workOrder.worker || '').appendTo(newRow);
+                    $('<td>').text(formatDate(new Date(workOrder.scheduledDate))).appendTo(newRow);
+
+                    $('<td>').text(duration + 'H').appendTo(newRow);
+                    // $('<td>').text(workOrder.duration.toHours() + 'H').appendTo(newRow);
+
+                    $('<td>').text(formatDate(new Date(workOrder.start || ''))).appendTo(newRow);
+                    $('<td>').text(formatDate(new Date(workOrder.end || ''))).appendTo(newRow);
+
+                    var statusText = '';
+                    switch (workOrder.workOrdersStatus) {
+                        case 'PENDING':
+                            statusText = '대기';
+                            break;
+                        case 'INPROGRESS':
+                            statusText = '진행중';
+                            break;
+                        case 'COMPLETED':
+                            statusText = '완료';
+                            break;
                     }
+                    $('<td>').text(statusText).attr('data-status', workOrder.workOrdersStatus).appendTo(newRow);
 
                 });
 
@@ -533,10 +575,12 @@
         var day = ('0' + date.getDate()).slice(-2);
         var hours = ('0' + date.getHours()).slice(-2);
         var minutes = ('0' + date.getMinutes()).slice(-2);
-        var seconds = ('0' + date.getSeconds()).slice(-2);
+        // var seconds = ('0' + date.getSeconds()).slice(-2);
 
-        return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
+        // return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
+        return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes;
     }
+
 </script>
 
 

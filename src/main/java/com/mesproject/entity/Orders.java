@@ -22,11 +22,11 @@ public class Orders {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch=FetchType.EAGER)
     @JoinColumn(name="product_id")
     private Product product;
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch=FetchType.EAGER)
     @JoinColumn(name="vendor_id")
     private Vendor vendor;
 
@@ -39,7 +39,7 @@ public class Orders {
 
     private LocalDate regDate;
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch=FetchType.EAGER)
     @JoinColumn(name="delivery_vendor_id")
     private Vendor deliveryVendor;
 

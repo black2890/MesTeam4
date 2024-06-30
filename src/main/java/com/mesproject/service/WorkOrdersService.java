@@ -329,21 +329,16 @@ public class WorkOrdersService {
     public List<WorkOrders> findByWorkPlanId(Long workPlanId) {
         return workOrdersRepository.findByWorkPlan_WorkPlanId(workPlanId);
     }
-    public List<WorkOrders> searchDateReplies(String condition, String start, String end) {
+    public List<WorkOrders> searchDailyWorkOrders(String start) {
         LocalDateTime startDateTime = convertStringToLocalDateTime(start, false);
 
-        if (end == null || end.isEmpty()) {
+
             return workOrdersRepository.findByDailyWorkOrders(startDateTime.toLocalDate());
 
-        } else {
-            LocalDateTime endDateTime = convertStringToLocalDateTime(end, true);
 
-            List<WorkOrders> workOrdersList = new ArrayList<>();
-
-        }
 
         // 검색 조건이 잘못된 경우 처리
-        throw new IllegalArgumentException("Invalid search condition: " + condition);
+       // throw new IllegalArgumentException("Invalid search condition: " + condition);
     }
     // 날짜 문자열을 LocalDateTime으로 변환하는 유틸리티 메서드
     private LocalDateTime convertStringToLocalDateTime(String dateStr, boolean isEndOfDay) {

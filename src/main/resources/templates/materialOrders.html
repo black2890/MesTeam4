@@ -147,7 +147,7 @@
                                 <tbody>
                                 <!-- Thymeleaf 반복문을 이용하여 데이터 출력 -->
                                 <tr th:each="material : ${materialOrders}">
-                                    <td><input class="replyCheckbox" type="checkbox" th:value="${material.getMaterialOrderId()}"/></td>
+                                    <td><input class="replyCheckbox" type="checkbox" th:value="${material.materialOrderId}"/></td>
                                     <td th:text="${material.getMaterialOrderId()}"></td>
 
                                     <td th:text="${material.getProduct().getProductName()}"></td>
@@ -349,7 +349,7 @@
                 // 데이터 출력
                 searchData.forEach(function (material) {
                     var newRow = $('<tr>').appendTo(tbody);
-                    $('<td><input class="replyCheckbox" type="checkbox" th:value="${material.getMaterialOrderId()}"/>').appendTo(newRow);
+                    $('<td><input class="replyCheckbox" type="checkbox" th:value="${material.materialOrderId}"/>').appendTo(newRow);
                     $('<td>').text(material.materialOrderId).appendTo(newRow);
 
 

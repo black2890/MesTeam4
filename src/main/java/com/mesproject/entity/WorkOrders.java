@@ -22,7 +22,7 @@ public class WorkOrders {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long workOrderId;
 
-    @ManyToOne(fetch= FetchType.LAZY)
+    @ManyToOne(fetch= FetchType.EAGER)
     @JoinColumn(name="work_plan_id")
     private WorkPlan workPlan;
 

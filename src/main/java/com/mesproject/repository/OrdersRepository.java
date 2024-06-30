@@ -2,6 +2,7 @@ package com.mesproject.repository;
 
 import com.mesproject.constant.OrdersStatus;
 import com.mesproject.entity.Orders;
+import com.mesproject.entity.WorkPlan;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +13,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public interface OrdersRepository extends JpaRepository<Orders, Long> {
     Page<Orders> findAllByProduct_ProductNameContainingOrVendor_VendorNameContaining(String searchValue, String searchValue1, Pageable pageable);
@@ -51,6 +53,10 @@ public interface OrdersRepository extends JpaRepository<Orders, Long> {
             "JOIN FETCH o.product p " +
             "WHERE o.orderId = :orderId")
     Orders findByOrderIdWithDetails(@Param("orderId") Long orderId);
+
+    List<Orders> findByVendor_VendorId(Long vendorId);
+    Optional<Orders> findFirstByVendor_VendorIdOrderByRegDateDesc(Long vendorId);
+
 }
 
 
