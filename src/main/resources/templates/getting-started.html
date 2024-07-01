@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout1}">
+
+<div layout:fragment="content" class="content">
+    <h2 class="mb-2 lh-sm">Getting Started</h2>
+    <div class="card shadow-none border my-4" data-component-card="data-component-card">
+        <div class="card-header p-4 border-bottom bg-body">
+            <div class="row g-3 justify-content-between align-items-center">
+                <div class="col-12 col-md">
+                    <h4 class="text-body mb-0" data-anchor="data-anchor">Quick start</h4>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="collapse code-collapse" id="quick-start-code">
+                <pre class="scrollbar" style="max-height:420px"><code class="language-html">&lt;p class=&quot;mb-0&quot;&gt;Looking to start your project quickly? Just unzip the &lt;code&gt;Phoenix-v1.18.0.zip&lt;/code&gt;. We have precompiled and packaged everything in the &lt;code&gt;public&lt;/code&gt; directory for you. Start editing the &lt;code&gt;public/pages/starter.html&lt;/code&gt; with a text or code editor, save it, and open the file in your favourite browser to see the changes.&lt;/p&gt;</code></pre>
+            </div>
+            <div class="p-4 code-to-copy">
+                <p class="mb-0">Looking to start your project quickly? Just unzip the <code>Phoenix-v1.18.0.zip</code>. We have precompiled and packaged everything in the <code>public</code> directory for you. Start editing the <code>public/pages/starter.html</code> with a text or code editor, save it, and open the file in your favourite browser to see the changes.</p>
+            </div>
+        </div>
+    </div>
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+        <div class="toast align-items-center text-white bg-dark border-0" id="icon-copied-toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex" data-bs-theme="dark">
+                <div class="toast-body p-3"></div>
+                <button class="btn-close me-2 m-auto" type="button" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+    <footer class="footer position-absolute">
+        <div class="row g-0 justify-content-between align-items-center h-100">
+            <div class="col-12 col-sm-auto text-center">
+                <p class="mb-0 mt-2 mt-sm-0 text-body">Thank you for creating with Phoenix<span class="d-none d-sm-inline-block"></span><span class="d-none d-sm-inline-block mx-1">|</span><br class="d-sm-none" />2024 &copy;<a class="mx-1" href="https://themewagon.com">Themewagon</a></p>
+            </div>
+            <div class="col-12 col-sm-auto text-center">
+                <p class="mb-0 text-body-tertiary text-opacity-85">v1.18.0</p>
+            </div>
+        </div>
+    </footer>
+</div>
+</html>

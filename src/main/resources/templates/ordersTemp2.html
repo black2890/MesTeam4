@@ -1,92 +1,80 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default">
+<html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Orders Management</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>MES</title>
+    <!-- FullCalendar CSS -->
     <link rel="stylesheet" type="text/css" th:href="@{/styles.css}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css" rel="stylesheet">
     <!-- Datatables CSS -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.css">
     <!-- Bootstrap CSS -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
-    <!-- FullCalendar CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css" rel="stylesheet">
+
+
+
+    <!-- Custom fonts for this template -->
+    <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+            href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+            rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="/css/sb-admin-2.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this page -->
+    <link href="/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="/vendor/jquery/jquery.min.js"></script>
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="/js/sb-admin-2.min.js"></script>
+
+    <!-- Page level plugins -->
+    <script src="/vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+    <!-- Page level custom scripts -->
+    <script src="/js/demo/datatables-demo.js"></script>
+
     <style>
-        /* Center the table */
-        div.dataTables_wrapper {
-            text-align: center;
+        footer {
+            background-color: #8D94C7;
+            color: black;
+            height: 80px; /* 푸터 높이 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        table.dataTable {
-            margin: 0 auto;
-            width: 80%;
-        }
         .fc-day-disabled {
-            background-color: #f0f0f0 !important;
+            background-color: #e9ecef;
             cursor: not-allowed;
         }
     </style>
 
 
-    <!-- ===============================================-->
-    <!--    Favicons-->
-    <!-- ===============================================-->
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/img/favicons/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicons/favicon-16x16.png">
-    <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicons/favicon.ico">
-    <link rel="manifest" href="assets/img/favicons/manifest.json">
-    <meta name="msapplication-TileImage" content="assets/img/favicons/mstile-150x150.png">
-    <meta name="theme-color" content="#ffffff">
-    <script src="vendors/simplebar/simplebar.min.js"></script>
-    <script src="assets/js/config.js"></script>
-
-
-    <!-- ===============================================-->
-    <!--    Stylesheets-->
-    <!-- ===============================================-->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&amp;display=swap" rel="stylesheet">
-    <link href="vendors/simplebar/simplebar.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
-    <link href="assets/css/theme-rtl.min.css" type="text/css" rel="stylesheet" id="style-rtl">
-    <link href="assets/css/theme.min.css" type="text/css" rel="stylesheet" id="style-default">
-    <link href="assets/css/user-rtl.min.css" type="text/css" rel="stylesheet" id="user-style-rtl">
-    <link href="assets/css/user.min.css" type="text/css" rel="stylesheet" id="user-style-default">
-    <script>
-        var phoenixIsRTL = window.config.config.phoenixIsRTL;
-        if (phoenixIsRTL) {
-            var linkDefault = document.getElementById('style-default');
-            var userLinkDefault = document.getElementById('user-style-default');
-            linkDefault.setAttribute('disabled', true);
-            userLinkDefault.setAttribute('disabled', true);
-            document.querySelector('html').setAttribute('dir', 'rtl');
-        } else {
-            var linkRTL = document.getElementById('style-rtl');
-            var userLinkRTL = document.getElementById('user-style-rtl');
-            linkRTL.setAttribute('disabled', true);
-            userLinkRTL.setAttribute('disabled', true);
-        }
-    </script>
-    <link href="vendors/leaflet/leaflet.css" rel="stylesheet">
-    <link href="vendors/leaflet.markercluster/MarkerCluster.css" rel="stylesheet">
-    <link href="vendors/leaflet.markercluster/MarkerCluster.Default.css" rel="stylesheet">
 </head>
-<body>
 
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- Datatables JS -->
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.js"></script>
-<!-- Bootstrap JS -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<body id="page-top">
 <!-- FullCalendar JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
+<!-- xlsx JS-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+
 <!-- Datatables Buttons JS -->
 <script src="https://cdn.datatables.net/buttons/2.0.1/js/dataTables.buttons.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
@@ -95,45 +83,128 @@
 
 <script src='https://unpkg.com/fullcalendar@5.11.0/main.min.js'></script>
 <script src='https://unpkg.com/axios/dist/axios.min.js'></script>
-<!-- 사이드바 영역 -->
-<div th:include="~{fragments/sidebar2 :: .main}"></div>
-<div class="container mt-4">
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Datatables JS -->
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<!-- Page Wrapper -->
+<div id="wrapper">
 
-    <button type="button" class="btn btn-primary mb-4 float-right" data-toggle="modal" data-target="#orderModal">
-        수주 등록
-    </button>
-    <!-- 버튼 -->
-    <button type="button" class="btn btn-primary mb-4 float-right" data-toggle="modal" data-target="#orderModal2">
-        일괄 등록
-    </button>
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+        <!-- 사이드바 영역 -->
+        <div th:include="~{fragments/sidebar2 :: .main}"></div>
+        <!-- Main Content -->
+        <div id="content">
+
+
+            <!-- 헤더 -->
+            <!--            <div th:include="~{admin/fragments/adminHeader :: #header}"></div>-->
+
+
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+
+
+                <!-- DataTales Example -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">수주 현황</h6>
+                    </div>
+
+                    <!--검색 및 버튼-->
+                    <div class="card-body">
+                        <div class="form-inline">
+
+                        </div>
+
+
+                        <button type="button" class="btn btn-primary mb-4 float-right" data-toggle="modal" data-target="#orderModal">
+                            수주 등록
+                        </button>
+                        <!-- 버튼 -->
+                        <button type="button" class="btn btn-primary mb-4 float-right" data-toggle="modal" data-target="#orderModal2">
+                            일괄 등록
+                        </button>
+                        <div>
+                            <button id="downloadExcel" class="btn btn-primary">엑셀 다운로드</button>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table data-order='[[1, "desc"]]' class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                <tr>
+                                    <th>checkbox</th>
+                                    <th>주문번호</th>
+                                    <th>거래처</th>
+                                    <th>제품명</th>
+                                    <th>수량</th>
+                                    <th>납품주소</th>
+                                    <th>납기일</th>
+                                    <th>상태</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <!-- Thymeleaf 반복문을 이용하여 데이터 출력 -->
+                                <tr th:each="order : ${orders}">
+                                    <td><input class="replyCheckbox" type="checkbox" th:value="${order.getOrderId()}"/></td>
+                                    <td th:text="${order.getOrderId()}"></td>
+
+                                    <td th:text="${order.getVendorName() != null ?
+                                    order.getVendorName() : ''}"></td>
+                                    <td th:text="${order.getProductName()}"></td>
+                                    <td th:text="${order.getQuantity()}"></td>
+                                    <td th:text="${order.getDeliveryAddress() != null ?
+                                    order.getDeliveryAddress() : ''}"></td>
+
+                                    <td th:text="${#temporals.format(order.getDeliveryDate(), 'yyyy.MM.dd')}"></td>
 
 
 
-    <table id="example" class="display" style="width:100%">
-        <thead>
-        <tr>
-            <th>주문번호</th>
-            <th>제품명</th>
-            <th>고객명</th>
-            <th>수량</th>
-            <th>납품주소</th>
-            <th>납품일</th>
-            <th>상태</th>
-            <th><input type="checkbox" name="checkall" id="checkall"></th>
-        </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+                                    <td th:if="${order.getOrdersStatus() == T(com.mesproject.constant.OrdersStatus).PENDINGSTORAGE}"
+                                        data-status="PENDINGSTORAGE">자재 입고 전</td>
+                                    <td th:if="${order.getOrdersStatus() == T(com.mesproject.constant.OrdersStatus).STORAGECOMPLETED}"
+                                        data-status="STORAGECOMPLETED">자재 입고 완료</td>
+                                    <td th:if="${order.getOrdersStatus() == T(com.mesproject.constant.OrdersStatus).PRODUCTIONCOMPLETED}"
+                                        data-status="PRODUCTIONCOMPLETED">생산 완료</td>
+                                    <td th:if="${order.getOrdersStatus() == T(com.mesproject.constant.OrdersStatus).RETRIEVALCOMPLETED}"
+                                        data-status="RETRIEVALCOMPLETED">출하 완료</td>
+                                    <td th:if="${order.getOrdersStatus() == T(com.mesproject.constant.OrdersStatus).DELIVERED}"
+                                        data-status="DELIVERED">배송 완료</td>
 
-    <div style="margin-top:5px;" >
-        <button type="button" id="shipButton" class="btn btn-success float-right">출하</button>
-        <button type="button" id="deliverButton" class="btn btn-info float-right" style="margin-right: 10px;">배송완료</button>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- /.container-fluid -->
+
+        </div>
+        <!-- End of Main Content -->
+
+        <!-- 푸터 -->
+        <!--        <div th:include="~{fragments/footer :: #footer}"></div>-->
+
     </div>
+    <!-- End of Content Wrapper -->
+
 </div>
+<!-- End of Page Wrapper -->
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+</a>
+
 
 <!-- Order Modal -->
-<div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="orderModalLabel"
+<div class="modal fade" id="orderModal" role="dialog" aria-labelledby="orderModalLabel"
      aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -194,7 +265,7 @@
 </div>
 
 <!-- FullCalendar Modal -->
-<div class="modal fade" id="calendarModal" tabindex="-1" role="dialog" aria-labelledby="calendarModalLabel"
+<div class="modal fade" id="calendarModal"  role="dialog" aria-labelledby="calendarModalLabel"
      aria-hidden="true">
     <div class="modal-dialog" role="document" style="max-width:800px">
         <div class="modal-content">
@@ -212,7 +283,7 @@
 </div>
 
 <!-- 엑셀 모달 -->
-<div class="modal fade" id="orderModal2" tabindex="-1" role="dialog" aria-labelledby="orderModalLabel" aria-hidden="true">
+<div class="modal fade" id="orderModal2"  role="dialog" aria-labelledby="orderModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -237,74 +308,9 @@
     </div>
 </div>
 
-
 <script>
     $(document).ready(function () {
-        var table = $('#example').DataTable({
-            "processing": true,
-            "serverSide": true,
-            "paging": true,
-            "pageLength": 10,
-            "searching": true,
-            "lengthChange": true,
-            "ordering": true,
-            "info": true,
-            "ajax": {
-                "url": "/orderData",
-                "type": "POST",
-            },
-            "columns": [
-                {"data": "orderId"},
-                {"data": "productName"},
-                {"data": "vendorName"},
-                {"data": "quantity"},
-                {"data": "deliveryAddress"},
-                {"data": "deliveryDate"},
-                {
-                    "data": "ordersStatus",
-                    "render": function (data) {
-                        switch (data) {
-                            case 'PENDINGSTORAGE':
-                                return '원자재 입고전';
-                            case 'STORAGECOMPLETED':
-                                return '원자재 입고완료';
-                            case 'PRODUCTIONCOMPLETED':
-                                return '생산완료';
-                            case 'RETRIEVALCOMPLETED':
-                                return '출하완료';
-                            case 'DELIVERED':
-                                return '배송완료';
-                            default:
-                                return data;
-                        }
-                    }
-                },
-                {"data": null},
-            ],
-            columnDefs: [
-                {
-                    targets: 7,
-                    orderable: false,
-                    className: "select-checkbox",
-                    render: function () {
-                        return '<input type="checkbox" name="id[]" value="">';
-                    }
-                }
-            ],
-            select: {
-                style: "multi",
-                selector: "td:first-child"
-            },
-            "dom": '<"d-flex justify-content-between"lfB>tipr<"d-flex justify-content-between">',
-            buttons: [
-                {
-                    "extend": 'excelHtml5',
-                    "text": '엑셀 다운로드',
-                    "className": 'btn btn-outline-primary excelBtn',
-                    "title": '수주 데이터'
-                }
-            ]
-        });
+
 
         // 예상 납품 날짜를 가져오는 함수
         function getEstimatedDate(productName, quantity) {
@@ -339,93 +345,6 @@
             }
         });
 
-
-        $('#example tbody').on('click', 'input[type="checkbox"]', function () {
-            var data = table.row($(this).closest('tr')).data();
-
-        });
-
-        function updateOrderStatus(status) {
-
-            var selectedData = [];
-            $('#example tbody input[type="checkbox"]:checked').each(function () {
-                var data = table.row($(this).closest('tr')).data();
-                selectedData.push(data);
-            });
-
-            var orderIds = selectedData.map(function (item) {
-                return item.orderId;
-            });
-
-            if (orderIds.length > 0) {
-                $.ajax({
-                    url: '/updateOrderStatus',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ orderIds: orderIds, status: status }),
-                    success: function () {
-                        table.ajax.reload();
-                    },
-                    error: function (error) {
-                        console.error("Error updating order status: ", error);
-                    }
-                });
-            } else {
-                alert(" 최소한 하나 이상의 데이터 행을 체크해주세요. ");
-            }
-        }
-
-        $('#checkall').on('click', function(){
-            var rows = table.rows({ 'search': 'applied' }).nodes();
-            $('input[type="checkbox"]', rows).prop('checked', this.checked);
-        });
-
-        // Handle click on individual checkbox to maintain state of "select-all" checkbox
-        $('#example tbody').on('change', 'input[type="checkbox"]', function(){
-            if(!this.checked){
-                var el = $('#checkall').get(0);
-                if(el && el.checked && ('indeterminate' in el)){
-                    el.indeterminate = true;
-                }
-            }
-        });
-
-        $('#shipButton').on('click', function () {
-            var canShip = true;
-            $('#example tbody input[type="checkbox"]:checked').each(function () {
-                var data = table.row($(this).closest('tr')).data();
-                if (data.ordersStatus !== 'PRODUCTIONCOMPLETED') {
-                    canShip = false;
-                    return false;
-                }
-            });
-
-            if (canShip) {
-                updateOrderStatus('RETRIEVALCOMPLETED');
-                alert("출하가 완료되었습니다.");
-            } else {
-                alert("출하 버튼은 상태가 (생산완료)인 경우에만 사용할 수 있습니다.");
-            }
-        });
-
-        $('#deliverButton').on('click', function () {
-            var canDeliver = true;
-            $('#example tbody input[type="checkbox"]:checked').each(function () {
-                var data = table.row($(this).closest('tr')).data();
-                console.log('Order data:', data);
-                if (data.ordersStatus !== 'RETRIEVALCOMPLETED') {
-                    canDeliver = false;
-                    return false;
-                }
-            });
-
-            if (canDeliver) {
-                updateOrderStatus('DELIVERED');
-                alert("배송이 완료되었습니다.");
-            } else {
-                alert("배송완료 버튼은 상태가 (출하완료)인 경우에만 사용할 수 있습니다.");
-            }
-        });
 
 
         function populateSelects() {
@@ -539,8 +458,21 @@
 
     });
 </script>
+<script>
+    document.getElementById('downloadExcel').addEventListener('click', function() {
+        // 테이블 데이터를 배열로 변환
+        var table = document.getElementById('dataTable');
+        var workbook = XLSX.utils.table_to_book(table, {sheet: "Sheet JS"});
+
+        // 엑셀 파일 다운로드
+        XLSX.writeFile(workbook, 'table_data.xlsx');
+    });
+</script>
+
 
 <script src="upload.js"></script>
 
+
 </body>
+
 </html>

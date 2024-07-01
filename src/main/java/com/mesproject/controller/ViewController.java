@@ -96,7 +96,7 @@ public class ViewController {
         model.addAttribute("orders", ordersRepository.findByVendor_VendorId(vendorId));
         return "vendorOrder";
     }
-    @GetMapping(value = "/data/orders")
+    @GetMapping(value = "/order")
     public String orders2(Model model) {
 
         List<Orders> orders = ordersRepository.findAll();
@@ -127,6 +127,19 @@ public class ViewController {
         model.addAttribute("vendors",vendorDtos);
 
         return "vendor2";
+    }
+    @GetMapping(value = "/ordersTemp")
+    public String ordersTemp(Model model) {
+
+        List<Orders> orders = ordersRepository.findAll();
+        List<OrdersDto> ordersDtos = new ArrayList<>();
+        for(Orders order: orders){
+            OrdersDto ordersDto = OrdersDto.createOrdersDto(order);
+            ordersDtos.add(ordersDto);
+        }
+        model.addAttribute("orders",ordersDtos);
+
+        return "ordersTemp2";
     }
 
 }

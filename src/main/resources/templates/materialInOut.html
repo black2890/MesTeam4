@@ -11,7 +11,7 @@
 
     <title>MES</title>
 
-    <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/styles.css}">
     <!-- Custom fonts for this template -->
     <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link
@@ -87,7 +87,7 @@
                             <ul class="mr-auto">
                                 <!--검색-->
                                 <select class="form-control" style="width: auto;" id="searchCondition">
-                                    <option value="nickname">작성자</option>
+                                    <option value="nickname">제품명</option>
                                     <option value="content">댓글 내용</option>
                                     <option value="regdate">생성일시</option>
                                     <option value="deletetime">삭제일시</option>
@@ -193,52 +193,52 @@
 
 <!-- 검색조건에 따라 입력창 띄우는 스크립트 -->
 <script>
-    // // 페이지 로드 시 실행
-    // $(document).ready(function() {
-    //     // 검색 조건이 바뀔 때마다 이벤트 리스너 등록
-    //     $('#searchCondition').change(function() {
-    //         handleSearchConditionChange();
-    //     });
-    //
-    //     // 초기 실행
-    //     handleSearchConditionChange();
-    // });
-    //
-    // // 검색 조건에 따라 검색어 입력창과 날짜 선택창을 토글하는 함수
-    // function handleSearchConditionChange() {
-    //     var searchCondition = $('#searchCondition').val();
-    //     if (searchCondition === "regdate" || searchCondition === "deletetime" || searchCondition === "recovertime") {
-    //         // 날짜 선택창 표시
-    //         $('#startTime').removeClass('d-none');
-    //         $('#endTime').removeClass('d-none');
-    //         // 검색어 입력창 숨김
-    //         $('#searchKeyword').addClass('d-none');
-    //         $('#searchButton').removeClass('d-none');
-    //         // 삭제 여부 선택 숨김
-    //         $('#deleteCheckBox').addClass('d-none');
-    //     }else if (searchCondition === "replycondition") {
-    //         // 삭제 여부 선택 표시
-    //         $('#deleteCheckBox').removeClass('d-none');
-    //         // 검색어 입력창 숨김
-    //         $('#searchKeyword').addClass('d-none');
-    //         // 날짜 선택창 숨김
-    //         $('#startTime').addClass('d-none');
-    //         $('#endTime').addClass('d-none');
-    //         // 검색 버튼 표시
-    //         $('#searchButton').addClass('d-none');
-    //     }
-    //     else {
-    //         // 검색어 입력창 표시
-    //         $('#searchKeyword').removeClass('d-none');
-    //         // 날짜 선택창 숨김
-    //         $('#startTime').addClass('d-none');
-    //         $('#endTime').addClass('d-none');
-    //         // 삭제 여부 선택 숨김
-    //         $('#deleteCheckBox').addClass('d-none');
-    //         // 검색 버튼 표시
-    //         $('#searchButton').removeClass('d-none');
-    //     }
-    // }
+    // 페이지 로드 시 실행
+    $(document).ready(function() {
+        // 검색 조건이 바뀔 때마다 이벤트 리스너 등록
+        $('#searchCondition').change(function() {
+            handleSearchConditionChange();
+        });
+
+        // 초기 실행
+        handleSearchConditionChange();
+    });
+
+    // 검색 조건에 따라 검색어 입력창과 날짜 선택창을 토글하는 함수
+    function handleSearchConditionChange() {
+        var searchCondition = $('#searchCondition').val();
+        if (searchCondition === "regdate" || searchCondition === "deletetime" || searchCondition === "recovertime") {
+            // 날짜 선택창 표시
+            $('#startTime').removeClass('d-none');
+            $('#endTime').removeClass('d-none');
+            // 검색어 입력창 숨김
+            $('#searchKeyword').addClass('d-none');
+            $('#searchButton').removeClass('d-none');
+            // 삭제 여부 선택 숨김
+            $('#deleteCheckBox').addClass('d-none');
+        }else if (searchCondition === "replycondition") {
+            // 삭제 여부 선택 표시
+            $('#deleteCheckBox').removeClass('d-none');
+            // 검색어 입력창 숨김
+            $('#searchKeyword').addClass('d-none');
+            // 날짜 선택창 숨김
+            $('#startTime').addClass('d-none');
+            $('#endTime').addClass('d-none');
+            // 검색 버튼 표시
+            $('#searchButton').addClass('d-none');
+        }
+        else {
+            // 검색어 입력창 표시
+            $('#searchKeyword').removeClass('d-none');
+            // 날짜 선택창 숨김
+            $('#startTime').addClass('d-none');
+            $('#endTime').addClass('d-none');
+            // 삭제 여부 선택 숨김
+            $('#deleteCheckBox').addClass('d-none');
+            // 검색 버튼 표시
+            $('#searchButton').removeClass('d-none');
+        }
+    }
 </script>
 
 <!-- 검색에 따라 테이블을 띄워주는 스크립트 -->
@@ -382,7 +382,7 @@
     //     return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
     // }
 </script>
-
+<script type="text/javascript" src="/js/sideBar.js"></script>
 </body>
 
 </html>

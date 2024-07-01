@@ -1,4 +1,4 @@
-document.getElementById('uploadForm').addEventListener('submit', function(event) {
+window.onload = function () {document.getElementById('uploadForm').addEventListener('submit', function(event) {
     event.preventDefault();
 
     const fileInput = document.getElementById('fileInput');
@@ -19,6 +19,8 @@ document.getElementById('uploadForm').addEventListener('submit', function(event)
         .then(response => {
             if (response.ok) {
                 $('#orderModal2').modal('hide');
+                // 현재 페이지 새로 고침
+                window.location.reload();
                 return response.text();
             } else {
                 throw new Error('Error uploading file: ' + response.statusText);
@@ -32,3 +34,4 @@ document.getElementById('uploadForm').addEventListener('submit', function(event)
             alert(error.message);
         });
 });
+};

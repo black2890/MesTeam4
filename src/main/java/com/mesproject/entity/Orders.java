@@ -98,7 +98,7 @@ public class Orders {
         if(orderDto.getQuantity() ==999){
             order.setQuantity(1000L);
         }
-        if(orderDto.getVendorId()== null){
+        if(orderDto.getVendorId()!= null){
             order.setDeliveryDate(orderDto.getDeliveryDate());
             order.setDeliveryAddress(orderDto.getDeliveryAddress());
         }
