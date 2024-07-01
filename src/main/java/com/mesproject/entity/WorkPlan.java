@@ -18,7 +18,7 @@ public class WorkPlan {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long workPlanId;
 
-    @ManyToOne(fetch= FetchType.LAZY)
+    @ManyToOne(fetch= FetchType.EAGER)
     @JoinColumn(name="product_id")
     private Product product;
 

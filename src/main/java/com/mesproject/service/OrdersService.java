@@ -2,9 +2,16 @@ package com.mesproject.service;
 
 import com.mesproject.constant.InventoryStatus;
 import com.mesproject.constant.OrdersStatus;
+import com.mesproject.dto.OrderDto;
 import com.mesproject.dto.ShipmentDto;
 import com.mesproject.entity.*;
 import com.mesproject.repository.*;
+import com.mesproject.dto.OrderDetailsDto;
+import com.mesproject.entity.*;
+import com.mesproject.repository.InventoryRepository;
+import com.mesproject.repository.OrdersPlanRepository;
+import com.mesproject.repository.OrdersRepository;
+import com.mesproject.repository.WorkPlanRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +21,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Transactional
 @Service
@@ -30,6 +39,8 @@ public class OrdersService {
     private WorkPlanRepository workPlanRepository;
     @Autowired
     private VendorRepository vendorRepository;
+    @Autowired
+    private OrderService orderService;
 
 
     public void updateOrderStatus(List<Long> orderIds, OrdersStatus status) {
@@ -100,9 +111,6 @@ public class OrdersService {
 
             }
 
-
-
-
         }
     }
     public List<Orders> getCompletedOrders() {
@@ -137,44 +145,71 @@ public class OrdersService {
 
     }
 
-    public void retrievalCompletedOne(Long orderId , String worker){
+    /*
+    출고시킨 뒤, 재고 일정량 이하로 떨어지면 생산계획 편성.
+     */
+    public void retrievalCompletedOne(Long orderId , String worker) {
         List<Long> workPlanIdList = new ArrayList<>();
 
 
-            Orders orders = ordersRepository.findById(orderId)
+        Orders orders = ordersRepository.findById(orderId)
+                .orElseThrow(EntityNotFoundException::new);
+        Long quantity = orders.getQuantity();
+        List<OrdersPlan> ordersPlanList = ordersPlanRepository.findByOrders_OrderIdOrderByOrders_OrderIdAsc(orderId);
+        // 수주코드는 무조건 하나의 작업계획이라도 참조하게 되어있음.
+        //아닌 경우 생기면 추후 고려
+        for (OrdersPlan ordersPlan : ordersPlanList) {
+            workPlanIdList.add(ordersPlan.getWorkPlan().getWorkPlanId());
+        }
+        //
+        for (Long workPlanId : workPlanIdList) {
+            WorkPlan workPlan = workPlanRepository.findById(workPlanId)
                     .orElseThrow(EntityNotFoundException::new);
-            Long quantity = orders.getQuantity();
-            List<OrdersPlan> ordersPlanList = ordersPlanRepository.findByOrders_OrderIdOrderByOrders_OrderIdAsc(orderId);
-            // 수주코드는 무조건 하나의 작업계획이라도 참조하게 되어있음.
-            //아닌 경우 생기면 추후 고려
-            for(OrdersPlan ordersPlan : ordersPlanList){
-                workPlanIdList.add(ordersPlan.getWorkPlan().getWorkPlanId());
-            }
-            //
-            for(Long workPlanId : workPlanIdList){
-                WorkPlan workPlan = workPlanRepository.findById(workPlanId)
-                        .orElseThrow(EntityNotFoundException::new);
-                Inventory inventory = inventoryRepository.findByWorkPlan_WorkPlanId(workPlanId);
-                if(quantity >= inventory.getQuantity()){
-                    inventory.setInventoryStatus(InventoryStatus.RETRIEVALCOMPLETED);
-                    inventory.setRetrievalDate(LocalDateTime.now());
-                    inventory.setRetrievalWorker(worker);
-                    quantity-=inventory.getQuantity();
-                }else{
-                    //기존 재고는 수량만 update
-                    inventory.setQuantity(inventory.getQuantity() - quantity);
-                    //출고한 재고는 출고시킨 수량으로 insert
-                    Inventory  retrievalInventory = Inventory.updateInventory(workPlan, quantity);
-                    inventory.setRetrievalDate(LocalDateTime.now());
-                    inventory.setRetrievalWorker(worker);
-                    inventoryRepository.save(retrievalInventory);
-                }
+            Inventory inventory = inventoryRepository.findByWorkPlan_WorkPlanId(workPlanId);
+            if (quantity >= inventory.getQuantity()) {
+                inventory.setInventoryStatus(InventoryStatus.RETRIEVALCOMPLETED);
+                inventory.setRetrievalDate(LocalDateTime.now());
+                inventory.setRetrievalWorker(worker);
+                quantity -= inventory.getQuantity();
+                checkStock(inventory.getProduct().getProductId());
 
+            } else {
+                //기존 재고는 수량만 update
+                inventory.setQuantity(inventory.getQuantity() - quantity);
+                //출고한 재고는 출고시킨 수량으로 insert
+                Inventory retrievalInventory = Inventory.updateInventory(workPlan, quantity);
+                inventory.setRetrievalDate(LocalDateTime.now());
+                inventory.setRetrievalWorker(worker);
+                inventoryRepository.save(retrievalInventory);
+                checkStock(inventory.getProduct().getProductId());
             }
 
-
-
-
-
+        }
     }
+    public void checkStock(Long productId){
+            Long tempQuantity = inventoryRepository.sumQuantityByProductIdAndStatus(productId);
+            if(tempQuantity != null && tempQuantity<1000){
+
+                OrderDto orderDto = new OrderDto();
+                orderDto.setProductId(productId);
+                orderDto.setQuantity(1000-tempQuantity);
+                orderService.order(orderDto);
+
+            } else if (tempQuantity ==null) {
+                OrderDto orderDto = new OrderDto();
+                orderDto.setProductId(productId);
+                orderDto.setQuantity(1000L);
+                orderService.order(orderDto);
+            }
+    }
+
+
+
+
+
+    public List<Map<String, Object>> getOrderDetails(Long orderId) {
+        return ordersRepository.findRelatedDataByOrderId(orderId);
+    }
+
+
 }

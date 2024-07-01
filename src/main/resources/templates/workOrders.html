@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Code Q&A</title>
+    <title>MES</title>
     <!-- FullCalendar CSS -->
     <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css" rel="stylesheet">
@@ -89,7 +89,7 @@
                 <!-- DataTales Example -->
                 <div class="card shadow mb-4">
                     <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">댓글 관리</h6>
+                        <h6 class="m-0 font-weight-bold text-primary">작업 지시</h6>
                     </div>
 
                     <!--검색 및 버튼-->
@@ -98,12 +98,8 @@
                             <ul class="mr-auto">
                                 <!--검색-->
                                 <select class="form-control" style="width: auto;" id="searchCondition">
-                                    <option value="nickname">작성자</option>
-                                    <option value="content">댓글 내용</option>
-                                    <option value="regdate">생성일시</option>
-                                    <option value="deletetime">삭제일시</option>
-                                    <option value="recovertime">복원일시</option>
-                                    <option value="replycondition">삭제여부</option>
+
+                                    <option value="regdate">예정일</option>
 
                                 </select>
                                 <!-- 검색어 입력란 -->
@@ -150,7 +146,7 @@
                                     <th>제품명</th>
                                     <th>공정</th>
                                     <th>담당자</th>
-                                    <th>예정일</th>
+                                    <th>예정일시</th>
                                     <th>소요시간</th>
                                     <th>시작일시</th>
                                     <th>완료일시</th>
@@ -163,13 +159,32 @@
                                     <td><input class="replyCheckbox" type="checkbox" th:value="${workOrder.getWorkOrderId()}"/></td>
                                     <td th:text="${workOrder.getWorkOrderId()}"></td>
                                     <td th:text="${workOrder.getWorkPlan().getProduct().getProductName()}"></td>
-                                    <td th:text="${workOrder.getProcessType()}"></td>
+                                    <td th:if="${workOrder.getProcessType() == T(com.mesproject.constant.ProcessType).CLEANING}">세척</td>
+                                    <td th:if="${workOrder.getProcessType() == T(com.mesproject.constant.ProcessType).EXTRACTION}">추출</td>
+                                    <td th:if="${workOrder.getProcessType() == T(com.mesproject.constant.ProcessType).FILTRATION}">여과</td>
+                                    <td th:if="${workOrder.getProcessType() == T(com.mesproject.constant.ProcessType).STERILIZATION}">살균</td>
+                                    <td th:if="${workOrder.getProcessType() == T(com.mesproject.constant.ProcessType).FILLING}">충진</td>
+                                    <td th:if="${workOrder.getProcessType() == T(com.mesproject.constant.ProcessType).INSPECTION}">검사</td>
+                                    <td th:if="${workOrder.getProcessType() == T(com.mesproject.constant.ProcessType).PACKAGING}">포장</td>
+                                    <td th:if="${workOrder.getProcessType() == T(com.mesproject.constant.ProcessType).MIX}">혼합</td>
+                                    <td th:if="${workOrder.getProcessType() == T(com.mesproject.constant.ProcessType).COOLING}">냉각</td>
+
                                     <td th:text="${workOrder.getWorker()}"></td>
-                                    <td th:text="${workOrder.getScheduledDate()}"></td>
-                                    <td th:text="${workOrder.getDuration()}"></td>
-                                    <td th:text="${workOrder.getStart()}"></td>
-                                    <td th:text="${workOrder.getEnd()}"></td>
-                                    <td th:text="${workOrder.getWorkOrdersStatus()}"></td>
+                                    <td th:text=" ${#temporals.format(workOrder.getScheduledDate(), 'yyyy.MM.dd HH:mm')}"></td>
+                                    <td th:text="${workOrder.getDuration().toHours()}+'H'"></td>
+
+                                    <td th:text=" ${#temporals.format(workOrder.getStart(), 'yyyy.MM.dd HH:mm')}"></td>
+                                    <td th:text=" ${#temporals.format(workOrder.getEnd(), 'yyyy.MM.dd HH:mm')}"></td>
+
+
+
+                                    <td th:if="${workOrder.getWorkOrdersStatus() == T(com.mesproject.constant.WorkOrdersStatus).PENDING}"
+                                        data-status="PENDING">대기</td>
+                                    <td th:if="${workOrder.getWorkOrdersStatus() == T(com.mesproject.constant.WorkOrdersStatus).INPROGRESS}"
+                                        data-status="INPROGRESS">진행중</td>
+                                    <td th:if="${workOrder.getWorkOrdersStatus() == T(com.mesproject.constant.WorkOrdersStatus).COMPLETED}"
+                                        data-status="COMPLETED">완료</td>
+
 
                                 </tr>
                                 </tbody>
@@ -265,52 +280,52 @@
 
 <!-- 검색조건에 따라 입력창 띄우는 스크립트 -->
 <script>
-    // // 페이지 로드 시 실행
-    // $(document).ready(function() {
-    //     // 검색 조건이 바뀔 때마다 이벤트 리스너 등록
-    //     $('#searchCondition').change(function() {
-    //         handleSearchConditionChange();
-    //     });
-    //
-    //     // 초기 실행
-    //     handleSearchConditionChange();
-    // });
-    //
-    // // 검색 조건에 따라 검색어 입력창과 날짜 선택창을 토글하는 함수
-    // function handleSearchConditionChange() {
-    //     var searchCondition = $('#searchCondition').val();
-    //     if (searchCondition === "regdate" || searchCondition === "deletetime" || searchCondition === "recovertime") {
-    //         // 날짜 선택창 표시
-    //         $('#startTime').removeClass('d-none');
-    //         $('#endTime').removeClass('d-none');
-    //         // 검색어 입력창 숨김
-    //         $('#searchKeyword').addClass('d-none');
-    //         $('#searchButton').removeClass('d-none');
-    //         // 삭제 여부 선택 숨김
-    //         $('#deleteCheckBox').addClass('d-none');
-    //     }else if (searchCondition === "replycondition") {
-    //         // 삭제 여부 선택 표시
-    //         $('#deleteCheckBox').removeClass('d-none');
-    //         // 검색어 입력창 숨김
-    //         $('#searchKeyword').addClass('d-none');
-    //         // 날짜 선택창 숨김
-    //         $('#startTime').addClass('d-none');
-    //         $('#endTime').addClass('d-none');
-    //         // 검색 버튼 표시
-    //         $('#searchButton').addClass('d-none');
-    //     }
-    //     else {
-    //         // 검색어 입력창 표시
-    //         $('#searchKeyword').removeClass('d-none');
-    //         // 날짜 선택창 숨김
-    //         $('#startTime').addClass('d-none');
-    //         $('#endTime').addClass('d-none');
-    //         // 삭제 여부 선택 숨김
-    //         $('#deleteCheckBox').addClass('d-none');
-    //         // 검색 버튼 표시
-    //         $('#searchButton').removeClass('d-none');
-    //     }
-    // }
+    // 페이지 로드 시 실행
+    $(document).ready(function() {
+        // 검색 조건이 바뀔 때마다 이벤트 리스너 등록
+        $('#searchCondition').change(function() {
+            handleSearchConditionChange();
+        });
+
+        // 초기 실행
+        handleSearchConditionChange();
+    });
+
+    // 검색 조건에 따라 검색어 입력창과 날짜 선택창을 토글하는 함수
+    function handleSearchConditionChange() {
+        var searchCondition = $('#searchCondition').val();
+        if (searchCondition === "regdate" || searchCondition === "deletetime" || searchCondition === "recovertime") {
+            // 날짜 선택창 표시
+            $('#startTime').removeClass('d-none');
+            // $('#endTime').removeClass('d-none');
+            // 검색어 입력창 숨김
+            $('#searchKeyword').addClass('d-none');
+            $('#searchButton').removeClass('d-none');
+            // 삭제 여부 선택 숨김
+            $('#deleteCheckBox').addClass('d-none');
+        }else if (searchCondition === "replycondition") {
+            // 삭제 여부 선택 표시
+            $('#deleteCheckBox').removeClass('d-none');
+            // 검색어 입력창 숨김
+            $('#searchKeyword').addClass('d-none');
+            // 날짜 선택창 숨김
+            $('#startTime').addClass('d-none');
+            $('#endTime').addClass('d-none');
+            // 검색 버튼 표시
+            $('#searchButton').addClass('d-none');
+        }
+        else {
+            // 검색어 입력창 표시
+            $('#searchKeyword').removeClass('d-none');
+            // 날짜 선택창 숨김
+            $('#startTime').addClass('d-none');
+            $('#endTime').addClass('d-none');
+            // 삭제 여부 선택 숨김
+            $('#deleteCheckBox').addClass('d-none');
+            // 검색 버튼 표시
+            $('#searchButton').removeClass('d-none');
+        }
+    }
 </script>
 
 <!-- 검색에 따라 테이블을 띄워주는 스크립트 -->
@@ -374,7 +389,7 @@
                 body: JSON.stringify(work) //comment 객체를 JSON 문자열로 변환 전송
             }).then(response => {
                 // HTTP 응답 코드에 따른 메시지 출력
-                const msg = (response.ok) ? "작업이 시작처리되었습니다." : "작업 시작처리 실패했습니다.";
+                const msg = (response.ok) ? "작업이 종료처리되었습니다." : "작업 종료처리 실패했습니다.";
                 alert(msg);
                 // 현재 페이지 새로 고침
                 window.location.reload();
@@ -384,144 +399,188 @@
 
     });
 
-    // $(document).ready(function() {
-    //
-    //     $('input[name="deleteCheckbox"]').change(function() {
-    //         triggerSearch();
-    //     });
-    //     // 검색 버튼 클릭 이벤트 핸들러를 등록합니다.
-    //     $('#searchButton').click(function() {
-    //         triggerSearch();
-    //     });
-    //     $('#searchKeyword').keydown(function(event) {
-    //         if (event.keyCode === 13) { // Enter 키 코드는 13입니다.
-    //             triggerSearch();
-    //         }
-    //     });
-    //
-    //     function triggerSearch() {
-    //         var searchCondition = $('#searchCondition').val();
-    //         var searchKeyword = $('#searchKeyword').val();
-    //         var starttime = $('#startTime').val();
-    //         var endtime = $('#endTime').val();
-    //         var deleteCondition = $('input[name="deleteCheckbox"]:checked').val();
-    //
-    //         if (searchCondition === "regdate" || searchCondition === "deletetime" || searchCondition === "recovertime") {
-    //             if (!starttime) {
-    //                 alert("시작날짜를 선택해주세요");
-    //                 return;
-    //             }
-    //         } else if(searchCondition === "replycondition"){
-    //             console.log(deleteCondition);
-    //         } else {
-    //             if (!searchKeyword) {
-    //                 alert("검색어를 입력하세요");
-    //                 return;
-    //             }
-    //         }
-    //
-    //         filterTable(searchCondition, searchKeyword, starttime, endtime, deleteCondition);
-    //     }
-    // });
-    //
-    // function filterTable(searchCondition, searchKeyword, starttime, endtime,deleteCondition) {
-    //     // AJAX를 사용하여 서버에 검색 요청을 보냅니다.
-    //     $.ajax({
-    //         url: '/boardAPI/searchReplies', // 검색을 처리하는 서버 엔드포인트 URL
-    //         type: 'GET',
-    //         data: { condition: searchCondition, keyword: searchKeyword, start: starttime, end: endtime, deleteCondition: deleteCondition },
-    //         success: function (data) {
-    //             // 검색 결과를 받아옵니다.
-    //             var searchData = data;
-    //
-    //             console.log(data);
-    //
-    //             // 기존 테이블을 삭제합니다.
-    //             $('.table-responsive').empty();
-    //
-    //             // 새로운 테이블을 만듭니다.
-    //             var newTable = $('<table data-order=\'\[\[1, "desc"\]\]\' class="table table-bordered">').attr('id', 'dataTable').attr('width', '100%').attr('cellspacing', '0');
-    //             var thead = $('<thead>').appendTo(newTable);
-    //             var tbody = $('<tbody>').appendTo(newTable);
-    //
-    //             // 테이블 헤더 생성
-    //             var headerRow = $('<tr>').appendTo(thead);
-    //             $('<th>').text('checkbox').appendTo(headerRow);
-    //             $('<th>').text('번호').appendTo(headerRow);
-    //             $('<th>').text('작성자').appendTo(headerRow);
-    //             $('<th>').text('내용').appendTo(headerRow);
-    //             $('<th>').text('작성일').appendTo(headerRow);
-    //             $('<th>').text('삭제여부').appendTo(headerRow);
-    //             $('<th>').text('삭제일시').appendTo(headerRow);
-    //             $('<th>').text('복원일시').appendTo(headerRow);
-    //
-    //
-    //             // 데이터 출력
-    //             searchData.forEach(function (reply) {
-    //                 var newRow = $('<tr>').appendTo(tbody);
-    //                 $('<td><input class="userCheckbox" type="checkbox"/>').appendTo(newRow);
-    //                 $('<td>').text(reply.id).appendTo(newRow);
-    //                 $('<td>').text(reply.nickname).appendTo(newRow);
-    //                 $('<td>').text(reply.content).appendTo(newRow);
-    //
-    //                 $('<td>').text(formatDate(new Date(reply.regdate))).appendTo(newRow);
-    //                 $('<td>').text(reply.reply_condition).appendTo(newRow);
-    //
-    //
-    //                 if(reply.delete_time ==null){
-    //                     $('<td>').text("").appendTo(newRow);
-    //                 }else{
-    //                     $('<td>').text(formatDate(new Date(reply.delete_time))).appendTo(newRow);
-    //                 }
-    //                 if(reply.recover_time ==null){
-    //                     $('<td>').text("").appendTo(newRow);
-    //                 }else{
-    //                     $('<td>').text(formatDate(new Date(reply.recover_time))).appendTo(newRow);
-    //                 }
-    //
-    //             });
-    //
-    //             tableResponsive = $('<div>').appendTo($('.table-responsive'));
-    //
-    //             // 테이블 생성한 것을 tableResponsive 안에 넣어준다
-    //             tableResponsive.append(newTable);
-    //
-    //             // 새로 생성된 테이블에 DataTables 초기화
-    //             newTable.DataTable({
-    //                 "dom": "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
-    //                     "<'row'<'col-sm-12'tr>>" +
-    //                     "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
-    //                 "renderer": 'bootstrap',
-    //                 "language": {
-    //                     "paginate": {
-    //                         "previous": "previous",
-    //                         "next": "next"
-    //                     }
-    //                 }
-    //             });
-    //         },
-    //         error: function (xhr, status, error) {
-    //             // 에러 처리
-    //             console.error(xhr);
-    //         }
-    //     });
-    // }
-    //
-    // // 날짜 포맷팅 함수
-    // function formatDate(date) {
-    //     if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
-    //         return ''; // date가 null이거나 유효한 날짜가 아니면 빈 문자열 반환
-    //     }
-    //
-    //     var year = date.getFullYear();
-    //     var month = ('0' + (date.getMonth() + 1)).slice(-2); // 월은 0부터 시작하므로 +1
-    //     var day = ('0' + date.getDate()).slice(-2);
-    //     var hours = ('0' + date.getHours()).slice(-2);
-    //     var minutes = ('0' + date.getMinutes()).slice(-2);
-    //     var seconds = ('0' + date.getSeconds()).slice(-2);
-    //
-    //     return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
-    // }
+    $(document).ready(function() {
+
+        $('input[name="deleteCheckbox"]').change(function() {
+            triggerSearch();
+        });
+        // 검색 버튼 클릭 이벤트 핸들러를 등록합니다.
+        $('#searchButton').click(function() {
+            triggerSearch();
+        });
+        $('#searchKeyword').keydown(function(event) {
+            if (event.keyCode === 13) { // Enter 키 코드는 13입니다.
+                triggerSearch();
+            }
+        });
+
+        function triggerSearch() {
+            var searchCondition = $('#searchCondition').val();
+            var searchKeyword = $('#searchKeyword').val();
+            var starttime = $('#startTime').val();
+            var endtime = $('#endTime').val();
+            var deleteCondition = $('input[name="deleteCheckbox"]:checked').val();
+
+            if (searchCondition === "regdate" || searchCondition === "deletetime" || searchCondition === "recovertime") {
+                if (!starttime) {
+                    alert("시작날짜를 선택해주세요");
+                    return;
+                }
+            } else if(searchCondition === "replycondition"){
+                console.log(deleteCondition);
+            } else {
+                if (!searchKeyword) {
+                    alert("검색어를 입력하세요");
+                    return;
+                }
+            }
+
+            filterTable(searchCondition, searchKeyword, starttime, endtime, deleteCondition);
+        }
+    });
+
+    function filterTable(searchCondition, searchKeyword, starttime, endtime,deleteCondition) {
+        // AJAX를 사용하여 서버에 검색 요청을 보냅니다.
+        $.ajax({
+            url: '/workOrder/search', // 검색을 처리하는 서버 엔드포인트 URL
+            type: 'GET',
+            data: { start: starttime },
+            success: function (data) {
+                // 검색 결과를 받아옵니다.
+                var searchData = data;
+
+                console.log(data);
+
+                // 기존 테이블을 삭제합니다.
+                $('.table-responsive').empty();
+
+                // 새로운 테이블을 만듭니다.
+                var newTable = $('<table data-order=\'\[\[1, "desc"\]\]\' class="table table-bordered">').attr('id', 'dataTable').attr('width', '100%').attr('cellspacing', '0');
+                var thead = $('<thead>').appendTo(newTable);
+                var tbody = $('<tbody>').appendTo(newTable);
+
+                // 테이블 헤더 생성
+                var headerRow = $('<tr>').appendTo(thead);
+                $('<th>').text('checkbox').appendTo(headerRow);
+                $('<th>').text('작업번호').appendTo(headerRow);
+                $('<th>').text('제품명').appendTo(headerRow);
+                $('<th>').text('공정').appendTo(headerRow);
+                $('<th>').text('담당자').appendTo(headerRow);
+                $('<th>').text('예정일시').appendTo(headerRow);
+                $('<th>').text('소요시간').appendTo(headerRow);
+                $('<th>').text('시작일시').appendTo(headerRow);
+                $('<th>').text('완료일시').appendTo(headerRow);
+                $('<th>').text('상태').appendTo(headerRow);
+
+
+                // 데이터 출력
+                searchData.forEach(function (workOrder) {
+                    var newRow = $('<tr>').appendTo(tbody);
+
+                    $('<td><input class="replyCheckbox" type="checkbox" value="' + workOrder.workOrderId + '"/>').appendTo(newRow);
+                    $('<td>').text(workOrder.workOrderId).appendTo(newRow);
+                    $('<td>').text(workOrder.productName).appendTo(newRow);
+
+                    var processTypeText = '';
+                    switch (workOrder.processType) {
+                        case 'CLEANING':
+                            processTypeText = '세척';
+                            break;
+                        case 'EXTRACTION':
+                            processTypeText = '추출';
+                            break;
+                        case 'FILTRATION':
+                            processTypeText = '여과';
+                            break;
+                        case 'STERILIZATION':
+                            processTypeText = '살균';
+                            break;
+                        case 'FILLING':
+                            processTypeText = '충진';
+                            break;
+                        case 'INSPECTION':
+                            processTypeText = '검사';
+                            break;
+                        case 'PACKAGING':
+                            processTypeText = '포장';
+                            break;
+                        case 'MIX':
+                            processTypeText = '혼합';
+                            break;
+                        case 'COOLING':
+                            processTypeText = '냉각';
+                            break;
+                    }
+                    $('<td>').text(processTypeText).appendTo(newRow);
+
+                    $('<td>').text(workOrder.worker || '').appendTo(newRow);
+                    $('<td>').text(formatDate(new Date(workOrder.scheduledDate))).appendTo(newRow);
+
+                    $('<td>').text(workOrder.duration + 'H').appendTo(newRow);
+                    // $('<td>').text(workOrder.duration.toHours() + 'H').appendTo(newRow);
+
+                    $('<td>').text(formatDate(new Date(workOrder.start || ''))).appendTo(newRow);
+                    $('<td>').text(formatDate(new Date(workOrder.end || ''))).appendTo(newRow);
+
+                    var statusText = '';
+                    switch (workOrder.workOrdersStatus) {
+                        case 'PENDING':
+                            statusText = '대기';
+                            break;
+                        case 'INPROGRESS':
+                            statusText = '진행중';
+                            break;
+                        case 'COMPLETED':
+                            statusText = '완료';
+                            break;
+                    }
+                    $('<td>').text(statusText).attr('data-status', workOrder.workOrdersStatus).appendTo(newRow);
+
+                });
+
+                tableResponsive = $('<div>').appendTo($('.table-responsive'));
+
+                // 테이블 생성한 것을 tableResponsive 안에 넣어준다
+                tableResponsive.append(newTable);
+
+                // 새로 생성된 테이블에 DataTables 초기화
+                newTable.DataTable({
+                    "dom": "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+                        "<'row'<'col-sm-12'tr>>" +
+                        "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+                    "renderer": 'bootstrap',
+                    "language": {
+                        "paginate": {
+                            "previous": "previous",
+                            "next": "next"
+                        }
+                    }
+                });
+            },
+            error: function (xhr, status, error) {
+                // 에러 처리
+                console.error(xhr);
+            }
+        });
+    }
+
+    // 날짜 포맷팅 함수
+    function formatDate(date) {
+        if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
+            return ''; // date가 null이거나 유효한 날짜가 아니면 빈 문자열 반환
+        }
+
+        var year = date.getFullYear();
+        var month = ('0' + (date.getMonth() + 1)).slice(-2); // 월은 0부터 시작하므로 +1
+        var day = ('0' + date.getDate()).slice(-2);
+        var hours = ('0' + date.getHours()).slice(-2);
+        var minutes = ('0' + date.getMinutes()).slice(-2);
+        // var seconds = ('0' + date.getSeconds()).slice(-2);
+
+        // return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
+        return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes;
+    }
+
 </script>
 
 
@@ -568,19 +627,19 @@
                 // },
                 cache : false,
                 success : function (){
-                    console.log("삭제 처리 되었습니다.");
+                    console.log("시작 및 종료 처리 되었습니다.");
                 },
                 error : function (request, error){
                     if (request.status == '401'){
                         alert("권한이 없습니다.");
                         location.href='/users/login';
                     }else {
-                        alert("삭제처리 오류");
+                        alert("시작 및 종료처리 오류");
                         alert("code: " + request.status + "\n message : " + request.responseText + "\n error : " + error);
                     }
                 }
             });
-            alert("삭제 처리 되었습니다.");
+            // alert("삭제 처리 되었습니다.");
             window.location.reload();
         }
     }

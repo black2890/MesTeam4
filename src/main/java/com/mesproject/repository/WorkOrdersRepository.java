@@ -8,11 +8,13 @@ import com.mesproject.entity.WorkOrders;
 import com.mesproject.entity.WorkPlan;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface WorkOrdersRepository extends JpaRepository<WorkOrders, Long> {
@@ -70,6 +72,9 @@ public interface WorkOrdersRepository extends JpaRepository<WorkOrders, Long> {
 
     // 작업 계획 아이디에 해당하는 모든 작업 지시 내역 반환
     List<WorkOrders> findByWorkPlan_WorkPlanId(Long workPlanId);
+
+    @Query("SELECT w FROM WorkOrders w WHERE FUNCTION('DATE', w.scheduledDate) = :searchDate")
+    List<WorkOrders> findByDailyWorkOrders( @Param("searchDate") LocalDate searchDate);
 
 
 

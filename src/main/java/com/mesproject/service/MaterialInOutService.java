@@ -25,13 +25,14 @@ public class MaterialInOutService {
     private final OrdersMaterialsRepository ordersMaterialsRepository;
     private final WorkPlanRepository workPlanRepository;
     private final ProductRepository productRepository;
+    private final WorkOrdersRepository workOrdersRepository;
 
 
-   /*
-    입고 메서드
-    입출고코드 들고와서 상태 바꿔주기
-    발주일 기준 원자재 lead time 지났는지 유효성 검사(원자재 종류에 따라)
-  */
+    /*
+     입고 메서드
+     입출고코드 들고와서 상태 바꿔주기
+     발주일 기준 원자재 lead time 지났는지 유효성 검사(원자재 종류에 따라)
+   */
     public void In(MaterialOrderDto materialOrderDto){
 
         MaterialOrders materialOrders = materialOrdersRepository.findById(materialOrderDto.getMaterialOrderId())
@@ -43,14 +44,14 @@ public class MaterialInOutService {
 
 
         // deliveryDate 가져오기
-        LocalDate deliveryDate = materialOrders.getDeliveryDate();
+        LocalDateTime deliveryDate = materialOrders.getDeliveryDate();
         if(materialOrderDto.getStorageDate() ==null){
-            materialOrderDto.setStorageDate(deliveryDate.atStartOfDay());
+            materialOrderDto.setStorageDate(deliveryDate);
         }
 
         // storageDate가 deliveryDate 이후인지 확인
 
-        if (materialOrderDto.getStorageDate().isBefore(deliveryDate.atStartOfDay())) {
+        if (materialOrderDto.getStorageDate().isBefore(deliveryDate)) {
             throw new IllegalArgumentException("발주일 기준, 원자재 lead time 이 지나지 않았습니다.");
         }
         //입고 데이터에 입고일, 입고자, 입고상태 저장
@@ -141,7 +142,7 @@ public class MaterialInOutService {
         }
     }
 
-    public void outpackaging(WorkPlan workPlan, LocalDateTime start, String worker) {
+    public void outpackaging(Long workOrderId,WorkPlan workPlan, LocalDateTime start, String worker) {
         Long productId = workPlan.getProduct().getProductId();
         //quantity 는 box 단위
         //즙의 경우, 포장지는 30*quantity 필요, box 는 quantity  필요
@@ -155,17 +156,25 @@ public class MaterialInOutService {
             wrappingQuantity = quantity*25;
         }
             //자재 입출고 테이블에서 입고된 box 선입선출
-            List<MaterialInOut> wrappingPaperList = materialInOutRepository.findAllByProduct_ProductIdOrderByStorageDateAsc(11L);
-            List<MaterialInOut> boxList = materialInOutRepository.findAllByProduct_ProductIdOrderByStorageDateAsc(12L);
+            List<MaterialInOut> wrappingPaperList = materialInOutRepository.findByProductIdAndStatusOrderByStorageDateAsc(11L);
+            List<MaterialInOut> boxList = materialInOutRepository.findByProductIdAndStatusOrderByStorageDateAsc(12L);
 
             for(MaterialInOut materialInOut : wrappingPaperList){
 
                 if(wrappingQuantity >= materialInOut.getQuantity()){
+                    WorkOrders workOrders = workOrdersRepository.findById(workOrderId)
+                            .orElseThrow(EntityNotFoundException::new);
+                    materialInOut.setWorkOrders(workOrders);
                     materialInOut.setMaterialInOutStatus(MaterialInOutStatus.RETRIEVAL);
+                    materialInOut.setRetrievalWorker(worker);
+                    materialInOut.setRetrievalDate(start);
                     wrappingQuantity-=materialInOut.getQuantity();
                     if(wrappingQuantity==0){break;}
                 }else{
                     //기존 재고는 수량만 update
+                    WorkOrders workOrders = workOrdersRepository.findById(workOrderId)
+                            .orElseThrow(EntityNotFoundException::new);
+                    materialInOut.setWorkOrders(workOrders);
                     materialInOut.setQuantity(materialInOut.getQuantity() - wrappingQuantity);
                     //출고한 재고는 출고시킨 수량으로 insert
                    MaterialInOut materialInOut1 = MaterialInOut.updateMaterialInOut(materialInOut, wrappingQuantity, start,worker);
@@ -177,11 +186,19 @@ public class MaterialInOutService {
 
             for(MaterialInOut materialInOut : boxList){
                 if(quantity >= materialInOut.getQuantity()){
+                    WorkOrders workOrders = workOrdersRepository.findById(workOrderId)
+                            .orElseThrow(EntityNotFoundException::new);
+                    materialInOut.setWorkOrders(workOrders);
                     materialInOut.setMaterialInOutStatus(MaterialInOutStatus.RETRIEVAL);
+                    materialInOut.setRetrievalWorker(worker);
+                    materialInOut.setRetrievalDate(start);
                     quantity-=materialInOut.getQuantity();
                     if(quantity==0){break;}
                 }else{
                     //기존 재고는 수량만 update
+                    WorkOrders workOrders = workOrdersRepository.findById(workOrderId)
+                            .orElseThrow(EntityNotFoundException::new);
+                    materialInOut.setWorkOrders(workOrders);
                     materialInOut.setQuantity(materialInOut.getQuantity() - quantity);
                     //출고한 재고는 출고시킨 수량으로 insert
                     MaterialInOut materialInOut1 = MaterialInOut.updateMaterialInOut(materialInOut, quantity, start,worker);
@@ -192,6 +209,63 @@ public class MaterialInOutService {
             }
             orderPackaging(11L);
             orderPackaging(12L);
+
+
+
+
+    }
+
+
+
+
+    public void outMaterial(Long materialId, Long workOrderId, LocalDateTime start, String worker) {
+
+        Long quantity = 0L;
+        if(materialId ==5L || materialId ==6L){
+            quantity= 1000L;
+        }else if(materialId ==7L){
+            quantity = 50L;
+        }else if(materialId ==8L || materialId ==9L){
+            quantity = 20L;
+        }else if(materialId ==10L){
+            quantity = 8L;
+        }
+
+
+        //자재 입출고 테이블에서 입고된 콜라겐 선입선출
+        List<MaterialInOut> collagenList = materialInOutRepository.findByProductIdAndStatusOrderByStorageDateAsc(materialId);
+
+
+        for(MaterialInOut materialInOut : collagenList){
+
+            if(quantity >= materialInOut.getQuantity()){
+                materialInOut.setMaterialInOutStatus(MaterialInOutStatus.RETRIEVAL);
+                WorkOrders workOrders = workOrdersRepository.findById(workOrderId)
+                        .orElseThrow(EntityNotFoundException::new);
+                materialInOut.setWorkOrders(workOrders);
+                materialInOut.setRetrievalWorker(worker);
+                materialInOut.setRetrievalDate(start);
+                quantity-=materialInOut.getQuantity();
+                if(quantity==0){break;}
+
+            }else{
+                //기존 재고는 수량만 update
+                WorkOrders workOrders = workOrdersRepository.findById(workOrderId)
+                        .orElseThrow(EntityNotFoundException::new);
+                materialInOut.setWorkOrders(workOrders);
+                materialInOut.setQuantity(materialInOut.getQuantity() - quantity);
+                //출고한 재고는 출고시킨 수량으로 insert
+                MaterialInOut materialInOut1 = MaterialInOut.updateMaterialInOut(materialInOut, quantity, start,worker);
+                materialInOutRepository.save(materialInOut1);
+                break;
+            }
+
+        }
+
+        if(materialId == 10L){
+            orderPackaging(materialId);
+        }
+
 
 
 
@@ -221,7 +295,7 @@ public class MaterialInOutService {
                 materialInOutRepository.save(materialInOut);
             }
 
-            if(productId == 12L && quantity <=10000){
+            else if(productId == 12L && quantity <=10000){
 
             Product product = productRepository.findById(productId)
                     .orElseThrow(EntityNotFoundException::new);
@@ -234,6 +308,20 @@ public class MaterialInOutService {
             materialOrdersRepository.save(materialOrders);
             materialInOutRepository.save(materialInOut);
         }
+        else if(productId == 10L && quantity <=24L){
+
+            Product product = productRepository.findById(productId)
+                    .orElseThrow(EntityNotFoundException::new);
+            MaterialOrderDto materialOrderDto = new MaterialOrderDto();
+            materialOrderDto.setProductId(productId);
+            materialOrderDto.setMaterialOrderDate(LocalDateTime.now());
+            materialOrderDto.setQuantity(24L);
+            MaterialOrders materialOrders = MaterialOrders.createMaterialOrders(materialOrderDto,product);
+            MaterialInOut materialInOut = MaterialInOut.createMaterialInOut(materialOrders);
+            materialOrdersRepository.save(materialOrders);
+            materialInOutRepository.save(materialInOut);
+        }
+
 
     }
 

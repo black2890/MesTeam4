@@ -4,6 +4,7 @@ import com.mesproject.constant.vendorType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
@@ -18,4 +19,7 @@ public class Vendor {
 
     @Enumerated(EnumType.STRING)
     private vendorType vendorType;
+
+    @ColumnDefault("false")
+    private boolean deleted = false;
 }

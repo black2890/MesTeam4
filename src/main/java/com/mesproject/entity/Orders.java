@@ -22,12 +22,12 @@ public class Orders {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
 
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name = "product_id")
+    @ManyToOne(fetch=FetchType.EAGER)
+    @JoinColumn(name="product_id")
     private Product product;
 
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name = "vendor_id")
+    @ManyToOne(fetch=FetchType.EAGER)
+    @JoinColumn(name="vendor_id")
     private Vendor vendor;
     private Long workPlanId;
     private Long materialOrderId;
@@ -41,7 +41,7 @@ public class Orders {
 
     private LocalDate regDate;
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch=FetchType.EAGER)
     @JoinColumn(name="delivery_vendor_id")
     private Vendor deliveryVendor;
 
@@ -92,13 +92,19 @@ public class Orders {
         }
 
         order.setProduct(product);
-        order.setVendor(vendor);
+        if(vendor!= null){
+            order.setVendor(vendor);
+        }
+
         order.setQuantity(orderDto.getQuantity());
         if(orderDto.getQuantity() ==999){
             order.setQuantity(1000L);
         }
-        order.setDeliveryDate(orderDto.getDeliveryDate());
-        order.setDeliveryAddress(orderDto.getDeliveryAddress());
+        if(orderDto.getVendorId()== null){
+            order.setDeliveryDate(orderDto.getDeliveryDate());
+            order.setDeliveryAddress(orderDto.getDeliveryAddress());
+        }
+
         order.setOrdersStatus(OrdersStatus.PENDINGSTORAGE);
         order.setRegDate(LocalDate.now());
 

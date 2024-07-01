@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -67,8 +68,12 @@ public class OrderService {
         Product product = productRepository.findById(orderDto.getProductId())
                 .orElseThrow(EntityNotFoundException::new);
 
-        Vendor vendor = vendorRepository.findById(orderDto.getVendorId())
-                .orElseThrow(EntityNotFoundException::new);
+        Vendor vendor = null;
+        if(orderDto.getVendorId() != null){
+            vendor = vendorRepository.findById(orderDto.getVendorId())
+                    .orElseThrow(EntityNotFoundException::new);
+        }
+
         /*
         수량에 따라, 발주량, 생산계획 조정 필요
          */
@@ -127,8 +132,8 @@ public class OrderService {
         // 납품예정일 저장해야함(지금 기준 이틀 뒤?, 원래는 생산 일정에 맞춰 발주하는 게 맞음)--> 첫 생산계획 3일 전?
         MaterialOrderDto materialOrderDto1 = new MaterialOrderDto();
         materialOrderDto1.setProductId(materialId1);
-        materialOrderDto1.setMaterialOrderDate(productionDate.minusDays(7));
-   //     materialOrderDto1.setDeliveryDate(productionDate);
+        materialOrderDto1.setMaterialOrderDate(LocalDateTime.now());
+        //     materialOrderDto1.setDeliveryDate(productionDate);
         if(orderDto.getProductId()==1 || orderDto.getProductId()==2){
             materialOrderDto1.setQuantity(1000L);
         }else if(orderDto.getProductId()==3||orderDto.getProductId()==4){
@@ -136,17 +141,17 @@ public class OrderService {
         }
         MaterialOrderDto materialOrderDto2 = new MaterialOrderDto();
         materialOrderDto2.setProductId(materialId2);
-        materialOrderDto2.setMaterialOrderDate(productionDate.minusDays(7));
-      //  materialOrderDto2.setDeliveryDate(productionDate);
+        materialOrderDto2.setMaterialOrderDate(LocalDateTime.now());
+        //  materialOrderDto2.setDeliveryDate(productionDate);
         if(orderDto.getProductId()==1 || orderDto.getProductId()==2){
             materialOrderDto2.setQuantity(50L);
         }else if(orderDto.getProductId()==3||orderDto.getProductId()==4){
-            materialOrderDto2.setQuantity(20L);
+            materialOrderDto2.setQuantity(24L);
         }
 
 
 
-      //수주-발주 리스트 생성
+        //수주-발주 리스트 생성
         // 수주-작업계획 리스트 생성
         //현재방식의 문제점 : workplan 3 을 333으로 저장해버림. 실제 생산량과 괴리 있음.
         List<OrdersMaterials> ordersMaterialsList = new ArrayList<>();
@@ -200,20 +205,20 @@ public class OrderService {
             }
             count++;
             if(isIntegrated && count==2){
-                    OrdersPlan ordersPlan = ordersPlanRepository.findFirstByWorkPlan_WorkPlanIdOrderByOrders_OrderIdAsc(
-                            tempWorkPlan.getWorkPlanId()).orElseThrow(EntityNotFoundException::new);
-                    Long orderId = ordersPlan.getOrders().getOrderId();
-                    List<OrdersMaterials> ordersMaterials = ordersMaterialsRepository.findByOrders_OrderId(orderId);
-                    List<MaterialOrders> materialOrders = new ArrayList<>();;
+                OrdersPlan ordersPlan = ordersPlanRepository.findFirstByWorkPlan_WorkPlanIdOrderByOrders_OrderIdAsc(
+                        tempWorkPlan.getWorkPlanId()).orElseThrow(EntityNotFoundException::new);
+                Long orderId = ordersPlan.getOrders().getOrderId();
+                List<OrdersMaterials> ordersMaterials = ordersMaterialsRepository.findByOrders_OrderId(orderId);
+                List<MaterialOrders> materialOrders = new ArrayList<>();;
 
-                    for(OrdersMaterials ordersMaterial: ordersMaterials){
-                        materialOrders.add(ordersMaterial.getMaterialOrders());
-                    }
-                    for(MaterialOrders materialOrder: materialOrders){
-                        //수주-발주 엔티티 생성 : 수주코드 저장은 createorder 에서
-                        OrdersMaterials ordersMaterial = OrdersMaterials.createOrdersMaterials(materialOrder);
-                        ordersMaterialsList.add(ordersMaterial);
-                    }
+                for(OrdersMaterials ordersMaterial: ordersMaterials){
+                    materialOrders.add(ordersMaterial.getMaterialOrders());
+                }
+                for(MaterialOrders materialOrder: materialOrders){
+                    //수주-발주 엔티티 생성 : 수주코드 저장은 createorder 에서
+                    OrdersMaterials ordersMaterial = OrdersMaterials.createOrdersMaterials(materialOrder);
+                    ordersMaterialsList.add(ordersMaterial);
+                }
 
                 //수주-작업계획 엔티티 생성 :  수주코드 저장은 createorder 에서
                 OrdersPlan tempOrdersPlan = OrdersPlan.createOrdersPlan(tempWorkPlan);
@@ -223,7 +228,7 @@ public class OrderService {
 
 
             }
-          else{
+            else{
                 //발주, 입출고 엔티티생성
                 Product product1 = productRepository.findById(materialId1)
                         .orElseThrow(EntityNotFoundException::new);
@@ -232,19 +237,24 @@ public class OrderService {
                 materialOrdersRepository.save(materialOrders1);
                 materialInOutRepository.save(materialInOut1);
 
-
-                Product product2 = productRepository.findById(materialId2)
-                        .orElseThrow(EntityNotFoundException::new);
-                MaterialOrders materialOrders2 = MaterialOrders.createMaterialOrders(materialOrderDto2, product2);
-                MaterialInOut materialInOut2 = MaterialInOut.createMaterialInOut(materialOrders2);
-                materialOrdersRepository.save(materialOrders2);
-                materialInOutRepository.save(materialInOut2);
-
+                MaterialInOut materialInOut2 =null;
+             if(materialId2!=10L || materialId2==10L &&
+                     materialInOutRepository.sumQuantityByProductIdAndStatus(materialId2)
+                             +materialInOutRepository.sumQuantityByProductIdAndPendingStatus(materialId2)<8) {
+                 Product product2 = productRepository.findById(materialId2)
+                         .orElseThrow(EntityNotFoundException::new);
+                 MaterialOrders materialOrders2 = MaterialOrders.createMaterialOrders(materialOrderDto2, product2);
+                 materialInOut2 = MaterialInOut.createMaterialInOut(materialOrders2);
+                 materialOrdersRepository.save(materialOrders2);
+                 materialInOutRepository.save(materialInOut2);
+                 OrdersMaterials ordersMaterials2 = OrdersMaterials.createOrdersMaterials(materialOrders2);
+                 ordersMaterialsList.add(ordersMaterials2);
+             }
                 //수주-발주 엔티티 생성 : 수주코드 저장은 createorder 에서
                 OrdersMaterials ordersMaterials1 = OrdersMaterials.createOrdersMaterials(materialOrders1);
-                OrdersMaterials ordersMaterials2 = OrdersMaterials.createOrdersMaterials(materialOrders2);
+
                 ordersMaterialsList.add(ordersMaterials1);
-                ordersMaterialsList.add(ordersMaterials2);
+
 
                 if(orderDto.getProductId()==1||orderDto.getProductId()==2 && workPlan != null){
                     Long checkProductId ;
@@ -316,7 +326,7 @@ public class OrderService {
                                 }
 
                                 //추출기 사용할 수 있는지 확인
-                               tempWorkPlanList2 = workPlanRepository.findByProducts_ProductIdAndEnd(1L, 2L, productionDate.toLocalDate());
+                                tempWorkPlanList2 = workPlanRepository.findByProducts_ProductIdAndEnd(1L, 2L, productionDate.toLocalDate());
                                 if(!tempWorkPlanList2.isEmpty()){
                                     while(tempWorkPlanList2.size()>=2){
                                         productionDate = productionDate.plusDays(1);
@@ -427,18 +437,19 @@ public class OrderService {
         양배추, 흑마늘에 세척 저장
         벌꿀에 충진 저장
 
+        혼합에 석류, 매실,콜라겐 저장
          */
                 for(WorkOrders workOrders : workOrdersList){
                     if(workOrders.getProcessType()== ProcessType.CLEANING){
                         materialInOut1.setWorkOrders(workOrders);
                     }
-                    else if(workOrders.getProcessType()== ProcessType.FILLING){
+                    else if( materialId2 == 7L && workOrders.getProcessType()== ProcessType.FILLING){
                         materialInOut2.setWorkOrders(workOrders);
 
                     }
-                    else if(workOrders.getProcessType()== ProcessType.MIX){
+                    else if( workOrders.getProcessType()== ProcessType.MIX){
                         materialInOut1.setWorkOrders(workOrders);
-                        materialInOut2.setWorkOrders(workOrders);
+                        //materialInOut2.setWorkOrders(workOrders);
                     }
                 }
             }
@@ -734,17 +745,17 @@ public class OrderService {
             }
 
             for(WorkPlan temp:workPlanList){
-                    if(temp.getStart().toLocalDate().equals(productionDate)){
-                        productionDate = productionDate.plusDays(1);
+                if(temp.getStart().toLocalDate().equals(productionDate)){
+                    productionDate = productionDate.plusDays(1);
 
-                    }else{
-                        count++;
-                        if(count==numberOfProduction){
-                            //생산완료 후 3일 뒤 배송완료
-                            return productionDate.plusDays(3);
-                        }
-                        productionDate = productionDate.plusDays(1);
+                }else{
+                    count++;
+                    if(count==numberOfProduction){
+                        //생산완료 후 3일 뒤 배송완료
+                        return productionDate.plusDays(3);
                     }
+                    productionDate = productionDate.plusDays(1);
+                }
 
 
             }
@@ -756,8 +767,8 @@ public class OrderService {
 
 
         }
-    return null;
-        
+        return null;
+
     }
     public List<OrderDto> parseExcelFile(MultipartFile file) throws Exception {
         List<OrderDto> orders = new ArrayList<>();
@@ -776,15 +787,15 @@ public class OrderService {
                 orderDto.setProductId((long) row.getCell(0).getNumericCellValue());
                 orderDto.setVendorId((long) row.getCell(1).getNumericCellValue());
                 orderDto.setQuantity((long) row.getCell(2).getNumericCellValue());
-      //          row.getCell(3).getStringCellValue();
+                //          row.getCell(3).getStringCellValue();
 //                Date date = sdf.parse(row.getCell(3).getStringCellValue());
                 Date date = row.getCell(3).getDateCellValue();
-                LocalDateTime localDateTime = new java.sql.Timestamp(date.getTime()).toLocalDateTime();
+                LocalDateTime localDateTime = new Timestamp(date.getTime()).toLocalDateTime();
 
 
 //
 //                orderDto.setDeliveryDate(parseDate(row.getCell(3).getDateCellValue()));
-    //            orderDto.setDeliveryDate(LocalDateTime.parse(sdf.format(row.getCell(3).getDateCellValue())));
+                //            orderDto.setDeliveryDate(LocalDateTime.parse(sdf.format(row.getCell(3).getDateCellValue())));
 
                 orderDto.setDeliveryDate(localDateTime);
                 orderDto.setDeliveryAddress(row.getCell(4).getStringCellValue());
@@ -804,7 +815,10 @@ public class OrderService {
         }
     }
 
-// 엑셀 파싱 코드에서
+    public List<Map<String, Object>> getRelatedOrdersByWorkPlanId(Long workPlanId) {
+        return workPlanRepository.findOrdersByWorkPlanId(workPlanId);
+    }
+
 
 
 

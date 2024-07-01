@@ -27,4 +27,11 @@ public class WorkPlanDto {
         this.end = workPlan.getEnd();
         this.workPlanStatus = workPlan.getWorkPlanStatus().toString(); // Enum 값을 문자열로 변환
     }
+
+    public WorkPlanDto(Long workPlanId, LocalDateTime start, LocalDateTime end, String productName) {
+        this.workPlanId = workPlanId;
+        this.start = start;
+        this.end = end;
+        this.productName = productName;
+    }
 }

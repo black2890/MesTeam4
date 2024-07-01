@@ -5,6 +5,7 @@ import com.mesproject.constant.WorkOrdersStatus;
 import com.mesproject.dto.*;
 import com.mesproject.entity.*;
 import com.mesproject.repository.InventoryRepository;
+import com.mesproject.repository.MaterialInOutRepository;
 import com.mesproject.repository.WorkOrdersRepository;
 import com.mesproject.repository.WorkPlanRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -14,7 +15,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -29,6 +33,7 @@ public class WorkOrdersService {
     private final InventoryRepository inventoryRepository;
     private final MaterialInOutService materialInOutService;
     private final WorkPlanServicce workPlanService;
+    private final MaterialInOutRepository materialInOutRepository;
 
     public List<WorkOrders> createWorkOrders(WorkPlan workPlan){
         List<WorkOrders> workOrdersList = new ArrayList<>();
@@ -214,16 +219,41 @@ public class WorkOrdersService {
         workOrders.setWorker(workOrdersDto.getWorker());
         workOrders.setWorkOrdersStatus(WorkOrdersStatus.INPROGRESS);
 
+        Long materialId1 =0L;
+        Long materialId2 =0L;
+        if(workPlan.getProduct().getProductId() ==1L){
+            materialId1 = 5L;
+            materialId2 = 7L;
+        }else if(workPlan.getProduct().getProductId() ==2L){
+            materialId1 = 6L;
+            materialId2 = 7L;
+        }else if(workPlan.getProduct().getProductId() ==3L){
+            materialId1 = 8L;
+            materialId2 = 10L;
+        }else if(workPlan.getProduct().getProductId() ==4L){
+            materialId1 = 9L;
+            materialId2 = 10L;
+        }
+
+
         // 공정에 필요한 원자재 출고 처리
         //포장지, box 도 출고해야 함( 생산량에 따라)
         switch (workOrders.getProcessType()) {
             case CLEANING:
+                materialInOutService.outMaterial(materialId1,workOrders.getWorkOrderId(), workOrdersDto.getStart(),workOrdersDto.getWorker());
+                break;
             case FILLING:
+                if(materialId2==7L){
+                    materialInOutService.outMaterial(materialId2,workOrders.getWorkOrderId(), workOrdersDto.getStart(),workOrdersDto.getWorker());
+                }
+                break;
             case MIX:
-                materialInOutService.Out(workOrders.getWorkOrderId(),workOrdersDto.getStart(),workOrdersDto.getWorker());
+                materialInOutService.outMaterial(materialId1,workOrders.getWorkOrderId(), workOrdersDto.getStart(),workOrdersDto.getWorker());
+                materialInOutService.outMaterial(materialId2,workOrders.getWorkOrderId(), workOrdersDto.getStart(),workOrdersDto.getWorker());
                  break;
             case PACKAGING:
-                materialInOutService.outpackaging(workPlan,workOrdersDto.getStart(),workOrdersDto.getWorker());
+                materialInOutService.outpackaging(workOrders.getWorkOrderId(),workPlan,workOrdersDto.getStart(),workOrdersDto.getWorker());
+                break;
             default:
                 break;
 
@@ -324,4 +354,25 @@ public class WorkOrdersService {
 //    public List<WorkOrders> findByWorkPlanId(Long workPlanId) {
 //        return workOrdersRepository.findByWorkPlan_WorkPlanId(workPlanId);
 //    }
+    public List<WorkOrders> findByWorkPlanId(Long workPlanId) {
+        return workOrdersRepository.findByWorkPlan_WorkPlanId(workPlanId);
+    }
+    public List<WorkOrders> searchDailyWorkOrders(String start) {
+        LocalDateTime startDateTime = convertStringToLocalDateTime(start, false);
+
+
+            return workOrdersRepository.findByDailyWorkOrders(startDateTime.toLocalDate());
+
+
+
+        // 검색 조건이 잘못된 경우 처리
+       // throw new IllegalArgumentException("Invalid search condition: " + condition);
+    }
+    // 날짜 문자열을 LocalDateTime으로 변환하는 유틸리티 메서드
+    private LocalDateTime convertStringToLocalDateTime(String dateStr, boolean isEndOfDay) {
+        LocalDate localDate = LocalDate.parse(dateStr, DateTimeFormatter.ISO_DATE);
+        return isEndOfDay ? LocalDateTime.of(localDate, LocalTime.MAX) : LocalDateTime.of(localDate, LocalTime.MIN);
+    }
+
+
 }

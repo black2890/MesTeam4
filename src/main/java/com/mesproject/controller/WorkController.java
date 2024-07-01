@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
@@ -27,7 +28,8 @@ public class WorkController {
     @GetMapping("/data/workOrders")
     public String workOrders(Model model){
 
-        List<WorkOrders> workOrders = workOrdersRepository.findAll();
+//        List<WorkOrders> workOrders = workOrdersRepository.findAll();
+        List<WorkOrders> workOrders = workOrdersRepository.findByDailyWorkOrders(LocalDate.now());
         model.addAttribute("workOrders", workOrders);
         return "workOrders";
     }
@@ -67,7 +69,6 @@ public class WorkController {
         return ResponseEntity.ok()
                 .build();
     }
-
 
 
 

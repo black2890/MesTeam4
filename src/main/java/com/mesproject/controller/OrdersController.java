@@ -9,6 +9,10 @@ import com.mesproject.dto.WorkOrdersDto;
 import com.mesproject.entity.Orders;
 import com.mesproject.entity.Product;
 import com.mesproject.entity.Vendor;
+import com.mesproject.dto.OrderDetailsDto;
+import com.mesproject.dto.OrderDto;
+import com.mesproject.dto.OrderStatusUpdateRequest;
+import com.mesproject.entity.*;
 import com.mesproject.repository.OrdersRepository;
 import com.mesproject.repository.ProductRepository;
 import com.mesproject.repository.VendorRepository;
@@ -20,6 +24,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @RestController
 public class OrdersController {
@@ -240,4 +246,15 @@ public class OrdersController {
                 .build();
     }
 
+
+    @GetMapping("/api/orders/details")
+    public ResponseEntity<List<Map<String, Object>>> getOrderDetails(@RequestParam("orderId") Long orderId) {
+        List<Map<String, Object>> orderDetails = ordersService.getOrderDetails(orderId);
+        return ResponseEntity.ok(orderDetails);
+    }
+
+    @GetMapping("/api/orders/related")
+    public List<Map<String, Object>> getRelatedOrders(@RequestParam Long workPlanId) {
+        return orderService.getRelatedOrdersByWorkPlanId(workPlanId);
+    }
 }
