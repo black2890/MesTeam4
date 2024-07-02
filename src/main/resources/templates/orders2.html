@@ -92,148 +92,134 @@
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.js"></script>
 <!-- Bootstrap JS -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-<!-- Page Wrapper -->
-<div id="wrapper">
 
-    <!-- Content Wrapper -->
-    <div id="content-wrapper" class="d-flex flex-column">
+<div th:include="~{fragments/header :: .header}"></div>
 
-        <!-- 사이드바 영역 -->
-        <div th:include="~{fragments/sidebar :: .sidebar}"></div>
-        <!-- Main Content -->
-        <div id="content">
+<div style="display: flex; flex-direction: row">
+    <!-- 사이드바 영역 -->
+    <ul style="list-style-type : none; background-color: #ffffff" th:include="~{fragments/sidebar :: .sidebar}" ></ul>
+    <!-- Main Content -->
+    <div id="content">
 
 
-            <!-- 헤더 -->
-            <!--            <div th:include="~{admin/fragments/adminHeader :: #header}"></div>-->
+        <!-- 헤더 -->
+        <!--            <div th:include="~{admin/fragments/adminHeader :: #header}"></div>-->
 
 
-            <!-- Begin Page Content -->
-            <div class="container-fluid">
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
 
 
-                <!-- DataTales Example -->
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">수주 현황</h6>
-                    </div>
-
-                    <!--검색 및 버튼-->
-                    <div class="card-body">
-                        <div class="form-inline">
-                            <ul class="mr-auto">
-                                <!--검색-->
-                                <select class="form-control" style="width: auto;" id="searchCondition">
-
-                                    <option value="content">제품명</option>
-                                    <option value="deletetime">발주일</option>
-                                    <option value="recovertime">납품일</option>
-                                    <option value="replycondition">상태</option>
-
-                                </select>
-                                <!-- 검색어 입력란 -->
-                                <input type="text" class="form-control" placeholder="검색어를 입력해주세요." id="searchKeyword">
-
-                                <!-- 시작 날짜 선택 -->
-                                <input type="date" class="form-control d-none" id="startTime">
-
-                                <!-- 끝 날짜 선택 -->
-                                <input type="date" class="form-control d-none" id="endTime">
-
-                                <!-- 삭제여부 선택 -->
-                                <div id="deleteCheckBox" class="form-check form-check-inline ml-2">
-                                    <label class="form-check-label p-2" style="margin-left: 10px" for="deleteCheckboxY">입고대기</label>
-                                    <input class="form-check-input" type="radio" name="deleteCheckbox" id="deleteCheckboxY" value="PENDINGSTORAGE">
-                                    <label class="form-check-label p-2" style="margin-left: 10px" for="deleteCheckboxN">입고완료</label>
-                                    <input class="form-check-input" type="radio" name="deleteCheckbox" id="deleteCheckboxN" value="STORAGECOMPLETED">
-                                </div>
-
-                                <!-- 검색 버튼 -->
-                                <button id="searchButton" type="submit" class="btn btn-primary">검색</button>
-
-                            </ul>
-                        </div>
-
-
-                        <button type="button" class="btn btn-primary mb-4 float-right" data-toggle="modal" data-target="#orderModal">
-                            수주 등록
-                        </button>
-                        <!-- 버튼 -->
-                        <button type="button" class="btn btn-primary mb-4 float-right" data-toggle="modal" data-target="#orderModal2">
-                            일괄 등록
-                        </button>
-                        <div>
-                            <button id="downloadExcel" class="btn btn-primary">엑셀 다운로드</button>
-                        </div>
-
-                        <div class="table-responsive">
-                            <table data-order='[[1, "desc"]]' class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                <thead>
-                                <tr>
-                                    <th>checkbox</th>
-                                    <th>주문번호</th>
-                                    <th>거래처</th>
-                                    <th>제품명</th>
-                                    <th>수량</th>
-                                    <th>납품주소</th>
-                                    <th>납기일</th>
-                                    <th>상태</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <!-- Thymeleaf 반복문을 이용하여 데이터 출력 -->
-                                <tr th:each="order : ${orders}">
-                                    <td><input class="replyCheckbox" type="checkbox" th:value="${order.getOrderId()}"/></td>
-                                    <td th:text="${order.getOrderId()}"></td>
-
-                                    <td th:text="${order.getVendorName() != null ?
-                                    order.getVendorName() : ''}"></td>
-                                    <td th:text="${order.getProductName()}"></td>
-                                    <td th:text="${order.getQuantity()}"></td>
-                                    <td th:text="${order.getDeliveryAddress() != null ?
-                                    order.getDeliveryAddress() : ''}"></td>
-
-                                    <td th:text="${#temporals.format(order.getDeliveryDate(), 'yyyy.MM.dd')}"></td>
-
-
-
-                                    <td th:if="${order.getOrdersStatus() == T(com.mesproject.constant.OrdersStatus).PENDINGSTORAGE}"
-                                        data-status="PENDINGSTORAGE">자재 입고 전</td>
-                                    <td th:if="${order.getOrdersStatus() == T(com.mesproject.constant.OrdersStatus).STORAGECOMPLETED}"
-                                        data-status="STORAGECOMPLETED">자재 입고 완료</td>
-                                    <td th:if="${order.getOrdersStatus() == T(com.mesproject.constant.OrdersStatus).PRODUCTIONCOMPLETED}"
-                                        data-status="PRODUCTIONCOMPLETED">생산 완료</td>
-                                    <td th:if="${order.getOrdersStatus() == T(com.mesproject.constant.OrdersStatus).RETRIEVALCOMPLETED}"
-                                        data-status="RETRIEVALCOMPLETED">출하 완료</td>
-                                    <td th:if="${order.getOrdersStatus() == T(com.mesproject.constant.OrdersStatus).DELIVERED}"
-                                        data-status="DELIVERED">배송 완료</td>
-
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+            <!-- DataTales Example -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">수주 현황</h6>
                 </div>
 
+                <!--검색 및 버튼-->
+                <div class="card-body">
+                    <div class="form-inline">
+                        <ul class="mr-auto">
+                            <!--검색-->
+                            <select class="form-control" style="width: auto;" id="searchCondition">
+
+                                <option value="content">제품명</option>
+                                <option value="deletetime">발주일</option>
+                                <option value="recovertime">납품일</option>
+                                <option value="replycondition">상태</option>
+
+                            </select>
+                            <!-- 검색어 입력란 -->
+                            <input type="text" class="form-control" placeholder="검색어를 입력해주세요." id="searchKeyword">
+
+                            <!-- 시작 날짜 선택 -->
+                            <input type="date" class="form-control d-none" id="startTime">
+
+                            <!-- 끝 날짜 선택 -->
+                            <input type="date" class="form-control d-none" id="endTime">
+
+                            <!-- 삭제여부 선택 -->
+                            <div id="deleteCheckBox" class="form-check form-check-inline ml-2">
+                                <label class="form-check-label p-2" style="margin-left: 10px" for="deleteCheckboxY">입고대기</label>
+                                <input class="form-check-input" type="radio" name="deleteCheckbox" id="deleteCheckboxY" value="PENDINGSTORAGE">
+                                <label class="form-check-label p-2" style="margin-left: 10px" for="deleteCheckboxN">입고완료</label>
+                                <input class="form-check-input" type="radio" name="deleteCheckbox" id="deleteCheckboxN" value="STORAGECOMPLETED">
+                            </div>
+
+                            <!-- 검색 버튼 -->
+                            <button id="searchButton" type="submit" class="btn btn-primary">검색</button>
+
+                        </ul>
+                    </div>
+
+
+                    <button type="button" class="btn btn-primary mb-4 float-right" data-toggle="modal" data-target="#orderModal">
+                        수주 등록
+                    </button>
+                    <!-- 버튼 -->
+                    <button type="button" class="btn btn-primary mb-4 float-right" data-toggle="modal" data-target="#orderModal2">
+                        일괄 등록
+                    </button>
+                    <div>
+                        <button id="downloadExcel" class="btn btn-primary">엑셀 다운로드</button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table data-order='[[1, "desc"]]' class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                            <tr>
+                                <th>checkbox</th>
+                                <th>주문번호</th>
+                                <th>거래처</th>
+                                <th>제품명</th>
+                                <th>수량</th>
+                                <th>납품주소</th>
+                                <th>납기일</th>
+                                <th>상태</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <!-- Thymeleaf 반복문을 이용하여 데이터 출력 -->
+                            <tr th:each="order : ${orders}">
+                                <td><input class="replyCheckbox" type="checkbox" th:value="${order.getOrderId()}"/></td>
+                                <td th:text="${order.getOrderId()}"></td>
+
+                                <td th:text="${order.getVendorName() != null ?
+                                order.getVendorName() : ''}"></td>
+                                <td th:text="${order.getProductName()}"></td>
+                                <td th:text="${order.getQuantity()}"></td>
+                                <td th:text="${order.getDeliveryAddress() != null ?
+                                order.getDeliveryAddress() : ''}"></td>
+
+                                <td th:text="${#temporals.format(order.getDeliveryDate(), 'yyyy.MM.dd')}"></td>
+
+
+
+                                <td th:if="${order.getOrdersStatus() == T(com.mesproject.constant.OrdersStatus).PENDINGSTORAGE}"
+                                    data-status="PENDINGSTORAGE">자재 입고 전</td>
+                                <td th:if="${order.getOrdersStatus() == T(com.mesproject.constant.OrdersStatus).STORAGECOMPLETED}"
+                                    data-status="STORAGECOMPLETED">자재 입고 완료</td>
+                                <td th:if="${order.getOrdersStatus() == T(com.mesproject.constant.OrdersStatus).PRODUCTIONCOMPLETED}"
+                                    data-status="PRODUCTIONCOMPLETED">생산 완료</td>
+                                <td th:if="${order.getOrdersStatus() == T(com.mesproject.constant.OrdersStatus).RETRIEVALCOMPLETED}"
+                                    data-status="RETRIEVALCOMPLETED">출하 완료</td>
+                                <td th:if="${order.getOrdersStatus() == T(com.mesproject.constant.OrdersStatus).DELIVERED}"
+                                    data-status="DELIVERED">배송 완료</td>
+
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-            <!-- /.container-fluid -->
 
         </div>
-        <!-- End of Main Content -->
-
-        <!-- 푸터 -->
-        <!--        <div th:include="~{fragments/footer :: #footer}"></div>-->
+        <!-- /.container-fluid -->
 
     </div>
-    <!-- End of Content Wrapper -->
-
+    <!-- End of Main Content -->
 </div>
-<!-- End of Page Wrapper -->
 
-<!-- Scroll to Top Button-->
-<a class="scroll-to-top rounded" href="#page-top">
-    <i class="fas fa-angle-up"></i>
-</a>
 
 
 <!-- Order Modal -->
@@ -250,7 +236,7 @@
             <div class="modal-body">
                 <form id="orderForm">
                     <div class="form-group">
-                        <label for="productName">Product</label>
+                        <label for="productName">제품명</label>
                         <select class="form-control" id="productName" name="productName" required>
                             <option value="양배추 즙">양배추 즙</option>
                             <option value="흑마늘 즙">흑마늘 즙</option>
@@ -260,7 +246,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="quantity">Quantity(Box)</label>
+                        <label for="quantity">수량(Box)</label>
                         <input type="number" class="form-control" id="quantity" name="quantity" min="20" max="1000" required>
                     </div>
                     <div class="form-group">
@@ -269,14 +255,14 @@
 
                     </div>
                     <div class="form-group">
-                        <label for="vendorName">Vendor</label>
+                        <label for="vendorName">고객명</label>
                         <select class="form-control" id="vendorName" name="vendorName" required>
                             <!-- Options will be populated by JavaScript -->
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="deliveryDate">Delivery Date</label>
+                        <label for="deliveryDate">납품일자</label>
                         <div class="input-group">
                             <input type="date" class="form-control" id="deliveryDate" name="deliveryDate"
                                    required>
@@ -290,7 +276,7 @@
 
 
                     <div class="form-group">
-                        <label for="deliveryAddress">Delivery Address</label>
+                        <label for="deliveryAddress">납품주소</label>
                         <input type="text" class="form-control" id="deliveryAddress" name="deliveryAddress" required>
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>

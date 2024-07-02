@@ -238,9 +238,21 @@ public class OrderService {
                 materialInOutRepository.save(materialInOut1);
 
                 MaterialInOut materialInOut2 =null;
+                Long quantity1;
+                Long quantity2;
+                if(materialInOutRepository.sumQuantityByProductIdAndStatus(materialId2) != null){
+                    quantity1 =    materialInOutRepository.sumQuantityByProductIdAndStatus(materialId2);
+                }else{
+                    quantity1 = 0L;
+                }
+                if(materialInOutRepository.sumQuantityByProductIdAndPendingStatus(materialId2) != null){
+                    quantity2 =    materialInOutRepository.sumQuantityByProductIdAndPendingStatus(materialId2);
+                }else{
+                    quantity2 = 0L;
+                }
+
              if(materialId2!=10L || materialId2==10L &&
-                     materialInOutRepository.sumQuantityByProductIdAndStatus(materialId2)
-                             +materialInOutRepository.sumQuantityByProductIdAndPendingStatus(materialId2)<8) {
+                     quantity1+ quantity2<8) {
                  Product product2 = productRepository.findById(materialId2)
                          .orElseThrow(EntityNotFoundException::new);
                  MaterialOrders materialOrders2 = MaterialOrders.createMaterialOrders(materialOrderDto2, product2);

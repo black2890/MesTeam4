@@ -1,6 +1,31 @@
-<canvas id="productionChart" width="800" height="400"></canvas>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>MES</title>
+
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+
+<div th:include="~{fragments/header :: .header}"></div>
+
+<div style="display: flex; flex-direction: row">
+    <!-- 사이드바 영역 -->
+    <ul style="list-style-type : none; background-color: #ffffff; width: 800px; height:800px"
+        th:include="~{fragments/sidebar :: .sidebar}"></ul>
+    <!-- Main Content -->
+    <canvas id="productionChart" width="500px"></canvas>
+    <!-- End of Main Content -->
+</div>
+
 <link rel="stylesheet" type="text/css" th:href="@{/styles.css}">
-<div th:include="~{fragments/sidebar :: .sidebar}"></div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <!-- Chart.js CDN -->
@@ -37,7 +62,7 @@
         ],
         options: {
             maintainAspectRatio: false,
-            responsive: true,
+            responsive: false,
             layout: {
                 padding: {
                     left: 20,
@@ -65,8 +90,8 @@
     };
 
     // AJAX로 데이터 가져오기
-    $.get('/api/production-data', function(data) {
-        data.forEach(function(item) {
+    $.get('/api/production-data', function (data) {
+        data.forEach(function (item) {
             chartData.labels.push(item.end);
             chartData.datasets[0].data.push(item.productName === '양배추 즙' ? item.totalQuantity : 0);
             chartData.datasets[1].data.push(item.productName === '흑마늘 즙' ? item.totalQuantity : 0);
@@ -78,7 +103,7 @@
             type: 'line',
             data: chartData,
             options: {
-                responsive: true,
+                responsive: false,
                 title: {
                     display: true,
                     text: '제품별 생산량'
@@ -105,6 +130,8 @@
         });
     });
 </script>
-<script type="text/javascript" src="/js/sideBar.js"></script>
+<!--<script type="text/javascript" src="/js/sideBar.js"></script>-->
+</body>
+</html>
 
 

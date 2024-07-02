@@ -68,14 +68,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
 
-<!-- Page Wrapper -->
-<div id="wrapper">
-
-    <!-- Content Wrapper -->
-    <div id="content-wrapper" class="d-flex flex-column">
-
-        <!-- 사이드바 영역 -->
-        <div th:include="~{fragments/sidebar :: .sidebar}"></div>
+<div style="display: flex; flex-direction: row">
+    <!-- 사이드바 영역 -->
+    <ul style="list-style-type : none; background-color: #ffffff" th:include="~{fragments/sidebar :: .sidebar}" ></ul>
         <!-- Main Content -->
         <div id="content">
 
@@ -127,12 +122,13 @@
 
 
                         </div>
-                        <button type="button" class="btn btn-primary mb-4 float-right" data-toggle="modal" data-target="#orderModal">
-                            시작
-                        </button>
                         <button type="button" class="btn btn-primary mb-4 float-right" data-toggle="modal" data-target="#orderModal2">
                             완료
                         </button>
+                        <button type="button" class="btn btn-primary mb-4 float-right" data-toggle="modal" data-target="#orderModal">
+                            시작
+                        </button>
+
 
                         <button class="btn btn-warning btn-icon-split" style="padding: 5px" onclick="startWorks()">일괄 시작 및 종료</button>
 
@@ -205,13 +201,10 @@
     </div>
     <!-- End of Content Wrapper -->
 
-</div>
+
 <!-- End of Page Wrapper -->
 
-<!-- Scroll to Top Button-->
-<a class="scroll-to-top rounded" href="#page-top">
-    <i class="fas fa-angle-up"></i>
-</a>
+
 
 <!-- workstart Modal -->
 <div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="orderModalLabel"

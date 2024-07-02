@@ -10,10 +10,12 @@
 </head>
 <body>
 
+<div style="display: flex; flex-direction: row">
+    <!-- 사이드바 영역 -->
+    <ul style="list-style-type : none; background-color: #ffffff" th:include="~{fragments/sidebar :: .sidebar}" ></ul>
+<div id="content">
 
-<div class="container mt-4">
 
-    <div th:include="~{fragments/sidebar :: .sidebar}"></div>
 
     <div class="row">
         <div class="col-3">
@@ -39,6 +41,7 @@
         <tbody>
         </tbody>
     </table>
+</div>
 </div>
 
 <!-- Modal -->

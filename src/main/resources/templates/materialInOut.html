@@ -41,30 +41,15 @@
     <!-- Page level custom scripts -->
     <script src="/js/demo/datatables-demo.js"></script>
 
-    <style>
-        footer {
-            background-color: #8D94C7;
-            color: black;
-            height: 80px; /* 푸터 높이 */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-    </style>
 
 
 </head>
 
-<body id="page-top">
+<div th:include="~{fragments/header :: .header}"></div>
 
-<!-- Page Wrapper -->
-<div id="wrapper">
-
-    <!-- Content Wrapper -->
-    <div id="content-wrapper" class="d-flex flex-column">
-        <!-- 사이드바 영역 -->
-        <div th:include="~{fragments/sidebar :: .sidebar}"></div>
-
+<div style="display: flex; flex-direction: row">
+    <!-- 사이드바 영역 -->
+    <ul style="list-style-type : none; background-color: #ffffff" th:include="~{fragments/sidebar :: .sidebar}" ></ul>
         <!-- Main Content -->
         <div id="content">
 
@@ -183,13 +168,8 @@
     </div>
     <!-- End of Content Wrapper -->
 
-</div>
 <!-- End of Page Wrapper -->
 
-<!-- Scroll to Top Button-->
-<a class="scroll-to-top rounded" href="#page-top">
-    <i class="fas fa-angle-up"></i>
-</a>
 
 <!-- 검색조건에 따라 입력창 띄우는 스크립트 -->
 <script>

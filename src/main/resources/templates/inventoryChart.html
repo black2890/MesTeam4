@@ -25,9 +25,15 @@
         }
     </style>
 </head>
+
+
 <body>
 <!-- 사이드바 영역 -->
-<div th:include="~{fragments/sidebar :: .sidebar}"></div>
+<div th:include="~{fragments/header :: .header}"></div>
+<div style="display: flex; flex-direction: row">
+    <!-- 사이드바 영역 -->
+    <ul style="list-style-type : none; background-color: #ffffff; width: 400px"
+        th:include="~{fragments/sidebar :: .sidebar}"></ul>
 <div class="chart-container">
     <canvas id="stockChart" width="400" height="200"></canvas>
     <table id="productTotals" class="product-totals">
@@ -39,6 +45,7 @@
         </thead>
         <tbody></tbody>
     </table>
+</div>
 </div>
 <script>
     fetch('/api/inventory/totalStock')

@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,6 +27,7 @@ public class Equipment {
     private String product;
 
     private Long productionCapacity;
+
     private String equipmentStatus;
     private LocalDateTime setupTime;
     private Long cycleHour;

@@ -73,13 +73,11 @@
 <body id="page-top">
 
 <!-- Page Wrapper -->
-<div id="wrapper">
+<div th:include="~{fragments/header :: .header}"></div>
 
-    <!-- Content Wrapper -->
-    <div id="content-wrapper" class="d-flex flex-column">
-
-        <!-- 사이드바 영역 -->
-        <div th:include="~{fragments/sidebar :: .sidebar}"></div>
+<div style="display: flex; flex-direction: row">
+    <!-- 사이드바 영역 -->
+    <ul style="list-style-type : none; background-color: #ffffff" th:include="~{fragments/sidebar :: .sidebar}" ></ul>
         <!-- Main Content -->
         <div id="content">
 
@@ -155,11 +153,11 @@
                                     <th>재고번호</th>
                                     <th>제품명</th>
                                     <th>수량</th>
-                                    <th>상태</th>
                                     <th>입고일</th>
                                     <th>입고자</th>
                                     <th>출고일</th>
                                     <th>출고자</th>
+                                    <th>상태</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -173,8 +171,13 @@
                                     <td th:text="${inventory.getStorageWorker()}"></td>
                                     <td th:text="${inventory.getRetrievalDate()}"></td>
                                     <td th:text="${inventory.getRetrievalWorker()}"></td>
-                                    <td th:text="${inventory.getInventoryStatus()}"></td>
 
+                                    <td th:if="${inventory.getInventoryStatus() == T(com.mesproject.constant.InventoryStatus).PENDINGSTORAGE}"
+                                        data-status="PENDINGSTORAGE">입고대기</td>
+                                    <td th:if="${inventory.getInventoryStatus() == T(com.mesproject.constant.InventoryStatus).STORAGECOMPLETED}"
+                                        data-status="STORAGECOMPLETED">입고완료</td>
+                                    <td th:if="${inventory.getInventoryStatus() == T(com.mesproject.constant.InventoryStatus).RETRIEVALCOMPLETED}"
+                                        data-status="RETRIEVALCOMPLETED">출고완료</td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -194,7 +197,7 @@
     </div>
     <!-- End of Content Wrapper -->
 
-</div>
+
 <!-- End of Page Wrapper -->
 
 <!-- Scroll to Top Button-->
@@ -209,7 +212,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="orderModalLabel">Create Order</h5>
+                <h5 class="modal-title" id="orderModalLabel">입고</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -441,11 +444,16 @@
             var inventoryId = $('.replyCheckbox:checked').first().val();
             var worker = $('#worker').val();
             var startDate = $('#startDate').val();
-            var status = $('.replyCheckbox:checked').first().closest('tr').find('td:eq(8)').text().trim();
+
+
+
+            var status = $('.replyCheckbox:checked').first().closest('tr').find('td[data-status]').data('status');
             if (status !== "PENDINGSTORAGE") {
-                alert("선택된 재고의 상태가 입고대기 상태가 아닙니다.");
+                alert("선택된 주문의 상태가 생산완료가 아닙니다.");
                 return; // 함수 실행을 중단합니다.
             }
+
+
 
 
             const work = {

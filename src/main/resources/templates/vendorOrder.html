@@ -68,14 +68,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
 
-<!-- Page Wrapper -->
-<div id="wrapper">
+<div th:include="~{fragments/header :: .header}"></div>
 
-    <!-- Content Wrapper -->
-    <div id="content-wrapper" class="d-flex flex-column">
+<div style="display: flex; flex-direction: row">
+    <!-- 사이드바 영역 -->
+    <ul style="list-style-type : none; background-color: #ffffff" th:include="~{fragments/sidebar :: .sidebar}" ></ul>
 
-        <!-- 사이드바 영역 -->
-        <div th:include="~{fragments/sidebar :: .sidebar}"></div>
         <!-- Main Content -->
         <div id="content">
 
@@ -197,7 +195,7 @@
     </div>
     <!-- End of Content Wrapper -->
 
-</div>
+
 <!-- End of Page Wrapper -->
 
 <!-- Scroll to Top Button-->

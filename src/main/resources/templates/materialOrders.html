@@ -57,14 +57,16 @@
 
 <body id="page-top">
 
-<!-- Page Wrapper -->
-<div id="wrapper">
 
-    <!-- Content Wrapper -->
-    <div id="content-wrapper" class="d-flex flex-column">
+<div th:include="~{fragments/header :: .header}"></div>
 
-        <!-- 사이드바 영역 -->
-        <div th:include="~{fragments/sidebar :: .sidebar}"></div>
+
+
+<div style="display: flex; flex-direction: row">
+    <!-- 사이드바 영역 -->
+    <ul style="list-style-type : none; background-color: #ffffff" th:include="~{fragments/sidebar :: .sidebar}" ></ul>
+
+
         <!-- Main Content -->
         <div id="content">
 
@@ -177,13 +179,8 @@
     </div>
     <!-- End of Content Wrapper -->
 
-</div>
-<!-- End of Page Wrapper -->
 
-<!-- Scroll to Top Button-->
-<a class="scroll-to-top rounded" href="#page-top">
-    <i class="fas fa-angle-up"></i>
-</a>
+
 
 
 <!-- workstart Modal -->
@@ -192,7 +189,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="orderModalLabel">Create Order</h5>
+                <h5 class="modal-title" id="orderModalLabel">자재 입고</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
