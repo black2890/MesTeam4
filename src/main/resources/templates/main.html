@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}">
+    <!-- Datatables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href='https://unpkg.com/fullcalendar@5.11.0/main.min.css' rel='stylesheet'/>
+    <style>
+
+    </style>
+</head>
+<body>
+<div class="container mt-4">
+    <!-- 상단 섹션 -->
+    <div class="top-section">
+        <!-- 캘린더 영역 -->
+        <div class="calendar-section">
+            <h2>캘린더</h2>
+            <div id='calendar'></div>
+        </div>
+
+        <!-- 월별 생산량 차트 영역 -->
+        <div class="chart-section">
+            <h2>월별 생산량</h2>
+            <canvas id="mainChart-1"></canvas>
+            <canvas id="mainChart-2"></canvas>
+        </div>
+    </div>
+
+    <!-- 공정 현황 영역 -->
+    <div class="progress-section">
+        <h2>현재 진행중인 공정 현황</h2>
+        <!-- 각 제품에 해당하는 작업 계획 리스트 마다 <H3> 태그 및 테이블 생성 -->
+        <div th:each="workPlanProgress : ${workPlanProgresses}" class="progressTable">
+            <h3 th:text="${workPlanProgress.getProductName()}"></h3>
+            <table>
+                <thead>
+                <tr>
+                    <th>공정</th>
+                    <th th:each="processProgress : ${workPlanProgress.getProcessProgressList()}" th:text="${processProgress.getProcessType()}"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>진행도</td>
+                    <td th:each="processProgress : ${workPlanProgress.processProgressList}">
+                        <div th:style="'width:' + ${processProgress.progress} + '%'" class="progress-bar" th:text="${processProgress.progress} + '%'"></div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Datatables JS -->
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<!-- Datatables Buttons JS -->
+<script src="https://cdn.datatables.net/buttons/2.0.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.print.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+<!-- Full Calendar-->
+<script src='https://unpkg.com/fullcalendar@5.11.0/main.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js'></script>
+<script type="text/javascript" src="/js/Chart.js"></script>
+<script type="text/javascript" src="/js/ChartPrac.js"></script>
+<script type="text/javascript" src="/js/Calendar.js"></script>
+
+
+</body>
+</html>

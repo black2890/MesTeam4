@@ -28,7 +28,7 @@ public class WorkOrders {
 
     @Enumerated(EnumType.STRING)
     private ProcessType processType;
-
+    private String workName;
     private LocalDateTime start;
     private LocalDateTime end;
     private Duration duration;
