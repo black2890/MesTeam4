@@ -1,6 +1,37 @@
+<<<<<<< Updated upstream:src/main/resources/templates/productChart.html
 <canvas id="productionChart" width="800" height="400"></canvas>
 
 <div th:include="~{fragments/sidebar :: .sidebar}"></div>
+=======
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>MES</title>
+
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+
+<div th:include="~{fragments/header :: .header}"></div>
+
+<div style="display: flex; flex-direction: row">
+    <!-- 사이드바 영역 -->
+    <ul style="list-style-type : none; background-color: #ffffff; width: 800px; height:800px"
+        th:include="~{fragments/sidebar :: .sidebar}"></ul>
+    <!-- Main Content -->
+    <canvas id="productionChart" width="500px"></canvas>
+    <!-- End of Main Content -->
+</div>
+
+<link rel="stylesheet" type="text/css" th:href="@{/styles.css}">
+>>>>>>> Stashed changes:build/resources/main/templates/productChart.html
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <!-- Chart.js CDN -->
@@ -37,7 +68,11 @@
         ],
         options: {
             maintainAspectRatio: false,
+<<<<<<< Updated upstream:src/main/resources/templates/productChart.html
             responsive: true,
+=======
+            responsive: false,
+>>>>>>> Stashed changes:build/resources/main/templates/productChart.html
             layout: {
                 padding: {
                     left: 20,
@@ -65,8 +100,13 @@
     };
 
     // AJAX로 데이터 가져오기
+<<<<<<< Updated upstream:src/main/resources/templates/productChart.html
     $.get('/api/production-data', function(data) {
         data.forEach(function(item) {
+=======
+    $.get('/api/production-data', function (data) {
+        data.forEach(function (item) {
+>>>>>>> Stashed changes:build/resources/main/templates/productChart.html
             chartData.labels.push(item.end);
             chartData.datasets[0].data.push(item.productName === '양배추 즙' ? item.totalQuantity : 0);
             chartData.datasets[1].data.push(item.productName === '흑마늘 즙' ? item.totalQuantity : 0);
@@ -78,7 +118,11 @@
             type: 'line',
             data: chartData,
             options: {
+<<<<<<< Updated upstream:src/main/resources/templates/productChart.html
                 responsive: true,
+=======
+                responsive: false,
+>>>>>>> Stashed changes:build/resources/main/templates/productChart.html
                 title: {
                     display: true,
                     text: '제품별 생산량'
@@ -105,5 +149,11 @@
         });
     });
 </script>
+<<<<<<< Updated upstream:src/main/resources/templates/productChart.html
+=======
+<!--<script type="text/javascript" src="/js/sideBar.js"></script>-->
+</body>
+</html>
+>>>>>>> Stashed changes:build/resources/main/templates/productChart.html
 
 

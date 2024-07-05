@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Chart.js Example with Product Totals</title>
+<<<<<<< Updated upstream:src/main/resources/templates/inventoryChart.html
     <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
+=======
+    <link rel="stylesheet" type="text/css" th:href="@{/styles.css}">
+>>>>>>> Stashed changes:build/resources/main/templates/inventoryChart.html
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .chart-container {
@@ -25,9 +29,21 @@
         }
     </style>
 </head>
+<<<<<<< Updated upstream:src/main/resources/templates/inventoryChart.html
 <body>
 <!-- 사이드바 영역 -->
 <div th:include="~{fragments/sidebar :: .sidebar}"></div>
+=======
+
+
+<body>
+<!-- 사이드바 영역 -->
+<div th:include="~{fragments/header :: .header}"></div>
+<div style="display: flex; flex-direction: row">
+    <!-- 사이드바 영역 -->
+    <ul style="list-style-type : none; background-color: #ffffff; width: 400px"
+        th:include="~{fragments/sidebar :: .sidebar}"></ul>
+>>>>>>> Stashed changes:build/resources/main/templates/inventoryChart.html
 <div class="chart-container">
     <canvas id="stockChart" width="400" height="200"></canvas>
     <table id="productTotals" class="product-totals">
@@ -40,6 +56,10 @@
         <tbody></tbody>
     </table>
 </div>
+<<<<<<< Updated upstream:src/main/resources/templates/inventoryChart.html
+=======
+</div>
+>>>>>>> Stashed changes:build/resources/main/templates/inventoryChart.html
 <script>
     fetch('/api/inventory/totalStock')
         .then(response => response.json())
@@ -102,5 +122,9 @@
             });
         });
 </script>
+<<<<<<< Updated upstream:src/main/resources/templates/inventoryChart.html
+=======
+<script type="text/javascript" src="/js/sideBar.js"></script>
+>>>>>>> Stashed changes:build/resources/main/templates/inventoryChart.html
 </body>
 </html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chart.js Example with Product Totals</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container {
+            width: 80%;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .product-totals {
+            margin-top: 20px;
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .product-totals th, .product-totals td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        .product-totals th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<!-- 사이드바 영역 -->
+<div th:include="~{fragments/header :: .header}"></div>
+
+<div style="display: flex; flex-direction: row">
+    <!-- 사이드바 영역 -->
+    <ul style="list-style-type : none; background-color: #ffffff; width: 400px"
+        th:include="~{fragments/sidebar :: .sidebar}"></ul>
+
+<div class="chart-container">
+    <canvas id="stockChart" width="400" height="200"></canvas>
+    <table id="productTotals" class="product-totals">
+        <thead>
+        <tr>
+            <th>제품명</th>
+            <th>총 재고량 (단위: BOX)</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+</div>
+
+<script>
+    fetch('/api/inventory/materialTotalStock')
+        .then(response => response.json())
+        .then(data => {
+            const labels = Object.keys(data);
+            const quantities = Object.values(data);
+
+            const backgroundColors = labels.map((_, i) => {
+                const colors = ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)', 'rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)', 'rgba(255, 159, 64, 0.2)'];
+                return colors[i % colors.length];
+            });
+
+            const borderColors = labels.map((_, i) => {
+                const colors = ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)'];
+                return colors[i % colors.length];
+            });
+
+            const ctx = document.getElementById('stockChart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Total Stock Quantity',
+                        data: quantities,
+                        backgroundColor: backgroundColors,
+                        borderColor: borderColors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    layout: {
+                        padding: {
+                            left: 50,
+                            right: 50,
+                            top: 50,
+                            bottom: 50
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            const productTotalsTbody = document.querySelector('#productTotals tbody');
+            labels.forEach((label, index) => {
+                const row = document.createElement('tr');
+                const cellProductName = document.createElement('td');
+                const cellQuantity = document.createElement('td');
+
+                cellProductName.innerText = label;
+                cellQuantity.innerText = quantities[index] + ' BOX';
+
+                row.appendChild(cellProductName);
+                row.appendChild(cellQuantity);
+                productTotalsTbody.appendChild(row);
+            });
+        });
+</script>
+<script type="text/javascript" src="/js/sideBar.js"></script>
+</body>
+</html>

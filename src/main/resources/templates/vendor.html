@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title></title>
+<<<<<<< Updated upstream:src/main/resources/templates/vendor.html
     <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
+=======
+    <link rel="stylesheet" type="text/css" th:href="@{/styles.css}">
+>>>>>>> Stashed changes:build/resources/main/templates/vendor.html
     <!-- Datatables CSS -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.css">
     <!-- Bootstrap CSS -->
@@ -76,6 +80,31 @@
     </div>
 </div>
 
+<<<<<<< Updated upstream:src/main/resources/templates/vendor.html
+=======
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Delete Vendor</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p><strong id="deleteVendorName"></strong>을(를) 삭제하시겠습니까?</p>
+                <form id="deleteForm">
+                    <input type="hidden" id="deleteVendorId" name="vendorId">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+>>>>>>> Stashed changes:build/resources/main/templates/vendor.html
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- Datatables JS -->
@@ -89,7 +118,11 @@
 <script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.print.min.js"></script>
 <script>
     $(document).ready(function () {
+<<<<<<< Updated upstream:src/main/resources/templates/vendor.html
         $('#example').DataTable({
+=======
+        var table = $('#example').DataTable({
+>>>>>>> Stashed changes:build/resources/main/templates/vendor.html
             "processing": true,
             "serverSide": true,
             "paging": true,
@@ -143,13 +176,50 @@
                 success: function(response) {
                     $('#vendorModal').modal('hide');
                     table.ajax.reload();
+<<<<<<< Updated upstream:src/main/resources/templates/vendor.html
+=======
+                    $('#vendorForm')[0].reset(); // 폼 초기화
+>>>>>>> Stashed changes:build/resources/main/templates/vendor.html
                 },
                 error: function(error) {
                     console.log(error);
                 }
             });
         });
+<<<<<<< Updated upstream:src/main/resources/templates/vendor.html
     });
+=======
+
+        $('#example tbody').on('click', 'tr', function () {
+            var data = table.row(this).data();
+            $('#deleteVendorId').val(data.vendorId);
+            $('#deleteVendorName').text(data.vendorName);
+            $('#deleteModal').modal('show');
+        });
+
+        $('#deleteForm').on('submit', function(e) {
+            e.preventDefault();
+            var vendorId = $('#deleteVendorId').val();
+            $.ajax({
+                url: '/delete-vendor',  // 서버에 데이터를 보낼 엔드포인트
+                type: 'POST',
+                data: { vendorId: vendorId },
+                success: function(response) {
+                    $('#deleteModal').modal('hide');
+                    table.ajax.reload();
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        });
+
+        $('#vendorModal').on('hidden.bs.modal', function () {
+            $(this).find('form')[0].reset();
+        });
+    });
+
+>>>>>>> Stashed changes:build/resources/main/templates/vendor.html
 </script>
 </body>
 </html>
