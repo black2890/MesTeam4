@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles.css}">
+    <!-- Datatables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Center the table */
+        div.dataTables_wrapper {
+            text-align: center;
+        }
+        table.dataTable {
+            margin: 0 auto;
+            width: 80%;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-4">
+
+    <!-- 사이드바 영역 -->
+    <div th:include="~{fragments/sidebar :: .sidebar}"></div>
+
+    <table id="example" class="display" style="width:100%">
+        <thead>
+        <tr>
+            <th>재고번호</th>
+            <th>제품명</th>
+            <th>수량</th>
+            <th>상태</th>
+            <th>생산완료일</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Datatables JS -->
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<!-- Datatables Buttons JS -->
+<script src="https://cdn.datatables.net/buttons/2.0.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.print.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#example').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "paging": true,
+            "pageLength": 10,
+            "searching": true,
+            "lengthChange": true,
+            "ordering": true,
+            "info": true,
+            "ajax": {
+                "url": "/inventoryData",
+                "type": "POST"
+            },
+            "columns": [
+                {"data": "inventoryId"},
+                {"data": "productName"},
+                {"data": "quantity"},
+                {
+                    "data": "inventoryStatus",
+                    "render": function (data, type, row, meta) {
+                        switch (data) {
+                            case 'PENDINGSTORAGE':
+                                return '입고대기';
+                            case 'STORAGECOMPLETED':
+                                return '입고완료';
+                            case 'RETRIEVALCOMPLETED':
+                                return '출고완료';
+                            default:
+                                return data;
+                        }
+                    }
+                },
+                 {"data": "completedDate"}
+            ],
+
+            "dom": '<"d-flex justify-content-between"lfB>tipr<"d-flex justify-content-between">',
+            buttons: [
+                {
+                    "extend": 'excelHtml5',
+                    "text": '엑셀 다운로드',
+                    "className": 'btn btn-outline-primary excelBtn',
+                    "title": '재고 데이터'
+                }
+            ]
+        });
+    });
+</script>
+</body>
+</html>

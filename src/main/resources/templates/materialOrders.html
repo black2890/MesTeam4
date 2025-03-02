@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>MES</title>
+
+    <link rel="stylesheet" type="text/css" th:href="@{/styles.css}">
+    <!-- Custom fonts for this template -->
+    <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+            href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+            rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="/css/sb-admin-2.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this page -->
+    <link href="/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="/vendor/jquery/jquery.min.js"></script>
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="/js/sb-admin-2.min.js"></script>
+
+    <!-- Page level plugins -->
+    <script src="/vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+    <!-- Page level custom scripts -->
+    <script src="/js/demo/datatables-demo.js"></script>
+
+    <style>
+        footer {
+            background-color: #8D94C7;
+            color: black;
+            height: 80px; /* 푸터 높이 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+
+
+</head>
+
+<body id="page-top">
+
+<!-- Page Wrapper -->
+<div id="wrapper">
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+        <!-- 사이드바 영역 -->
+        <div th:include="~{fragments/sidebar :: .sidebar}"></div>
+        <!-- Main Content -->
+        <div id="content">
+
+            <!-- 헤더 -->
+<!--            <div th:include="~{admin/fragments/adminHeader :: #header}"></div>-->
+
+
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+
+                <!-- DataTales Example -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">발주 현황</h6>
+                    </div>
+
+                    <!--검색 및 버튼-->
+                    <div class="card-body">
+                        <div class="form-inline">
+                            <ul class="mr-auto">
+                                <!--검색-->
+                                <select class="form-control" style="width: auto;" id="searchCondition">
+                                    <option value="deletetime">발주일</option>
+                                    <option value="content">제품명</option>
+                                    <option value="recovertime">납품일</option>
+                                    <option value="replycondition">상태</option>
+
+                                </select>
+                                <!-- 검색어 입력란 -->
+                                <input type="text" class="form-control" placeholder="검색어를 입력해주세요." id="searchKeyword">
+
+                                <!-- 시작 날짜 선택 -->
+                                <input type="date" class="form-control d-none" id="startTime">
+
+                                <!-- 끝 날짜 선택 -->
+                                <input type="date" class="form-control d-none" id="endTime">
+
+                                <!-- 삭제여부 선택 -->
+                                <div id="deleteCheckBox" class="form-check form-check-inline ml-2">
+                                    <label class="form-check-label p-2" style="margin-left: 10px" for="deleteCheckboxY">입고대기</label>
+                                    <input class="form-check-input" type="radio" name="deleteCheckbox" id="deleteCheckboxY" value="PENDINGSTORAGE">
+                                    <label class="form-check-label p-2" style="margin-left: 10px" for="deleteCheckboxN">입고완료</label>
+                                    <input class="form-check-input" type="radio" name="deleteCheckbox" id="deleteCheckboxN" value="STORAGECOMPLETED">
+                                </div>
+
+                                <!-- 검색 버튼 -->
+                                <button id="searchButton" type="submit" class="btn btn-primary">검색</button>
+
+                            </ul>
+
+                            <ul>
+
+
+                            </ul>
+
+
+                        </div>
+
+
+                        <button type="button" class="btn btn-primary mb-4 float-right" data-toggle="modal" data-target="#orderModal">
+                            입고
+                        </button>
+
+                        <button class="btn btn-warning btn-icon-split" style="padding: 5px" onclick="materialsIn()">일괄 입고</button>
+
+                        <div class="table-responsive">
+                            <table data-order='[[1, "desc"]]' class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                <tr>
+                                    <th>checkbox</th>
+                                    <th>발주번호</th>
+
+                                    <th>제품명</th>
+                                    <th>수량</th>
+                                    <th>발주일</th>
+                                    <th>납기일</th>
+                                    <th>상태</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <!-- Thymeleaf 반복문을 이용하여 데이터 출력 -->
+                                <tr th:each="material : ${materialOrders}">
+                                    <td><input class="replyCheckbox" type="checkbox" th:value="${material.materialOrderId}"/></td>
+                                    <td th:text="${material.getMaterialOrderId()}"></td>
+
+                                    <td th:text="${material.getProduct().getProductName()}"></td>
+                                    <td th:text="${material.getQuantity()}"></td>
+                                    <td th:text="${#temporals.format(material.getMaterialOrderDate(), 'yyyy-MM-dd')}"></td>
+                                    <td th:text="${#temporals.format(material.getDeliveryDate(), 'yyyy-MM-dd')}"></td>
+                                    <td th:if="${material.getMaterialOrdersStatus() == T(com.mesproject.constant.MaterialOrdersStatus).PENDINGSTORAGE}"
+                                        data-status="PENDINGSTORAGE">입고대기</td>
+                                    <td th:if="${material.getMaterialOrdersStatus() == T(com.mesproject.constant.MaterialOrdersStatus).STORAGECOMPLETED}"
+                                        data-status = "STORAGECOMPLETED">입고완료</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- /.container-fluid -->
+
+        </div>
+        <!-- End of Main Content -->
+
+        <!-- 푸터 -->
+<!--        <div th:include="~{fragments/footer :: #footer}"></div>-->
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+</div>
+<!-- End of Page Wrapper -->
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+</a>
+
+
+<!-- workstart Modal -->
+<div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="orderModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="orderModalLabel">Create Order</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="orderForm">
+                    <div class="form-group">
+                        <label for="worker">담당자</label>
+                        <select class="form-control" id="worker" name="worker" required>
+                            <option value="김길동">김길동</option>
+                            <option value="이길동">이길동</option>
+                            <option value="박길동">박길동</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="startDate">입고일시</label>
+                        <input type="datetime-local" class="form-control" id="startDate" name="startDate" required>
+                    </div>
+
+
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 검색조건에 따라 입력창 띄우는 스크립트 -->
+<script>
+    // 페이지 로드 시 실행
+    $(document).ready(function() {
+        // 검색 조건이 바뀔 때마다 이벤트 리스너 등록
+        $('#searchCondition').change(function() {
+            handleSearchConditionChange();
+        });
+
+        // 초기 실행
+        handleSearchConditionChange();
+    });
+
+    // 검색 조건에 따라 검색어 입력창과 날짜 선택창을 토글하는 함수
+    function handleSearchConditionChange() {
+        var searchCondition = $('#searchCondition').val();
+        if ( searchCondition === "deletetime" || searchCondition === "recovertime") {
+            // 날짜 선택창 표시
+            $('#startTime').removeClass('d-none');
+            $('#endTime').removeClass('d-none');
+            // 검색어 입력창 숨김
+            $('#searchKeyword').addClass('d-none');
+            $('#searchButton').removeClass('d-none');
+            // 삭제 여부 선택 숨김
+            $('#deleteCheckBox').addClass('d-none');
+        }else if (searchCondition === "replycondition") {
+            // 삭제 여부 선택 표시
+            $('#deleteCheckBox').removeClass('d-none');
+            // 검색어 입력창 숨김
+            $('#searchKeyword').addClass('d-none');
+            // 날짜 선택창 숨김
+            $('#startTime').addClass('d-none');
+            $('#endTime').addClass('d-none');
+            // 검색 버튼 표시
+            $('#searchButton').addClass('d-none');
+        }
+        else {
+            // 검색어 입력창 표시
+            $('#searchKeyword').removeClass('d-none');
+            // 날짜 선택창 숨김
+            $('#startTime').addClass('d-none');
+            $('#endTime').addClass('d-none');
+            // 삭제 여부 선택 숨김
+            $('#deleteCheckBox').addClass('d-none');
+            // 검색 버튼 표시
+            $('#searchButton').removeClass('d-none');
+        }
+    }
+</script>
+
+<!-- 검색에 따라 테이블을 띄워주는 스크립트 -->
+<script>
+    $(document).ready(function() {
+
+        $('input[name="deleteCheckbox"]').change(function() {
+            triggerSearch();
+        });
+        // 검색 버튼 클릭 이벤트 핸들러를 등록합니다.
+        $('#searchButton').click(function() {
+            triggerSearch();
+        });
+        $('#searchKeyword').keydown(function(event) {
+            if (event.keyCode === 13) { // Enter 키 코드는 13입니다.
+                triggerSearch();
+            }
+        });
+
+        function triggerSearch() {
+            var searchCondition = $('#searchCondition').val();
+            var searchKeyword = $('#searchKeyword').val();
+            var starttime = $('#startTime').val();
+            var endtime = $('#endTime').val();
+            var deleteCondition = $('input[name="deleteCheckbox"]:checked').val();
+
+            if ( searchCondition === "deletetime" || searchCondition === "recovertime") {
+                if (!starttime) {
+                    alert("시작날짜를 선택해주세요");
+                    return;
+                }
+            } else if(searchCondition === "replycondition"){
+                console.log(deleteCondition);
+            } else {
+                if (!searchKeyword) {
+                    alert("검색어를 입력하세요");
+                    return;
+                }
+            }
+
+            filterTable(searchCondition, searchKeyword, starttime, endtime, deleteCondition);
+        }
+    });
+
+    function filterTable(searchCondition, searchKeyword, starttime, endtime,deleteCondition) {
+        // AJAX를 사용하여 서버에 검색 요청을 보냅니다.
+        $.ajax({
+            url: '/material/search', // 검색을 처리하는 서버 엔드포인트 URL
+            type: 'GET',
+            data: { condition: searchCondition, keyword: searchKeyword, start: starttime, end: endtime, deleteCondition: deleteCondition },
+            success: function (data) {
+                // 검색 결과를 받아옵니다.
+                var searchData = data;
+
+                console.log(data);
+
+                // 기존 테이블을 삭제합니다.
+                $('.table-responsive').empty();
+
+                // 새로운 테이블을 만듭니다.
+                var newTable = $('<table data-order=\'\[\[1, "desc"\]\]\' class="table table-bordered">').attr('id', 'dataTable').attr('width', '100%').attr('cellspacing', '0');
+                var thead = $('<thead>').appendTo(newTable);
+                var tbody = $('<tbody>').appendTo(newTable);
+
+                // 테이블 헤더 생성
+                var headerRow = $('<tr>').appendTo(thead);
+                $('<th>').text('checkbox').appendTo(headerRow);
+                $('<th>').text('발주번호').appendTo(headerRow);
+
+                $('<th>').text('제품명').appendTo(headerRow);
+                $('<th>').text('수량').appendTo(headerRow);
+                $('<th>').text('발주일').appendTo(headerRow);
+                $('<th>').text('납기일').appendTo(headerRow);
+                $('<th>').text('상태').appendTo(headerRow);
+
+
+
+                // 데이터 출력
+                searchData.forEach(function (material) {
+                    var newRow = $('<tr>').appendTo(tbody);
+                    $('<td><input class="replyCheckbox" type="checkbox" th:value="${material.materialOrderId}"/>').appendTo(newRow);
+                    $('<td>').text(material.materialOrderId).appendTo(newRow);
+
+
+
+                    $('<td>').text(material.product.productName).appendTo(newRow);
+                    $('<td>').text(material.quantity).appendTo(newRow);
+
+                    if(material.materialOrderDate ==null){
+                        $('<td>').text("").appendTo(newRow);
+                    }else{
+                        $('<td>').text(formatDate(new Date(material.materialOrderDate))).appendTo(newRow);
+                    }
+                    if(material.deliveryDate ==null){
+                        $('<td>').text("").appendTo(newRow);
+                    }else{
+                        $('<td>').text(formatDate(new Date(material.deliveryDate))).appendTo(newRow);
+                    }
+
+
+                    if(material.materialOrdersStatus ==='PENDINGSTORAGE'){
+                        $('<td>').text("입고대기").appendTo(newRow);
+                    }else{
+                        $('<td>').text("입고완료").appendTo(newRow);
+                    }
+
+
+                });
+
+                tableResponsive = $('<div>').appendTo($('.table-responsive'));
+
+                // 테이블 생성한 것을 tableResponsive 안에 넣어준다
+                tableResponsive.append(newTable);
+
+                // 새로 생성된 테이블에 DataTables 초기화
+                newTable.DataTable({
+                    "dom": "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+                        "<'row'<'col-sm-12'tr>>" +
+                        "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+                    "renderer": 'bootstrap',
+                    "language": {
+                        "paginate": {
+                            "previous": "previous",
+                            "next": "next"
+                        }
+                    }
+                });
+            },
+            error: function (xhr, status, error) {
+                // 에러 처리
+                console.error(xhr);
+            }
+        });
+    }
+
+    // 날짜 포맷팅 함수
+    function formatDate(date) {
+        if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
+            return ''; // date가 null이거나 유효한 날짜가 아니면 빈 문자열 반환
+        }
+
+        var year = date.getFullYear();
+        var month = ('0' + (date.getMonth() + 1)).slice(-2); // 월은 0부터 시작하므로 +1
+        var day = ('0' + date.getDate()).slice(-2);
+        var hours = ('0' + date.getHours()).slice(-2);
+        var minutes = ('0' + date.getMinutes()).slice(-2);
+        var seconds = ('0' + date.getSeconds()).slice(-2);
+
+        // return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
+        return year + '-' + month + '-' + day;
+    }
+</script>
+
+<script>
+
+    $(document).ready(function() {
+
+
+        $('#orderForm').on('submit', function (e) {
+            e.preventDefault();
+
+            var materialOrderId = $('.replyCheckbox:checked').first().val();
+            var worker = $('#worker').val();
+            var startDate = $('#startDate').val();
+
+            var status = $('.replyCheckbox:checked').first().closest('tr').find('td[data-status]').data('status');
+            if (status !== "PENDINGSTORAGE") {
+                alert("선택된 자재의 상태가 입고대기 상태가 아닙니다.");
+                return; // 함수 실행을 중단합니다.
+            }
+
+
+            const work = {
+                materialOrderId: materialOrderId,
+                storageWorker: worker,
+                storageDate: startDate,
+
+            }
+
+            const url = "/material/in";
+            fetch(url, {
+                method: "POST", // PATCH 요청
+                headers: { // 전송 데이터 타입(JSON) 정보
+                    "Content-Type": "application/json"
+
+                },
+                body: JSON.stringify(work) //comment 객체를 JSON 문자열로 변환 전송
+            }).then(response => {
+                // HTTP 응답 코드에 따른 메시지 출력
+                const msg = (response.ok) ? "입고처리되었습니다." : "입고처리 실패했습니다.";
+                alert(msg);
+                // 현재 페이지 새로 고침
+                window.location.reload();
+            });
+
+        });
+    });
+
+</script>
+<script>
+    //일괄 시작
+    function materialsIn(){
+        // var token = $("meta[name='_csrf']").attr("content");
+        // var header = $("meta[name='_csrf_header']").attr("content");
+        const checkboxes = document.querySelectorAll('.replyCheckbox:checked');
+        if (checkboxes.length === 0) {
+            alert("입고할 자재를 선택해주세요.");
+            return;
+        }
+        let checked = true;
+        var rno_arr = [];
+        var url = "/materials/in";
+
+        console.log(checkboxes);
+
+
+        if (checked){
+            checkboxes.forEach(checkbox => {
+                const checkedId = checkbox.closest('tr').querySelector('td:nth-child(2)').innerText;
+                // var status = checkbox.closest('tr').find('td:eq(6)').text().trim();
+                var status = $('.replyCheckbox:checked').first().closest('tr').find('td[data-status]').data('status');
+                if (status !== "PENDINGSTORAGE") {
+                    alert("선택된 자재의 상태가 입고대기 상태가 아닙니다.");
+                    return; // 함수 실행을 중단합니다.
+                }
+
+                rno_arr.push(checkedId);
+
+                console.log(rno_arr);
+
+                // 선택된 댓글이 없는 경우 알림
+                if (rno_arr.length === 0) {
+                    alert("입고할 자재를 선택해주세요.");
+                    return;
+                }
+
+
+
+            })
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: JSON.stringify(rno_arr),
+                contentType: "application/json; charset-utf-8",
+                // beforeSend : function (xhr){
+                //     xhr.setRequestHeader(header, token);
+                // },
+                cache : false,
+                success : function (){
+                    alert("입고 처리 되었습니다.");
+                },
+                error : function (request, error){
+
+                        // alert("입고처리 오류");
+                    // alert("code: " + request.status + "\n message : " + request.responseText + "\n error : " + error);
+                    alert(error.message)
+
+                }
+            });
+            // alert("입고 처리 되었습니다.");
+            window.location.reload();
+        }
+    }
+</script>
+</body>
+
+</html>

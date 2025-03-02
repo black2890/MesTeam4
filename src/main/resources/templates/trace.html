@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" th:href="@{/styles.css}">
+</head>
+<body>
+
+
+<div class="container mt-4">
+
+    <div th:include="~{fragments/sidebar :: .sidebar}"></div>
+
+    <div class="row">
+        <div class="col-3">
+            <input type="text" id="orderIdInput" class="form-control" placeholder="수주번호를 입력하세요">
+        </div>
+        <div class="col-2">
+            <button class="btn btn-primary mt-2 btn-block" onclick="fetchOrderDetails()">Fetch Details</button>
+        </div>
+    </div>
+
+    <table id="orderDetailsTable" class="display mt-4">
+        <thead>
+        <tr>
+            <th>수주번호</th>
+            <th>재고번호</th>
+            <th>작업계획번호</th>
+            <th>작업지시번호</th>
+            <th>원자재발주번호</th>
+            <th>원자재입출고번호</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="relatedOrdersModal" tabindex="-1" role="dialog" aria-labelledby="relatedOrdersModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="relatedOrdersModalLabel">작업계획 수주정보</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table id="relatedOrdersTable" class="table">
+                    <thead>
+                    <tr>
+                        <th>수주번호</th>
+                        <th>고객명</th>
+                        <th>제품유형</th>
+                        <th>수량</th>
+                        <th>배달주소</th>
+                    </tr>
+                    </thead>
+                    <tbody id="relatedOrdersList">
+                    <!-- Dynamically populated rows go here -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    function fetchOrderDetails() {
+        const orderId = document.getElementById('orderIdInput').value;
+
+        $.ajax({
+            url: `/api/orders/details`,
+            data: {orderId: orderId},
+            success: function (data) {
+                const table = $('#orderDetailsTable').DataTable({
+                    destroy: true, // 기존 DataTable 인스턴스를 파괴하고 새로 생성합니다.
+                    data: data,
+                    columns: [
+                        {data: 'orderId'},
+                        {data: 'inventoryId'},
+                        {data: 'workPlanId'},
+                        {data: 'workOrderId'},
+                        {data: 'materialOrderId'},
+                        {data: 'inoutId'},
+                        {
+                            data: null,
+                            defaultContent: '<button class="btn btn-info" onclick="showRelatedOrders(this)">Show Related Orders</button>'
+                        }
+                    ],
+                    dom: 't',
+                    info: false
+                });
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        $('#orderDetailsTable').DataTable({
+            dom: 't',
+            info: false
+        });
+    });
+
+    function showRelatedOrders(button) {
+        const table = $('#orderDetailsTable').DataTable();
+        const data = table.row($(button).parents('tr')).data();
+        const workPlanId = data.workPlanId;
+
+        $.ajax({
+            url: `/api/orders/related`,
+            data: { workPlanId: workPlanId },
+            success: function(data) {
+                console.log('Received data:', data)
+
+                $('#relatedOrdersList').empty();
+                data.forEach(order => {
+
+                    const rowHtml = `
+                <tr>
+                    <td>${order.orderId}</td>
+                    <td>${order.vendorName}</td>
+                    <td>${order.productName}</td>
+                    <td>${order.quantity}</td>
+                    <td>${order.deliveryAddress}</td>
+                </tr>`;
+                    $('#relatedOrdersList').append(rowHtml);
+                });
+                $('#relatedOrdersModal').modal('show');
+            },
+        });
+    }
+
+</script>
+<script type="text/javascript" src="/js/sideBar.js"></script>
+</body>
+</html>

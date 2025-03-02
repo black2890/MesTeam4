@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Orders Management</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles.css}">
+    <!-- Datatables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FullCalendar CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css" rel="stylesheet">
+    <style>
+        /* Center the table */
+        div.dataTables_wrapper {
+            text-align: center;
+        }
+
+        table.dataTable {
+            margin: 0 auto;
+            width: 80%;
+        }
+        .fc-day-disabled {
+            background-color: #f0f0f0 !important;
+            cursor: not-allowed;
+        }
+    </style>
+
+
+    <!-- ===============================================-->
+    <!--    Favicons-->
+    <!-- ===============================================-->
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/img/favicons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicons/favicon-16x16.png">
+    <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicons/favicon.ico">
+    <link rel="manifest" href="assets/img/favicons/manifest.json">
+    <meta name="msapplication-TileImage" content="assets/img/favicons/mstile-150x150.png">
+    <meta name="theme-color" content="#ffffff">
+    <script src="vendors/simplebar/simplebar.min.js"></script>
+    <script src="assets/js/config.js"></script>
+
+
+    <!-- ===============================================-->
+    <!--    Stylesheets-->
+    <!-- ===============================================-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&amp;display=swap" rel="stylesheet">
+    <link href="vendors/simplebar/simplebar.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
+    <link href="assets/css/theme-rtl.min.css" type="text/css" rel="stylesheet" id="style-rtl">
+    <link href="assets/css/theme.min.css" type="text/css" rel="stylesheet" id="style-default">
+    <link href="assets/css/user-rtl.min.css" type="text/css" rel="stylesheet" id="user-style-rtl">
+    <link href="assets/css/user.min.css" type="text/css" rel="stylesheet" id="user-style-default">
+    <script>
+        var phoenixIsRTL = window.config.config.phoenixIsRTL;
+        if (phoenixIsRTL) {
+            var linkDefault = document.getElementById('style-default');
+            var userLinkDefault = document.getElementById('user-style-default');
+            linkDefault.setAttribute('disabled', true);
+            userLinkDefault.setAttribute('disabled', true);
+            document.querySelector('html').setAttribute('dir', 'rtl');
+        } else {
+            var linkRTL = document.getElementById('style-rtl');
+            var userLinkRTL = document.getElementById('user-style-rtl');
+            linkRTL.setAttribute('disabled', true);
+            userLinkRTL.setAttribute('disabled', true);
+        }
+    </script>
+    <link href="vendors/leaflet/leaflet.css" rel="stylesheet">
+    <link href="vendors/leaflet.markercluster/MarkerCluster.css" rel="stylesheet">
+    <link href="vendors/leaflet.markercluster/MarkerCluster.Default.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Datatables JS -->
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<!-- FullCalendar JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
+<!-- Datatables Buttons JS -->
+<script src="https://cdn.datatables.net/buttons/2.0.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.print.min.js"></script>
+
+<script src='https://unpkg.com/fullcalendar@5.11.0/main.min.js'></script>
+<script src='https://unpkg.com/axios/dist/axios.min.js'></script>
+<!-- 사이드바 영역 -->
+<div th:include="~{fragments/sidebar2 :: .main}"></div>
+<div class="container mt-4">
+
+    <button type="button" class="btn btn-primary mb-4 float-right" data-toggle="modal" data-target="#orderModal">
+        수주 등록
+    </button>
+    <!-- 버튼 -->
+    <button type="button" class="btn btn-primary mb-4 float-right" data-toggle="modal" data-target="#orderModal2">
+        일괄 등록
+    </button>
+
+
+
+    <table id="example" class="display" style="width:100%">
+        <thead>
+        <tr>
+            <th>주문번호</th>
+            <th>제품명</th>
+            <th>고객명</th>
+            <th>수량</th>
+            <th>납품주소</th>
+            <th>납품일</th>
+            <th>상태</th>
+            <th><input type="checkbox" name="checkall" id="checkall"></th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <div style="margin-top:5px;" >
+        <button type="button" id="shipButton" class="btn btn-success float-right">출하</button>
+        <button type="button" id="deliverButton" class="btn btn-info float-right" style="margin-right: 10px;">배송완료</button>
+    </div>
+</div>
+
+<!-- Order Modal -->
+<div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="orderModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="orderModalLabel">Create Order</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="orderForm">
+                    <div class="form-group">
+                        <label for="productName">Product</label>
+                        <select class="form-control" id="productName" name="productName" required>
+                            <option value="양배추 즙">양배추 즙</option>
+                            <option value="흑마늘 즙">흑마늘 즙</option>
+                            <option value="석류 젤리스틱">석류 젤리스틱</option>
+                            <option value="매실 젤리스틱">매실 젤리스틱</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="quantity">Quantity(Box)</label>
+                        <input type="number" class="form-control" id="quantity" name="quantity" min="20" max="1000" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="available">납품 가능일</label>
+                        <input type="text" class="form-control" id="available" name="available" min="20" max="1000" readonly>
+
+                    </div>
+                    <div class="form-group">
+                        <label for="vendorName">Vendor</label>
+                        <select class="form-control" id="vendorName" name="vendorName" required>
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="deliveryDate">Delivery Date</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="deliveryDate" name="deliveryDate" readonly
+                                   required>
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-outline-secondary" id="selectDeliveryDate">Select
+                                    Date
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="deliveryAddress">Delivery Address</label>
+                        <input type="text" class="form-control" id="deliveryAddress" name="deliveryAddress" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FullCalendar Modal -->
+<div class="modal fade" id="calendarModal" tabindex="-1" role="dialog" aria-labelledby="calendarModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document" style="max-width:800px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="calendarModalLabel">Select Delivery Date</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="calendar"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 엑셀 모달 -->
+<div class="modal fade" id="orderModal2" tabindex="-1" role="dialog" aria-labelledby="orderModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="orderModalLabel2">Excel File Upload</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="uploadForm">
+                    <div class="form-group">
+                        <label for="fileInput">Select Excel File</label>
+                        <input type="file" class="form-control-file" id="fileInput" accept=".xlsx" />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </form>
+                <div class="mt-3">
+                    <a href="/orderexample.xlsx" class="btn btn-secondary" download>Download Excel Template</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        var table = $('#example').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "paging": true,
+            "pageLength": 10,
+            "searching": true,
+            "lengthChange": true,
+            "ordering": true,
+            "info": true,
+            "ajax": {
+                "url": "/orderData",
+                "type": "POST",
+            },
+            "columns": [
+                {"data": "orderId"},
+                {"data": "productName"},
+                {"data": "vendorName"},
+                {"data": "quantity"},
+                {"data": "deliveryAddress"},
+                {"data": "deliveryDate"},
+                {
+                    "data": "ordersStatus",
+                    "render": function (data) {
+                        switch (data) {
+                            case 'PENDINGSTORAGE':
+                                return '원자재 입고전';
+                            case 'STORAGECOMPLETED':
+                                return '원자재 입고완료';
+                            case 'PRODUCTIONCOMPLETED':
+                                return '생산완료';
+                            case 'RETRIEVALCOMPLETED':
+                                return '출하완료';
+                            case 'DELIVERED':
+                                return '배송완료';
+                            default:
+                                return data;
+                        }
+                    }
+                },
+                {"data": null},
+            ],
+            columnDefs: [
+                {
+                    targets: 7,
+                    orderable: false,
+                    className: "select-checkbox",
+                    render: function () {
+                        return '<input type="checkbox" name="id[]" value="">';
+                    }
+                }
+            ],
+            select: {
+                style: "multi",
+                selector: "td:first-child"
+            },
+            "dom": '<"d-flex justify-content-between"lfB>tipr<"d-flex justify-content-between">',
+            buttons: [
+                {
+                    "extend": 'excelHtml5',
+                    "text": '엑셀 다운로드',
+                    "className": 'btn btn-outline-primary excelBtn',
+                    "title": '수주 데이터'
+                }
+            ]
+        });
+
+        // 예상 납품 날짜를 가져오는 함수
+        function getEstimatedDate(productName, quantity) {
+            $.ajax({
+                url: '/get-estimated-date',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ productName: productName, quantity: quantity }),
+                success: function(response) {
+                    $('#available').val(response.estimatedDate);
+                    $('#selectDeliveryDate').prop('disabled', false);
+                },
+                error: function(error) {
+                    console.error("Error fetching estimated date: ", error);
+                    $('#selectDeliveryDate').prop('disabled', true);
+                }
+            });
+        }
+
+        // 제품명 또는 수량이 변경될 때 예상 납품 날짜를 요청
+        $('#productName, #quantity').on('change', function () {
+            var productName = $('#productName').val();
+            var quantity = $('#quantity').val();
+
+            // 두 값이 모두 존재할 때만 요청
+            if (productName && quantity) {
+                getEstimatedDate(productName, quantity);
+            } else {
+                // 하나라도 값이 없으면 예상 납품일을 초기화하고 배송일자 선택 버튼 비활성화
+                $('#available').val('');
+                $('#selectDeliveryDate').prop('disabled', true);
+            }
+        });
+
+
+        $('#example tbody').on('click', 'input[type="checkbox"]', function () {
+            var data = table.row($(this).closest('tr')).data();
+
+        });
+
+        function updateOrderStatus(status) {
+
+            var selectedData = [];
+            $('#example tbody input[type="checkbox"]:checked').each(function () {
+                var data = table.row($(this).closest('tr')).data();
+                selectedData.push(data);
+            });
+
+            var orderIds = selectedData.map(function (item) {
+                return item.orderId;
+            });
+
+            if (orderIds.length > 0) {
+                $.ajax({
+                    url: '/updateOrderStatus',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ orderIds: orderIds, status: status }),
+                    success: function () {
+                        table.ajax.reload();
+                    },
+                    error: function (error) {
+                        console.error("Error updating order status: ", error);
+                    }
+                });
+            } else {
+                alert(" 최소한 하나 이상의 데이터 행을 체크해주세요. ");
+            }
+        }
+
+        $('#checkall').on('click', function(){
+            var rows = table.rows({ 'search': 'applied' }).nodes();
+            $('input[type="checkbox"]', rows).prop('checked', this.checked);
+        });
+
+        // Handle click on individual checkbox to maintain state of "select-all" checkbox
+        $('#example tbody').on('change', 'input[type="checkbox"]', function(){
+            if(!this.checked){
+                var el = $('#checkall').get(0);
+                if(el && el.checked && ('indeterminate' in el)){
+                    el.indeterminate = true;
+                }
+            }
+        });
+
+        $('#shipButton').on('click', function () {
+            var canShip = true;
+            $('#example tbody input[type="checkbox"]:checked').each(function () {
+                var data = table.row($(this).closest('tr')).data();
+                if (data.ordersStatus !== 'PRODUCTIONCOMPLETED') {
+                    canShip = false;
+                    return false;
+                }
+            });
+
+            if (canShip) {
+                updateOrderStatus('RETRIEVALCOMPLETED');
+                alert("출하가 완료되었습니다.");
+            } else {
+                alert("출하 버튼은 상태가 (생산완료)인 경우에만 사용할 수 있습니다.");
+            }
+        });
+
+        $('#deliverButton').on('click', function () {
+            var canDeliver = true;
+            $('#example tbody input[type="checkbox"]:checked').each(function () {
+                var data = table.row($(this).closest('tr')).data();
+                console.log('Order data:', data);
+                if (data.ordersStatus !== 'RETRIEVALCOMPLETED') {
+                    canDeliver = false;
+                    return false;
+                }
+            });
+
+            if (canDeliver) {
+                updateOrderStatus('DELIVERED');
+                alert("배송이 완료되었습니다.");
+            } else {
+                alert("배송완료 버튼은 상태가 (출하완료)인 경우에만 사용할 수 있습니다.");
+            }
+        });
+
+
+        function populateSelects() {
+            $.ajax({
+                url: '/get-vendors',
+                type: 'GET',
+                success: function (data) {
+                    $('#vendorName').empty();
+                    $('#vendorName').append('<option value="">Select Vendor</option>');
+                    data.forEach(customer => {
+                        $('#vendorName').append(`<option value="${customer.vendorName}">${customer.vendorName}</option>`);
+                    });
+                },
+                error: function (error) {
+                    console.error("Error fetching customers: ", error);
+                }
+            });
+        }
+
+        populateSelects();
+
+        $('#selectDeliveryDate').on('click', function () {
+            var estimatedDate = $('#available').val();
+
+            // 예상 납품일이 없으면 클릭을 막음
+            if (!estimatedDate) {
+                alert('제품명과 수량을 먼저 입력하여 예상 납품일을 확인해주세요.');
+                return false; // 클릭 이벤트 중지
+            }
+
+            $('#calendarModal').modal('show');
+        });
+
+        $('#selectDeliveryDate').prop('disabled', true);
+
+        $('#calendar').fullCalendar({
+            selectable: true,
+            select: function(startDate) {
+                var availableDate = $('#available').val();
+                var selectedDate = startDate.format('YYYY-MM-DD');
+
+                // 비활성화 로직: 납품 가능일 이전의 날짜는 선택할 수 없도록 설정
+                if (moment(selectedDate).isBefore(availableDate, 'day')) {
+                    alert('납품 가능일 이전의 날짜는 선택할 수 없습니다.');
+                    return false;
+                }
+                $('#deliveryDate').val(startDate.format('YYYY-MM-DD'));
+                $('#calendarModal').modal('hide');
+            },
+            selectAllow: function(selectInfo) {
+                var availableDate = $('#available').val();
+                var selectedDate = selectInfo.start.format('YYYY-MM-DD');
+
+                // 납품 가능일 이전의 날짜는 선택할 수 없도록 설정
+                if (moment(selectedDate).isBefore(availableDate, 'day')) {
+                    return false;
+                }
+
+                return true;
+            },
+            dayRender: function(date, cell) {
+                var availableDate = $('#available').val();
+                var formattedDate = date.format('YYYY-MM-DD');
+
+                // 납품 가능일 이전의 날짜를 회색으로 표시
+                if (moment(formattedDate).isBefore(availableDate, 'day')) {
+                    cell.addClass('fc-day-disabled');
+                }
+            }
+        });
+
+        $('#orderForm').on('submit', function (e) {
+            e.preventDefault();
+
+            var formData = $(this).serialize();
+            var productName = $('#productName').val();
+            var quantity = $('#quantity').val();
+            var vendorName = $('#vendorName').val();
+            var deliveryDate = $('#deliveryDate').val();
+            var deliveryAddress = $('#deliveryAddress').val();
+
+            var confirmationMessage = `제품명: ${productName}\n`;
+            confirmationMessage += `수량: ${quantity}\n`;
+            confirmationMessage += `고객명: ${vendorName}\n`;
+            confirmationMessage += `납품일자: ${deliveryDate}\n`;
+            confirmationMessage += `납품주소: ${deliveryAddress}\n\n`;
+            confirmationMessage += `위 수주내용을 등록하시겠습니까?`;
+
+            if (confirm(confirmationMessage)) {
+                $.ajax({
+                    url: '/create-order',
+                    type: 'POST',
+                    data: formData,
+                    success: function (response) {
+                        $('#orderModal').find('form')[0].reset();
+                        $('#orderModal').modal('hide');
+
+                        table.ajax.reload();
+                        // 모달 창의 입력 필드를 초기화
+                        $('#orderForm')[0].reset();
+                    },
+                    error: function (error) {
+                        console.error("Error creating order: ", error);
+                    }
+                });
+            } else {
+                return false;
+            }
+        });
+
+
+    });
+</script>
+
+<script src="upload.js"></script>
+
+</body>
+</html>
